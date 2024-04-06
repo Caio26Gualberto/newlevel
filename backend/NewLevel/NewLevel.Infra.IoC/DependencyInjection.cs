@@ -22,7 +22,7 @@ namespace NewLevel.Infra.IoC
                     .AddEntityFrameworkStores<NewLevelDbContext>()
                     .AddDefaultTokenProviders();
 
-            var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("SecretKey")!);
+            var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("jwtkey")!);
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

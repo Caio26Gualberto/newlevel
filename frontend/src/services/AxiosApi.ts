@@ -14,7 +14,7 @@ export class ApiClient {
 
     private async refreshToken() {
         try {
-            const response = await axios.post(`${this.baseUrl}/auth`, this.authObject);
+            const response = await axios.post(`${this.baseUrl}/newLevel/Authenticate/RenewToken`, this.authObject);
             this.token = response.data.token;
         } catch (error: any) {
             throw new Error('Error refreshing token: ' + error.message);
@@ -69,3 +69,7 @@ export class ApiClient {
         return await this.request<T>('get', url, undefined, config);
     }
 }
+
+export const baseUrlApiLocal = "https://localhost:7258"
+export const baseUrlReactLocal = "http://localhost:3000"
+export const baseUrlProd = ""

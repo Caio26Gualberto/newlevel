@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NewLevel.Domain.Account;
 using NewLevel.Infra.Data.Context;
@@ -30,15 +31,12 @@ namespace NewLevel.Infra.Data.Identity
             {
                 var user = await _signInManager.UserManager.FindByEmailAsync(email);
                 var tokenString = GenerateJwtToken(user);
-                var refreshToken = string.Empty;
+                var refreshToken = GenerateRefreshToken();
+                DateTime expirationDate = DateTime.UtcNow.AddMinutes(3);
 
-                if (!user.RefreshToken.Any())
-                {
-                    refreshToken = GenerateRefreshToken();
-                    user.Update(refreshToken);
-                    _newLevelDbContext.Users.Update(user);
-                    await _newLevelDbContext.SaveChangesAsync();
-                }
+                user.Update(refreshToken,expirationDate);
+                _newLevelDbContext.Users.Update(user);
+                await _newLevelDbContext.SaveChangesAsync();
 
                 return (tokenString, refreshToken);
             }
@@ -67,10 +65,10 @@ namespace NewLevel.Infra.Data.Identity
             await _signInManager.SignOutAsync();
         }
 
-        private string GenerateJwtToken(IdentityUser user)
+        private string GenerateJwtToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes("e9314d36ab7170d3d8a0c40971c96987915e27a4648c20e04184348d7c637c55d0f136de5e85a7c9f1cc314ebdebb17784e93c79a462dbf96bd711e6f7b7b94f");
+            var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("jwtkey")!);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -94,6 +92,52 @@ namespace NewLevel.Infra.Data.Identity
                 rng.GetBytes(randomNumber);
                 return Convert.ToBase64String(randomNumber);
             }
+        }
+
+        public async Task<(string, string)> RenewToken(string expiredToken)
+        {
+            if (string.IsNullOrEmpty(expiredToken))
+            {
+                throw new ArgumentNullException(nameof(expiredToken), "O token expirado não pode ser nulo ou vazio.");
+            }
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.ReadToken(expiredToken) as JwtSecurityToken;
+
+            if (token == null)
+            {
+                throw new ArgumentException("O token expirado é inválido.");
+            }
+
+            var userIdClaim = token.Claims.FirstOrDefault(c => c.Type == "userId");
+            if (userIdClaim == null)
+            {
+                throw new ArgumentException("O token expirado não contém a reivindicação 'userId'.");
+            }
+
+            var userId = userIdClaim.Value;
+            var user = await _newLevelDbContext.Users.FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (user != null)
+            {
+                if (user.TokenExpiresIn < DateTime.UtcNow)
+                {
+                    return (string.Empty, string.Empty);
+                }
+
+                var accessToken = GenerateJwtToken(user);
+                var refreshToken = GenerateRefreshToken();
+                DateTime expirationDate = DateTime.UtcNow.AddMinutes(3);
+
+                user.Update(refreshToken, expirationDate);
+                _newLevelDbContext.Users.Update(user);
+                await _newLevelDbContext.SaveChangesAsync();
+
+
+                return (accessToken, refreshToken);
+            }
+
+            return (string.Empty, string.Empty);
         }
     }
 }

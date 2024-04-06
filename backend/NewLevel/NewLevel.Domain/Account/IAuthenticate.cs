@@ -5,5 +5,6 @@
         Task<(string, string)> Authenticate(string email, string password);
         Task<bool> RegisterUser(string email, string password);
         Task Logout();
+        Task<(string, string)> RenewToken(string token);
     }
 }
