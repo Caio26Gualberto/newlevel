@@ -3,6 +3,7 @@ import Login from '../views/loginAndRegister/Login';
 import Register from '../views/loginAndRegister/Register';
 
 const Rotas = () => {
+  
   return (
     <Router>
       <Switch>

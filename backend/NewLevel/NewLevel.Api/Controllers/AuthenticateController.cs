@@ -18,10 +18,10 @@ namespace NewLevel.Api.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginAndRegisterInputDto input)
         {
-            //var (token, refresToken) = await _authenticate.Authenticate(input.Email, input.Password);
+            var (token, refresToken) = await _authenticate.Authenticate(input.Email, input.Password);
 
-            //if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(refresToken))
-            //    return Ok(new { Token = token, RefreshToken = refresToken });
+            if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(refresToken))
+                return Ok(new { Token = token, RefreshToken = refresToken });
 
             return Unauthorized();
         }

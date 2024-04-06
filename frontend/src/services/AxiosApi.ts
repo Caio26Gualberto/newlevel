@@ -1,23 +1,31 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { redirect } from 'react-router-dom';
 
 export class ApiClient {
     private baseUrl: string;
     private token: string | null = null;
-    private authObject: any;
 
-    constructor(baseUrl: string, authObject: any) {
+    constructor(baseUrl: string) {
         if (baseUrl === '') throw new Error('Base URL is empty');
         this.baseUrl = baseUrl;
-        this.authObject = authObject;
+        // this.authObject = authObject;
         this.token = window.localStorage.getItem('Authorization')
     }
 
     private async refreshToken() {
         try {
-            const response = await axios.post(`${this.baseUrl}/newLevel/Authenticate/RenewToken`, this.authObject);
+            const response = await axios.get(`${this.baseUrl}/Authenticate/RenewToken?accessToken=${this.token}`);
             this.token = response.data.token;
         } catch (error: any) {
-            throw new Error('Error refreshing token: ' + error.message);
+            const statusCodeToRefreshToken = [401, 403];
+                if (error.response && statusCodeToRefreshToken.includes(error.response.status)) {
+                    // Redirecionar para a página de login
+                    window.location.href = `${baseUrlReactLocal}/login`
+                    return
+                } else {
+                    // Tratar outros erros aqui
+                    throw error;
+                }
         }
     }
 
@@ -30,6 +38,8 @@ export class ApiClient {
         const headers: any = {
             'Content-Type': 'application/json',
         };
+
+        debugger
 
         if (this.token) {
             headers['Authorization'] = `Bearer ${this.token}`;
@@ -70,6 +80,6 @@ export class ApiClient {
     }
 }
 
-export const baseUrlApiLocal = "https://localhost:7258"
+export const baseUrlApiLocal = "https://localhost:7258/api"
 export const baseUrlReactLocal = "http://localhost:3000"
 export const baseUrlProd = ""
