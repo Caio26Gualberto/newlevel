@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewLevel.Infra.Data.Context;
 
@@ -11,9 +12,11 @@ using NewLevel.Infra.Data.Context;
 namespace NewLevel.Infra.Data.Migrations
 {
     [DbContext(typeof(NewLevelDbContext))]
-    partial class NewLevelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240406065811_AddRefreshTokenColumnToAspNetUsers")]
+    partial class AddRefreshTokenColumnToAspNetUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using NewLevel.Domain.Account;
-using NewLevel.Infra.Data.Dtos;
+using NewLevel.Infra.Data.Context;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -13,28 +13,37 @@ namespace NewLevel.Infra.Data.Identity
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly NewLevelDbContext _newLevelDbContext;
 
-        public AuthenticateService(UserManager<User> userManager, SignInManager<User> signInManager)
+        public AuthenticateService(UserManager<User> userManager, SignInManager<User> signInManager, NewLevelDbContext newLevelDbContext)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _newLevelDbContext = newLevelDbContext;
         }
 
-        public async Task<TokensDto> Authenticate(string email, string password)
+        public async Task<(string, string)> Authenticate(string email, string password)
         {
             var result = await _signInManager.PasswordSignInAsync(email, password, false, lockoutOnFailure: false);
-            
+
             if (result.Succeeded)
             {
                 var user = await _signInManager.UserManager.FindByEmailAsync(email);
                 var tokenString = GenerateJwtToken(user);
-                var refreshToken = GenerateRefreshToken();
+                var refreshToken = string.Empty;
 
-                user.
-                return tokenString;
+                if (!user.RefreshToken.Any())
+                {
+                    refreshToken = GenerateRefreshToken();
+                    user.Update(refreshToken);
+                    _newLevelDbContext.Users.Update(user);
+                    await _newLevelDbContext.SaveChangesAsync();
+                }
+
+                return (tokenString, refreshToken);
             }
 
-            return String.Empty;
+            return (string.Empty, string.Empty);
         }
 
         public async Task<bool> RegisterUser(string email, string password)
