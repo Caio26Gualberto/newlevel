@@ -5,7 +5,7 @@ const Rotas = () => {
   return (
     <Router>
       <Switch>
-        <Route path="/" element={<Login/>} />
+        <Route path="/login" element={<Login/>} />
       </Switch>
     </Router>
   )
