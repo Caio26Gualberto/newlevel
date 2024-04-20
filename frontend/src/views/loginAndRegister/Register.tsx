@@ -1,14 +1,16 @@
-import axios from 'axios'
-import { ApiClient, baseUrlApiLocal } from '../../services/axiosApi'
+import { get, post } from "../../services/api/httpService"
+
 
 const Register = () => {
-    const axiosInstance = new ApiClient(baseUrlApiLocal)
 
     const login = async () => {
         try {
             debugger
-            
-            const result = await axiosInstance.post<{ token: string, refreshToken: string }>(`/Authenticate/login`, userLogin)
+            const userLogin = {
+                email: "caio.gualberto",
+                password: "Franco1004@"
+            }
+            const result = await post<{ token: string, refreshToken: string }>(`/Authenticate/login`, userLogin)
             window.localStorage.setItem('Authorization', result.token)
             window.localStorage.setItem('RefreshToken', result.refreshToken)
         } catch (error) {
@@ -20,10 +22,10 @@ const Register = () => {
         try {
             debugger
             const userLogin = {
-                email: "caio.gualberto",
-                password: "Franco1004@"
+                email: "",
+                password: ""
             }
-            const result = await axiosInstance.get<{ token: string, refreshToken: string }>(`/Authenticate/logout`)
+            const result = await get<{ token: string, refreshToken: string }>(`/Authenticate/logout`)
         } catch (error) {
 
         }

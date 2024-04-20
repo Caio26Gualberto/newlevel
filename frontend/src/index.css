@@ -1,15 +1,17 @@
+@font-face {
+  font-family: 'RiotFont';
+  src: url('./assets/font/familiesImport/FontFont_FF.Mark.Pro.Black.otf')format('opentype');
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'RiotFont', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: 'RiotFont', Arial, sans-serif;
 }
 
 .image-with-opacity {
