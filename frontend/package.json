@@ -25,7 +25,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "generate-api": "if exist gen rmdir /s /q gen && openapi-generator-cli generate -i http://localhost:5105/swagger/v1/swagger.json --generator-name typescript-fetch -o gen/api --config api.json && if exist node_modules\\generate-api rmdir /s /q node_modules\\generate-api && npm install generate-api"
   },
   "eslintConfig": {
     "extends": [

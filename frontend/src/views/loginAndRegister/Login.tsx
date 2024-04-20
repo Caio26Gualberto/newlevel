@@ -30,7 +30,7 @@ const Login = () => {
   const login = async () => {
     try {
       debugger
-      const result = await post<{ token: string, refreshToken: string }>(`/Authenticate/login`, formLogin)
+      const result = await post<>(`/Authenticate/login`, formLogin)
       window.localStorage.setItem('Authorization', result.token)
       window.localStorage.setItem('RefreshToken', result.refreshToken)
     } catch (error) {

@@ -1,0 +1,7 @@
+{
+    "npmName": "generate-api",
+    "typescriptThreePlus": true,
+    "snapshot": false,
+    "supportsES6": true,
+    "modelPropertyNaming": "camelCase"
+}

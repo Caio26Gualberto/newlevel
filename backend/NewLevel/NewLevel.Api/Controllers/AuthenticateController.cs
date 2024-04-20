@@ -30,7 +30,7 @@ namespace NewLevel.Api.Controllers
         public async Task<IActionResult> Register(LoginAndRegisterInputDto input)
         {
             var result = await _authenticate.RegisterUser(input.Email, input.Password);
-            return View();
+            return Ok();
         }
 
         [Authorize]
