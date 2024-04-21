@@ -1,6 +1,6 @@
 import { Box, Button, Input, Modal, Typography } from "@mui/material"
+import { AuthenticateApi } from "../../gen/api/src";
 import { useState } from "react";
-import { post } from "../../services/api/httpService";
 
 const style = {
   transform: 'translate(-50%, -50%)',
@@ -15,8 +15,7 @@ interface IFormLogin {
 const Login = () => {
 
   const [formLogin, setFormLogin] = useState<IFormLogin>({
-    login: '',
-    password: '',
+
   });
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,9 +29,11 @@ const Login = () => {
   const login = async () => {
     try {
       debugger
-      const result = await post<>(`/Authenticate/login`, formLogin)
-      window.localStorage.setItem('Authorization', result.token)
-      window.localStorage.setItem('RefreshToken', result.refreshToken)
+      const api = new AuthenticateApi()
+      const result = await api.apiAuthenticateLoginPost({loginAndRegisterInputDto: {email: formLogin.login, password: formLogin.password}})
+      window.localStorage.setItem('Authorization', result.token!)
+      window.localStorage.setItem('RefreshToken', result.refreshToken!)
+      var caio = 10
     } catch (error) {
 
     }

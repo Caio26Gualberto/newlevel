@@ -1,6 +1,6 @@
 {
   "name": "generate-api",
-  "version": "1.0",
+  "version": "v1",
   "description": "OpenAPI client for generate-api",
   "author": "OpenAPI-Generator",
   "repository": {

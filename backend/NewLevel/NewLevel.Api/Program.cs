@@ -44,6 +44,13 @@ builder.Services.AddSwaggerGen(options =>
             new List<string>()
         }
     });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "NewLevel", Version = "v1" });
+
+    // Definir o baseUrl na especificação OpenAPI
+    options.SwaggerGeneratorOptions.Servers = new List<OpenApiServer>
+        {
+            new OpenApiServer { Url = "https://localhost:7258" } // Defina o baseUrl aqui
+        };
 });
 
 var app = builder.Build();
@@ -51,11 +58,11 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    app.UseSwagger(c => { c.RouteTemplate = "swagger/{documentName}/swagger.json"; });
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-        options.RoutePrefix = string.Empty;
+        options.SwaggerEndpoint("https://localhost:7258/swagger/v1/swagger.json", "New Level API v1");
+        options.RoutePrefix = "https://localhost:7258";
     });
 }
 

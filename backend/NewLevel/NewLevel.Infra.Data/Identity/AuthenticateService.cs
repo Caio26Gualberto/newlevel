@@ -23,7 +23,7 @@ namespace NewLevel.Infra.Data.Identity
             _newLevelDbContext = newLevelDbContext;
         }
 
-        public async Task<(string, string)> Authenticate(string email, string password)
+        public async Task<TokenDto> Authenticate(string email, string password)
         {
             var result = await _signInManager.PasswordSignInAsync(email, password, false, lockoutOnFailure: false);
 
@@ -38,7 +38,7 @@ namespace NewLevel.Infra.Data.Identity
                 _newLevelDbContext.Users.Update(user);
                 await _newLevelDbContext.SaveChangesAsync();
 
-                return (tokenString, refreshToken);
+                return new { Token = tokenString, RefreshToken = refreshToken};
             }
 
             return (string.Empty, string.Empty);
