@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using NewLevel.Domain.Account;
 using NewLevel.Infra.Data.Context;
+using NewLevel.Shared.Dtos;
+using NewLevel.Shared.Interfaces.Account;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -23,7 +24,7 @@ namespace NewLevel.Infra.Data.Identity
             _newLevelDbContext = newLevelDbContext;
         }
 
-        public async Task<TokenDto> Authenticate(string email, string password)
+        public async Task<TokensDto> Authenticate(string email, string password)
         {
             var result = await _signInManager.PasswordSignInAsync(email, password, false, lockoutOnFailure: false);
 
@@ -32,16 +33,16 @@ namespace NewLevel.Infra.Data.Identity
                 var user = await _signInManager.UserManager.FindByEmailAsync(email);
                 var tokenString = GenerateJwtToken(user);
                 var refreshToken = GenerateRefreshToken();
-                DateTime expirationDate = DateTime.UtcNow.AddMinutes(3);
+                DateTime expirationDate = DateTime.UtcNow.AddHours(-3).AddMinutes(3);
 
                 user.Update(refreshToken,expirationDate);
                 _newLevelDbContext.Users.Update(user);
                 await _newLevelDbContext.SaveChangesAsync();
 
-                return new { Token = tokenString, RefreshToken = refreshToken};
+                return new TokensDto {Token = tokenString, RefreshToken = refreshToken };
             }
 
-            return (string.Empty, string.Empty);
+            return new TokensDto();
         }
 
         public async Task<bool> RegisterUser(string email, string password)
@@ -76,7 +77,7 @@ namespace NewLevel.Infra.Data.Identity
                 {
                     new Claim("userId", user.Id)
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(2),
+                Expires = DateTime.UtcNow.AddSeconds(20),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -127,7 +128,8 @@ namespace NewLevel.Infra.Data.Identity
 
                 var accessToken = GenerateJwtToken(user);
                 var refreshToken = GenerateRefreshToken();
-                DateTime expirationDate = DateTime.UtcNow.AddMinutes(3);
+                                DateTime expirationDate = DateTime.UtcNow.AddHours(-3).AddMinutes(3);
+
 
                 user.Update(refreshToken, expirationDate);
                 _newLevelDbContext.Users.Update(user);

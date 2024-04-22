@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NewLevel.Domain\NewLevel.Domain.csproj" />
+    <ProjectReference Include="..\NewLevel.Shared\NewLevel.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

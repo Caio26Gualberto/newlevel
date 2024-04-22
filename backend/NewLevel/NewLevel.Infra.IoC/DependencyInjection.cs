@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using NewLevel.Domain.Account;
 using NewLevel.Infra.Data.Context;
 using NewLevel.Infra.Data.Identity;
+using NewLevel.Shared.Interfaces.Account;
 using System.Text;
 
 namespace NewLevel.Infra.IoC
@@ -33,6 +33,8 @@ namespace NewLevel.Infra.IoC
                 options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
+                    ClockSkew = TimeSpan.Zero,
+                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,

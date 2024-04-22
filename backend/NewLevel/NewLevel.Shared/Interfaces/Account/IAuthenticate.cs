@@ -1,8 +1,10 @@
-﻿namespace NewLevel.Domain.Account
+﻿using NewLevel.Shared.Dtos;
+
+namespace NewLevel.Shared.Interfaces.Account
 {
     public interface IAuthenticate
     {
-        Task<TokenDto> Authenticate(string email, string password);
+        Task<TokensDto> Authenticate(string email, string password);
         Task<bool> RegisterUser(string email, string password);
         Task Logout();
         Task<(string, string)> RenewToken(string token);

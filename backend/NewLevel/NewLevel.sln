@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewLevel.Infra.Data", "NewL
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewLevel.Api", "NewLevel.Api\NewLevel.Api.csproj", "{EEE5402B-9634-4400-9644-1F2FF7358BCF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewLevel.Shared", "NewLevel.Shared\NewLevel.Shared.csproj", "{7B037797-AFBE-4FF7-A885-9CBA0EDEB269}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{EEE5402B-9634-4400-9644-1F2FF7358BCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEE5402B-9634-4400-9644-1F2FF7358BCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEE5402B-9634-4400-9644-1F2FF7358BCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B037797-AFBE-4FF7-A885-9CBA0EDEB269}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B037797-AFBE-4FF7-A885-9CBA0EDEB269}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B037797-AFBE-4FF7-A885-9CBA0EDEB269}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B037797-AFBE-4FF7-A885-9CBA0EDEB269}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

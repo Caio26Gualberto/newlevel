@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NewLevel.Api.Dtos;
-using NewLevel.Domain.Account;
+using NewLevel.Shared.Dtos;
+using NewLevel.Shared.Interfaces.Account;
 
 namespace NewLevel.Api.Controllers
 {
@@ -16,7 +17,7 @@ namespace NewLevel.Api.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<TokensDto> Login(LoginAndRegisterInputDto input)
+        public async Task<TokensDto?> Login(LoginAndRegisterInputDto input)
         {
             TokensDto tokens = await _authenticate.Authenticate(input.Email, input.Password);
 

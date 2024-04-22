@@ -1,4 +1,4 @@
-﻿namespace NewLevel.Api.Dtos
+﻿namespace NewLevel.Shared.Dtos
 {
     public class TokensDto
     {
