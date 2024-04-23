@@ -33,7 +33,7 @@ namespace NewLevel.Infra.Data.Identity
                 var user = await _signInManager.UserManager.FindByEmailAsync(email);
                 var tokenString = GenerateJwtToken(user);
                 var refreshToken = GenerateRefreshToken();
-                DateTime expirationDate = DateTime.UtcNow.AddHours(-3).AddMinutes(3);
+                DateTime expirationDate = DateTime.UtcNow.AddHours(-3).AddMinutes(5);
 
                 user.Update(refreshToken,expirationDate);
                 _newLevelDbContext.Users.Update(user);
@@ -77,7 +77,7 @@ namespace NewLevel.Infra.Data.Identity
                 {
                     new Claim("userId", user.Id)
                 }),
-                Expires = DateTime.UtcNow.AddSeconds(20),
+                Expires = DateTime.UtcNow.AddMinutes(3),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
@@ -95,7 +95,7 @@ namespace NewLevel.Infra.Data.Identity
             }
         }
 
-        public async Task<(string, string)> RenewToken(string expiredToken)
+        public async Task<TokensDto> RenewToken(string expiredToken)
         {
             if (string.IsNullOrEmpty(expiredToken))
             {
@@ -121,25 +121,28 @@ namespace NewLevel.Infra.Data.Identity
 
             if (user != null)
             {
-                if (user.TokenExpiresIn < DateTime.UtcNow)
+                if (user.TokenExpiresIn < DateTime.UtcNow.AddHours(-3))
                 {
-                    return (string.Empty, string.Empty);
+                    return new TokensDto();
                 }
 
                 var accessToken = GenerateJwtToken(user);
                 var refreshToken = GenerateRefreshToken();
-                                DateTime expirationDate = DateTime.UtcNow.AddHours(-3).AddMinutes(3);
+                DateTime expirationDate = DateTime.UtcNow.AddHours(-3).AddMinutes(5);
 
 
                 user.Update(refreshToken, expirationDate);
                 _newLevelDbContext.Users.Update(user);
                 await _newLevelDbContext.SaveChangesAsync();
 
-
-                return (accessToken, refreshToken);
+                return new TokensDto 
+                {
+                    Token = accessToken,
+                    RefreshToken = refreshToken
+                };
             }
 
-            return (string.Empty, string.Empty);
+            return new TokensDto();
         }
     }
 }

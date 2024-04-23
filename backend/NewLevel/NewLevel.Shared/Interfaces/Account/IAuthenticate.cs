@@ -7,6 +7,6 @@ namespace NewLevel.Shared.Interfaces.Account
         Task<TokensDto> Authenticate(string email, string password);
         Task<bool> RegisterUser(string email, string password);
         Task Logout();
-        Task<(string, string)> RenewToken(string token);
+        Task<TokensDto> RenewToken(string token);
     }
 }

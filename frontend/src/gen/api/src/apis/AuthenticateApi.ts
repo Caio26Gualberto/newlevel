@@ -81,7 +81,7 @@ export class AuthenticateApi extends runtime.BaseAPI {
      */
     async apiAuthenticateLogoutGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
-
+debugger
         const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && this.configuration.accessToken) {
@@ -144,7 +144,7 @@ export class AuthenticateApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiAuthenticateRenewTokenGetRaw(requestParameters: ApiAuthenticateRenewTokenGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiAuthenticateRenewTokenGetRaw(requestParameters: ApiAuthenticateRenewTokenGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TokensDto>> {
         const queryParameters: any = {};
 
         if (requestParameters['accessToken'] != null) {
@@ -168,13 +168,14 @@ export class AuthenticateApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => TokensDtoFromJSON(jsonValue));
     }
 
     /**
      */
-    async apiAuthenticateRenewTokenGet(requestParameters: ApiAuthenticateRenewTokenGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiAuthenticateRenewTokenGetRaw(requestParameters, initOverrides);
+    async apiAuthenticateRenewTokenGet(requestParameters: ApiAuthenticateRenewTokenGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TokensDto> {
+        const response = await this.apiAuthenticateRenewTokenGetRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

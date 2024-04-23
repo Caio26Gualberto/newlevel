@@ -42,14 +42,14 @@ namespace NewLevel.Api.Controllers
         }
 
         [HttpGet("RenewToken")]
-        public async Task<IActionResult> RenewToken([FromQuery] string accessToken)
+        public async Task<TokensDto?> RenewToken([FromQuery] string accessToken)
         {
-            var (token, refresToken) = await _authenticate.RenewToken(accessToken);
+            TokensDto tokens = await _authenticate.RenewToken(accessToken);
 
-            if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(refresToken))
-                return Ok(new { Token = token, RefreshToken = refresToken });
+            if (!string.IsNullOrEmpty(tokens.Token) && !string.IsNullOrEmpty(tokens.RefreshToken))
+                return tokens;
 
-            return Unauthorized();
+            return null;
         }
     }
 }
