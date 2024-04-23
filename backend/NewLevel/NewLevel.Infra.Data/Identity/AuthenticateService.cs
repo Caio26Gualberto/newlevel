@@ -77,7 +77,7 @@ namespace NewLevel.Infra.Data.Identity
                 {
                     new Claim("userId", user.Id)
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(3),
+                Expires = DateTime.UtcNow.AddSeconds(30),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 

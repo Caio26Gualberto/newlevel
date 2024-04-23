@@ -81,7 +81,6 @@ export class AuthenticateApi extends runtime.BaseAPI {
      */
     async apiAuthenticateLogoutGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
-debugger
         const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && this.configuration.accessToken) {

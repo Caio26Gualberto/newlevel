@@ -15,37 +15,25 @@ interface IFormLogin {
 
 const Login = () => {
 
-  // const [formLogin, setFormLogin] = useState<IFormLogin>({
+  const [formLogin, setFormLogin] = useState<IFormLogin>({
+    login: '',
+    password: ''
+  });
 
-  // });
+  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormLogin({ ...formLogin, login: e.target.value });
+  };
 
-  // const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setFormLogin({ ...formLogin, login: e.target.value });
-  // };
-
-  // const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setFormLogin({ ...formLogin, password: e.target.value });
-  // };
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormLogin({ ...formLogin, password: e.target.value });
+  };
 
   const login = async () => {
     try {
       const api = new AuthenticateApi(ApiConfiguration)
-      const result = await api.apiAuthenticateLoginPost()
-      debugger
+      const result = await api.apiAuthenticateLoginPost({loginAndRegisterInputDto: {email: formLogin.login, password: formLogin.password}})
       window.localStorage.setItem('accessToken', result.token!)
       window.localStorage.setItem('refreshToken', result.refreshToken!)
-      var caio = 10
-    } catch (error) {
-
-    }
-  }
-
-  const logout = async () => {
-    try {
-      const api = new AuthenticateApi(ApiConfiguration)
-      const result = await api.apiAuthenticateLogoutGet()
-      debugger
-      var caio = 10
     } catch (error) {
 
     }
@@ -65,12 +53,11 @@ const Login = () => {
             <Typography color="white" fontSize={15}>Entre com a sua conta</Typography>
           </Box>
           <Box display="flex" flexDirection="column" alignItems="center">
-            {/* <Input value={formLogin.login} onChange={handleLoginChange} placeholder="Login" sx={{ color: "white" }}></Input>
-            <Input value={formLogin.password} onChange={handlePasswordChange} placeholder="Password" sx={{ color: "white" }}></Input> */}
+            <Input value={formLogin.login} onChange={handleLoginChange} placeholder="Login" sx={{ color: "white" }}></Input>
+            <Input value={formLogin.password} onChange={handlePasswordChange} placeholder="Password" sx={{ color: "white" }}></Input>
           </Box>
           <Box display="flex" mt={1}>
             <Button onClick={login} sx={{ color: "white" }}>Entrar</Button>
-            <Button onClick={logout} sx={{ color: "white" }}>Sair</Button>
           </Box>
         </Box>
       </Modal>

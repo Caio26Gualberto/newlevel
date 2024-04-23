@@ -5,7 +5,6 @@ const Register = () => {
 
     const login = async () => {
         try {
-            debugger
             const userLogin = {
                 email: "",
                 password: ""
@@ -18,26 +17,12 @@ const Register = () => {
         }
     }
 
-    const logout = async () => {
-        try {
-            debugger
-            const userLogin = {
-                email: "",
-                password: ""
-            }
-            const result = await get<{ token: string, refreshToken: string }>(`/Authenticate/logout`)
-        } catch (error) {
-
-        }
-    }
-
     return (
         <>
             <div>
                 <button onClick={login}>Caio Registro</button>
             </div>
             <div>
-                <button onClick={logout}>Caio Logout</button>
             </div>
         </>
     )
