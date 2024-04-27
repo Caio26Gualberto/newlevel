@@ -1,6 +1,5 @@
 import { Box, Button, Typography } from '@mui/material'
 import CelticFrost from '../../assets/Celtif_Frost.jpg'
-import React from 'react'
 
 const Apresentation = () => {
     return (

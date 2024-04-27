@@ -35,7 +35,7 @@ namespace NewLevel.Infra.Data.Identity
                 var refreshToken = GenerateRefreshToken();
                 DateTime expirationDate = DateTime.UtcNow.AddHours(-3).AddMinutes(5);
 
-                user.Update(refreshToken,expirationDate);
+                user.Update(refreshToken,expirationDate, isFirstTimeLogin: null);
                 _newLevelDbContext.Users.Update(user);
                 await _newLevelDbContext.SaveChangesAsync();
 
@@ -131,7 +131,7 @@ namespace NewLevel.Infra.Data.Identity
                 DateTime expirationDate = DateTime.UtcNow.AddHours(-3).AddMinutes(5);
 
 
-                user.Update(refreshToken, expirationDate);
+                user.Update(refreshToken, expirationDate, isFirstTimeLogin: null);
                 _newLevelDbContext.Users.Update(user);
                 await _newLevelDbContext.SaveChangesAsync();
 

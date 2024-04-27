@@ -1,4 +1,5 @@
 using Microsoft.OpenApi.Models;
+using NewLevel.Api.Middleware;
 using NewLevel.Infra.IoC;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -71,6 +72,7 @@ app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<JWTMiddleware>();
 
 app.MapControllers();
 

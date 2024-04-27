@@ -4,9 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using NewLevel.Application.Service;
 using NewLevel.Infra.Data.Context;
 using NewLevel.Infra.Data.Identity;
+using NewLevel.Infra.Data.Interfaces.Repositories;
+using NewLevel.Infra.Data.Repositories;
 using NewLevel.Shared.Interfaces.Account;
+using NewLevel.Shared.Interfaces.User;
+using NewLevel.Shared.Service;
 using System.Text;
 
 namespace NewLevel.Infra.IoC
@@ -43,8 +48,9 @@ namespace NewLevel.Infra.IoC
             });
 
             services.AddScoped<IAuthenticate, AuthenticateService>();
-
-            services.ConfigureApplicationCookie(options => options.AccessDeniedPath = "/Account/Login");
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<UserIdInterceptor>();
 
             return services;
         }

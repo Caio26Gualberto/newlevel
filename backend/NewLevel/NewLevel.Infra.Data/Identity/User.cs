@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using NewLevel.Domain.Validation;
+using NewLevel.Shared.Entities;
 
 namespace NewLevel.Infra.Data.Identity
 {
@@ -7,27 +8,32 @@ namespace NewLevel.Infra.Data.Identity
     {
         public User()
         {
-            
+
         }
-        public User(string refreshToken, DateTime expirationTimeToken)
+        public User(RefreshToken? refreshToken, DateTime expirationTimeToken, bool isFirstTimeLogin)
         {
-            ValidateDomainEntity(refreshToken, expirationTimeToken);
+            ValidateDomainEntity(refreshToken, expirationTimeToken, isFirstTimeLogin);
         }
-        public string RefreshToken { get; private set; }
         public DateTime TokenExpiresIn { get; private set; }
+        public bool IsFirstTimeLogin { get; private set; } = true;
+        public RefreshToken RefreshToken { get; set; }
+        public int RefreshTokenId { get; set; }
 
-        public void Update(string refreshToken, DateTime expirationTimeToken)
+        public void Update(RefreshToken? refreshToken, DateTime expirationTimeToken, bool? isFirstTimeLogin)
         {
-            ValidateDomainEntity(refreshToken, expirationTimeToken);
+            ValidateDomainEntity(refreshToken, expirationTimeToken, isFirstTimeLogin);
         }
 
-        private void ValidateDomainEntity(string refreshToken, DateTime expirationTimeToken)
+        private void ValidateDomainEntity(RefreshToken? refreshToken, DateTime expirationTimeToken, bool? isFirstTimeLogin)
         {
-            DomainExceptionValidation.When(string.IsNullOrEmpty(refreshToken), "Refreshtoken vazio!");
+            DomainExceptionValidation.When(refreshToken != null, "Refreshtoken vazio!");
             DomainExceptionValidation.When(expirationTimeToken < DateTime.Now, "Data de expiração para o token inválido!");
 
-            RefreshToken = refreshToken;
+            RefreshToken = refreshToken!;
             TokenExpiresIn = expirationTimeToken;
+
+            if (isFirstTimeLogin.HasValue)
+                IsFirstTimeLogin = isFirstTimeLogin.Value;
         }
     }
 }

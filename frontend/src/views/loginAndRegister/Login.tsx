@@ -34,6 +34,7 @@ const Login = () => {
       const result = await api.apiAuthenticateLoginPost({loginAndRegisterInputDto: {email: formLogin.login, password: formLogin.password}})
       window.localStorage.setItem('accessToken', result.token!)
       window.localStorage.setItem('refreshToken', result.refreshToken!)
+      window.location.href = "http://localhost:3000/welcome"
     } catch (error) {
 
     }
