@@ -40,6 +40,15 @@ const Login = () => {
     }
   }
 
+  const logout = async () => {
+    try {
+      const api = new AuthenticateApi(ApiConfiguration)
+      const result = await api.apiAuthenticateLogoutGet()
+    } catch (error) {
+      
+    }
+  }
+
   return (
     <>
       <Modal
@@ -59,6 +68,7 @@ const Login = () => {
           </Box>
           <Box display="flex" mt={1}>
             <Button onClick={login} sx={{ color: "white" }}>Entrar</Button>
+            <Button onClick={logout} sx={{ color: "white" }}>Sair</Button>
           </Box>
         </Box>
       </Modal>

@@ -34,7 +34,8 @@ export interface ApiAuthenticateRegisterPostRequest {
 }
 
 export interface ApiAuthenticateRenewTokenGetRequest {
-    accessToken?: string;
+    userId?: string;
+    refreshToken?: string;
 }
 
 /**
@@ -81,6 +82,7 @@ export class AuthenticateApi extends runtime.BaseAPI {
      */
     async apiAuthenticateLogoutGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && this.configuration.accessToken) {
@@ -146,8 +148,12 @@ export class AuthenticateApi extends runtime.BaseAPI {
     async apiAuthenticateRenewTokenGetRaw(requestParameters: ApiAuthenticateRenewTokenGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TokensDto>> {
         const queryParameters: any = {};
 
-        if (requestParameters['accessToken'] != null) {
-            queryParameters['accessToken'] = requestParameters['accessToken'];
+        if (requestParameters['userId'] != null) {
+            queryParameters['userId'] = requestParameters['userId'];
+        }
+
+        if (requestParameters['refreshToken'] != null) {
+            queryParameters['refreshToken'] = requestParameters['refreshToken'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

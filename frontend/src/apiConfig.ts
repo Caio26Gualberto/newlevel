@@ -3,7 +3,7 @@ import { Configuration, ResponseContext } from "./gen/api/src";
 let originalRequest: ResponseContext | null
 
 const ApiConfiguration = new Configuration({
-    basePath: "https://localhost:7258",
+    basePath: "https://localhost:7082",
 
     accessToken: async (name, scopes) => {
         const accessToken = window.localStorage.getItem('accessToken');
@@ -24,12 +24,12 @@ const ApiConfiguration = new Configuration({
                 let contentType = context.response.headers.get('content-type');
             
                 if (context.response.status == 401 || context.response.status == 403) {
-                    const response = await fetch(`https://localhost:7258/api/Authenticate/RenewToken?accessToken=${window.localStorage.getItem('accessToken')}`);
-            
+                    const response = await fetch(`https://localhost:7082/api/Authenticate/RenewToken?accessToken=${window.localStorage.getItem('accessToken')}`);
+                    debugger
                     if (response.ok) {
                         const newTokens = await response.json();
                         if (newTokens.token && newTokens.refreshToken) {
-                            window.localStorage.setItem('accessToken', newTokens.accessToken);
+                            window.localStorage.setItem('accessToken', newTokens.token);
                             window.localStorage.setItem('refreshToken', newTokens.refreshToken);
                             const newRequest = new Request(originalRequest.url, {
                                 method: originalRequest.init.method,

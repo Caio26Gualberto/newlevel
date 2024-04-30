@@ -28,19 +28,19 @@ namespace NewLevel.Infra.Data.Identity
         {
             var result = await _signInManager.PasswordSignInAsync(email, password, false, lockoutOnFailure: false);
 
-            if (result.Succeeded)
-            {
-                var user = await _signInManager.UserManager.FindByEmailAsync(email);
-                var tokenString = GenerateJwtToken(user);
-                var refreshToken = GenerateRefreshToken();
-                DateTime expirationDate = DateTime.UtcNow.AddHours(-3).AddMinutes(5);
+            //if (result.Succeeded)
+            //{
+            //    var user = await _signInManager.UserManager.FindByEmailAsync(email);
+            //    var tokenString = GenerateJwtToken(user);
+            //    var refreshToken = GenerateRefreshToken();
+            //    DateTime expirationDate = DateTime.UtcNow.AddHours(-3).AddMinutes(5);
 
-                user.Update(refreshToken,expirationDate, isFirstTimeLogin: null);
-                _newLevelDbContext.Users.Update(user);
-                await _newLevelDbContext.SaveChangesAsync();
+            //    user.Update(refreshToken,expirationDate, isFirstTimeLogin: null);
+            //    _newLevelDbContext.Users.Update(user);
+            //    await _newLevelDbContext.SaveChangesAsync();
 
-                return new TokensDto {Token = tokenString, RefreshToken = refreshToken };
-            }
+            //    return new TokensDto {Token = tokenString, RefreshToken = refreshToken };
+            //}
 
             return new TokensDto();
         }
@@ -119,28 +119,28 @@ namespace NewLevel.Infra.Data.Identity
             var userId = userIdClaim.Value;
             var user = await _newLevelDbContext.Users.FirstOrDefaultAsync(x => x.Id == userId);
 
-            if (user != null)
-            {
-                if (user.TokenExpiresIn < DateTime.UtcNow.AddHours(-3))
-                {
-                    return new TokensDto();
-                }
+            //if (user != null)
+            //{
+            //    if (user.TokenExpiresIn < DateTime.UtcNow.AddHours(-3))
+            //    {
+            //        return new TokensDto();
+            //    }
 
-                var accessToken = GenerateJwtToken(user);
-                var refreshToken = GenerateRefreshToken();
-                DateTime expirationDate = DateTime.UtcNow.AddHours(-3).AddMinutes(5);
+            //    var accessToken = GenerateJwtToken(user);
+            //    var refreshToken = GenerateRefreshToken();
+            //    DateTime expirationDate = DateTime.UtcNow.AddHours(-3).AddMinutes(5);
 
 
-                user.Update(refreshToken, expirationDate, isFirstTimeLogin: null);
-                _newLevelDbContext.Users.Update(user);
-                await _newLevelDbContext.SaveChangesAsync();
+            //    user.Update(refreshToken, expirationDate, isFirstTimeLogin: null);
+            //    _newLevelDbContext.Users.Update(user);
+            //    await _newLevelDbContext.SaveChangesAsync();
 
-                return new TokensDto 
-                {
-                    Token = accessToken,
-                    RefreshToken = refreshToken
-                };
-            }
+            //    return new TokensDto 
+            //    {
+            //        Token = accessToken,
+            //        RefreshToken = refreshToken
+            //    };
+            //}
 
             return new TokensDto();
         }
