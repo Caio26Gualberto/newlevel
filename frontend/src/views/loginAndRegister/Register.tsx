@@ -6,8 +6,8 @@ const Register = () => {
     const login = async () => {
         try {
             const userLogin = {
-                email: "caio.gualberto",
-                password: "Franco1004@"
+                email: "",
+                password: ""
             }
             const result = await post<{ token: string, refreshToken: string }>(`/Authenticate/login`, userLogin)
             window.localStorage.setItem('Authorization', result.token)

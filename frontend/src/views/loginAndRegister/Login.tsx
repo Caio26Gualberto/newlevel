@@ -1,7 +1,8 @@
-import { Box, Button, Input, Modal, Typography } from "@mui/material"
+import { Alert, Box, Button, Input, Modal, Typography } from "@mui/material"
 import { AuthenticateApi } from "../../gen/api/src";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import ApiConfiguration from "../../apiConfig";
+import { ApiContext } from "../../context/AlertContext";
 
 const style = {
   transform: 'translate(-50%, -50%)',
@@ -14,11 +15,13 @@ interface IFormLogin {
 
 
 const Login = () => {
-
   const [formLogin, setFormLogin] = useState<IFormLogin>({
     login: '',
     password: ''
   });
+
+  const apiContext = useContext(ApiContext);
+  const { setAlertMessage } = apiContext || {};
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormLogin({ ...formLogin, login: e.target.value });
@@ -31,21 +34,18 @@ const Login = () => {
   const login = async () => {
     try {
       const api = new AuthenticateApi(ApiConfiguration)
+
+      if (formLogin.login === '' || formLogin.password === '') {
+        setAlertMessage!({title: 'Atenção!', message: 'Preencha todos os campos', severity: 'warning'})
+        return
+      }
       const result = await api.apiAuthenticateLoginPost({loginAndRegisterInputDto: {email: formLogin.login, password: formLogin.password}})
       window.localStorage.setItem('accessToken', result.token!)
       window.localStorage.setItem('refreshToken', result.refreshToken!)
+      setAlertMessage!({title: 'Sucesso!', message: 'Login efetuado com sucesso', severity: 'success'})
       window.location.href = "http://localhost:3000/welcome"
     } catch (error) {
 
-    }
-  }
-
-  const logout = async () => {
-    try {
-      const api = new AuthenticateApi(ApiConfiguration)
-      const result = await api.apiAuthenticateLogoutGet()
-    } catch (error) {
-      
     }
   }
 
@@ -68,7 +68,6 @@ const Login = () => {
           </Box>
           <Box display="flex" mt={1}>
             <Button onClick={login} sx={{ color: "white" }}>Entrar</Button>
-            <Button onClick={logout} sx={{ color: "white" }}>Sair</Button>
           </Box>
         </Box>
       </Modal>
