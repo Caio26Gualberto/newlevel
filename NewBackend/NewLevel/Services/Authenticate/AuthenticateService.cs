@@ -3,13 +3,12 @@ using Microsoft.IdentityModel.Tokens;
 using NewLevel.Context;
 using NewLevel.Dtos;
 using NewLevel.Entities;
-using NewLevel.Interfaces;
+using NewLevel.Interfaces.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 
-namespace NewLevel.Services
+namespace NewLevel.Services.Authenticate
 {
     public class AuthenticateService : IAuthenticateService
     {
@@ -27,7 +26,7 @@ namespace NewLevel.Services
         }
         public async Task<TokensDto> GenerateNewAccessToken(string accessToken)
         {
-            var userId = _httpContextAccessor.HttpContext.Items["userId"] as string;
+            var userId = _httpContextAccessor.HttpContext.Items["userId"].ToString();
             var user = await _userManager.FindByIdAsync(userId);
 
             if (user == null)
@@ -63,7 +62,7 @@ namespace NewLevel.Services
                 var refreshToken = await _userManager.GenerateUserTokenAsync(user, tokenProvider: "local", purpose: "email");
                 await _userManager.SetAuthenticationTokenAsync(user, loginProvider: "email", tokenName: "refresh_token", tokenValue: refreshToken);
 
-                return new TokensDto { Token = tokenString, RefreshToken = refreshToken };
+                return new TokensDto { Token = tokenString, RefreshToken = refreshToken, SkipIntroduction = user.IsFirstTimeLogin };
             }
 
             return new TokensDto();
@@ -71,12 +70,12 @@ namespace NewLevel.Services
 
         public async Task<bool> Register(string email, string password)
         {
-            var user = new User {UserName = email, Email = email };
-            var result = await  _userManager.CreateAsync(user, password);
+            var user = new User { UserName = email, Email = email };
+            var result = await _userManager.CreateAsync(user, password);
 
             if (result.Succeeded)
                 await _signInManager.SignInAsync(user, isPersistent: false);
-            
+
             return result.Succeeded;
         }
 

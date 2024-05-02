@@ -4,6 +4,7 @@
 README.md
 package.json
 src/apis/AuthenticateApi.ts
+src/apis/UserApi.ts
 src/apis/index.ts
 src/index.ts
 src/models/LoginAndRegisterInputDto.ts

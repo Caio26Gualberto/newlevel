@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NewLevel.Dtos;
-using NewLevel.Interfaces;
+using NewLevel.Interfaces.Services;
 
 namespace NewLevel.Controllers
 {

@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Input, Modal, Typography } from "@mui/material"
+import { Alert, Box, Button, Dialog, Input, Modal, Typography } from "@mui/material"
 import { AuthenticateApi } from "../../gen/api/src";
 import { useContext, useState } from "react";
 import ApiConfiguration from "../../apiConfig";
@@ -36,14 +36,17 @@ const Login = () => {
       const api = new AuthenticateApi(ApiConfiguration)
 
       if (formLogin.login === '' || formLogin.password === '') {
-        setAlertMessage!({title: 'Atenção!', message: 'Preencha todos os campos', severity: 'warning'})
+        setAlertMessage!({ title: 'Atenção!', message: 'Preencha todos os campos', severity: 'warning' })
         return
       }
-      const result = await api.apiAuthenticateLoginPost({loginAndRegisterInputDto: {email: formLogin.login, password: formLogin.password}})
+      const result = await api.apiAuthenticateLoginPost({ loginAndRegisterInputDto: { email: formLogin.login, password: formLogin.password } })
       window.localStorage.setItem('accessToken', result.token!)
       window.localStorage.setItem('refreshToken', result.refreshToken!)
-      setAlertMessage!({title: 'Sucesso!', message: 'Login efetuado com sucesso', severity: 'success'})
-      window.location.href = "http://localhost:3000/welcome"
+      setAlertMessage!({ title: 'Sucesso!', message: 'Login efetuado com sucesso', severity: 'success' })
+
+      if (!result.skipIntroduction) {
+        window.location.href = "http://localhost:3000/welcome"
+      }
     } catch (error) {
 
     }
@@ -51,10 +54,7 @@ const Login = () => {
 
   return (
     <>
-      <Modal
-        open={true}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description">
+      <Box>
         <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center"
           position="absolute" top="50%" left="50%" width="768px" minHeight="480px" borderRadius="10px"
           boxShadow="0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22)" bgcolor="#3c140c" maxWidth="100%" sx={style}>
@@ -69,8 +69,11 @@ const Login = () => {
           <Box display="flex" mt={1}>
             <Button onClick={login} sx={{ color: "white" }}>Entrar</Button>
           </Box>
+          <Box>
+            <Typography color="white" fontSize={15}>Não tem uma conta? <a href="/register">Registre-se</a></Typography>
+          </Box>
         </Box>
-      </Modal>
+      </Box>
     </>
   )
 }

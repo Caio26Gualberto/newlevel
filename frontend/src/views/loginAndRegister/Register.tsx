@@ -1,17 +1,29 @@
-import { get, post } from "../../services/api/httpService"
+import { useState } from "react";
+import ApiConfiguration from "../../apiConfig"
+import { AuthenticateApi } from "../../gen/api/src"
 
+interface IFormRegister {
+    email: string,
+    password: string,
+    birthPlace: string,
+}
 
 const Register = () => {
+    const api = new AuthenticateApi(ApiConfiguration)
+    const [formRegister, setFormRegister] = useState<IFormRegister>({
+        email: '',
+        password: '',
+        birthPlace: ''
+    });
 
     const login = async () => {
         try {
-            const userLogin = {
-                email: "",
-                password: ""
-            }
-            const result = await post<{ token: string, refreshToken: string }>(`/Authenticate/login`, userLogin)
-            window.localStorage.setItem('Authorization', result.token)
-            window.localStorage.setItem('RefreshToken', result.refreshToken)
+            const result = await api.apiAuthenticateRegisterPost({
+                loginAndRegisterInputDto: {
+                    email: formRegister.email,
+                    password: formRegister.password
+                }
+            })
         } catch (error) {
 
         }

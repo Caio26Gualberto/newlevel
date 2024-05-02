@@ -31,6 +31,12 @@ export interface TokensDto {
      * @memberof TokensDto
      */
     refreshToken?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof TokensDto
+     */
+    skipIntroduction?: boolean;
 }
 
 /**
@@ -52,6 +58,7 @@ export function TokensDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         
         'token': json['token'] == null ? undefined : json['token'],
         'refreshToken': json['refreshToken'] == null ? undefined : json['refreshToken'],
+        'skipIntroduction': json['skipIntroduction'] == null ? undefined : json['skipIntroduction'],
     };
 }
 
@@ -63,6 +70,7 @@ export function TokensDtoToJSON(value?: TokensDto | null): any {
         
         'token': value['token'],
         'refreshToken': value['refreshToken'],
+        'skipIntroduction': value['skipIntroduction'],
     };
 }
 

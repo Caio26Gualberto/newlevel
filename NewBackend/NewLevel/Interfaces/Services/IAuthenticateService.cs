@@ -1,6 +1,6 @@
 ﻿using NewLevel.Dtos;
 
-namespace NewLevel.Interfaces
+namespace NewLevel.Interfaces.Services
 {
     public interface IAuthenticateService
     {

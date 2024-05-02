@@ -34,8 +34,7 @@ export interface ApiAuthenticateRegisterPostRequest {
 }
 
 export interface ApiAuthenticateRenewTokenGetRequest {
-    userId?: string;
-    refreshToken?: string;
+    accessToken?: string;
 }
 
 /**
@@ -148,12 +147,8 @@ export class AuthenticateApi extends runtime.BaseAPI {
     async apiAuthenticateRenewTokenGetRaw(requestParameters: ApiAuthenticateRenewTokenGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TokensDto>> {
         const queryParameters: any = {};
 
-        if (requestParameters['userId'] != null) {
-            queryParameters['userId'] = requestParameters['userId'];
-        }
-
-        if (requestParameters['refreshToken'] != null) {
-            queryParameters['refreshToken'] = requestParameters['refreshToken'];
+        if (requestParameters['accessToken'] != null) {
+            queryParameters['accessToken'] = requestParameters['accessToken'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

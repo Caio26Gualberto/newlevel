@@ -19,7 +19,7 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (alert) {
             const timer = setTimeout(() => {
                 setAlert(null);
-            }, 6000);
+            }, 4000);
 
             return () => {
                 clearTimeout(timer);

@@ -4,8 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NewLevel.Context;
 using NewLevel.Entities;
-using NewLevel.Interfaces;
-using NewLevel.Services;
+using NewLevel.Interfaces.Services;
+using NewLevel.Services.Authenticate;
+using NewLevel.Services.UserService;
 using System.Text;
 
 namespace NewLevel
@@ -48,6 +49,7 @@ namespace NewLevel
 
             services.AddHttpContextAccessor();
             services.AddScoped<IAuthenticateService, AuthenticateService>();
+            services.AddScoped<IUserService, UserService>();
 
             return services;
         }

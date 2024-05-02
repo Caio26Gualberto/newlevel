@@ -8,13 +8,13 @@ const AlertNewLevel: React.FC<IAlertNewLevel> = ({ severity, title, message }) =
     useEffect(() => {
         const timer = setTimeout(() => {
             setShow(false);
-        }, 3000);
+        }, 2000);
 
         return () => clearTimeout(timer);
     }, []);
     
     return (
-        <Box>
+        <Box position="absolute" bottom="30px" right="0" width="70%">
             {show && (
                 <Alert severity={severity} sx={{ animation: "slide-in 0.5s forwards" }}>
                     <AlertTitle>{title}</AlertTitle>
