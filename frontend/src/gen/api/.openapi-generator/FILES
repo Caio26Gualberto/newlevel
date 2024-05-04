@@ -10,7 +10,9 @@ src/apis/index.ts
 src/index.ts
 src/models/DisplayActivityLocationDto.ts
 src/models/EActivityLocation.ts
-src/models/LoginAndRegisterInputDto.ts
+src/models/LoginInputDto.ts
+src/models/RegisterInputDto.ts
+src/models/StringNewLevelResponse.ts
 src/models/TokensDto.ts
 src/models/index.ts
 src/runtime.ts

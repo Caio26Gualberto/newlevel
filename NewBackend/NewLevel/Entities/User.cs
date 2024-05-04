@@ -6,6 +6,10 @@ namespace NewLevel.Entities
 {
     public sealed class User : IdentityUser
     {
+        public User()
+        {
+                
+        }
         public User(bool isFirstTimeLogin, string nickName, EActivityLocation activityLocation)
         {
             ValidateDomainEntity(isFirstTimeLogin, nickName, activityLocation);

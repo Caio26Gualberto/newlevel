@@ -40,7 +40,7 @@ const Login = () => {
         setAlertMessage!({ title: 'Atenção!', message: 'Preencha todos os campos', severity: 'warning' })
         return
       }
-      const result = await api.apiAuthenticateLoginPost({ loginAndRegisterInputDto: { email: formLogin.login, password: formLogin.password } })
+      const result = await api.apiAuthenticateLoginPost({ loginInputDto: { email: formLogin.login, password: formLogin.password } })
       window.localStorage.setItem('accessToken', result.token!)
       window.localStorage.setItem('refreshToken', result.refreshToken!)
       setAlertMessage!({ title: 'Sucesso!', message: 'Login efetuado com sucesso', severity: 'success' })

@@ -23,47 +23,47 @@ import {
 /**
  * 
  * @export
- * @interface LoginAndRegisterInputDto
+ * @interface RegisterInputDto
  */
-export interface LoginAndRegisterInputDto {
+export interface RegisterInputDto {
     /**
      * 
      * @type {string}
-     * @memberof LoginAndRegisterInputDto
+     * @memberof RegisterInputDto
      */
     email?: string;
     /**
      * 
      * @type {string}
-     * @memberof LoginAndRegisterInputDto
+     * @memberof RegisterInputDto
      */
     nickname?: string;
     /**
      * 
      * @type {string}
-     * @memberof LoginAndRegisterInputDto
+     * @memberof RegisterInputDto
      */
     password?: string;
     /**
      * 
      * @type {EActivityLocation}
-     * @memberof LoginAndRegisterInputDto
+     * @memberof RegisterInputDto
      */
     activityLocation?: EActivityLocation;
 }
 
 /**
- * Check if a given object implements the LoginAndRegisterInputDto interface.
+ * Check if a given object implements the RegisterInputDto interface.
  */
-export function instanceOfLoginAndRegisterInputDto(value: object): boolean {
+export function instanceOfRegisterInputDto(value: object): boolean {
     return true;
 }
 
-export function LoginAndRegisterInputDtoFromJSON(json: any): LoginAndRegisterInputDto {
-    return LoginAndRegisterInputDtoFromJSONTyped(json, false);
+export function RegisterInputDtoFromJSON(json: any): RegisterInputDto {
+    return RegisterInputDtoFromJSONTyped(json, false);
 }
 
-export function LoginAndRegisterInputDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): LoginAndRegisterInputDto {
+export function RegisterInputDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): RegisterInputDto {
     if (json == null) {
         return json;
     }
@@ -76,7 +76,7 @@ export function LoginAndRegisterInputDtoFromJSONTyped(json: any, ignoreDiscrimin
     };
 }
 
-export function LoginAndRegisterInputDtoToJSON(value?: LoginAndRegisterInputDto | null): any {
+export function RegisterInputDtoToJSON(value?: RegisterInputDto | null): any {
     if (value == null) {
         return value;
     }

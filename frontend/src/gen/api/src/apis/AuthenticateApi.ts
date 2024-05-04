@@ -15,22 +15,28 @@
 
 import * as runtime from '../runtime';
 import type {
-  LoginAndRegisterInputDto,
+  LoginInputDto,
+  RegisterInputDto,
+  StringNewLevelResponse,
   TokensDto,
 } from '../models/index';
 import {
-    LoginAndRegisterInputDtoFromJSON,
-    LoginAndRegisterInputDtoToJSON,
+    LoginInputDtoFromJSON,
+    LoginInputDtoToJSON,
+    RegisterInputDtoFromJSON,
+    RegisterInputDtoToJSON,
+    StringNewLevelResponseFromJSON,
+    StringNewLevelResponseToJSON,
     TokensDtoFromJSON,
     TokensDtoToJSON,
 } from '../models/index';
 
 export interface ApiAuthenticateLoginPostRequest {
-    loginAndRegisterInputDto?: LoginAndRegisterInputDto;
+    loginInputDto?: LoginInputDto;
 }
 
 export interface ApiAuthenticateRegisterPostRequest {
-    loginAndRegisterInputDto?: LoginAndRegisterInputDto;
+    registerInputDto?: RegisterInputDto;
 }
 
 export interface ApiAuthenticateRenewTokenGetRequest {
@@ -64,7 +70,7 @@ export class AuthenticateApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: LoginAndRegisterInputDtoToJSON(requestParameters['loginAndRegisterInputDto']),
+            body: LoginInputDtoToJSON(requestParameters['loginInputDto']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => TokensDtoFromJSON(jsonValue));
@@ -110,7 +116,7 @@ export class AuthenticateApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiAuthenticateRegisterPostRaw(requestParameters: ApiAuthenticateRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiAuthenticateRegisterPostRaw(requestParameters: ApiAuthenticateRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<StringNewLevelResponse>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -130,16 +136,17 @@ export class AuthenticateApi extends runtime.BaseAPI {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: LoginAndRegisterInputDtoToJSON(requestParameters['loginAndRegisterInputDto']),
+            body: RegisterInputDtoToJSON(requestParameters['registerInputDto']),
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => StringNewLevelResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async apiAuthenticateRegisterPost(requestParameters: ApiAuthenticateRegisterPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiAuthenticateRegisterPostRaw(requestParameters, initOverrides);
+    async apiAuthenticateRegisterPost(requestParameters: ApiAuthenticateRegisterPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<StringNewLevelResponse> {
+        const response = await this.apiAuthenticateRegisterPostRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace NewLevel.Dtos
 {
-    public class LoginAndRegisterInputDto
+    public class RegisterInputDto
     {
         public string Email { get; set; }   
         public string Nickname { get; set; }

@@ -2,8 +2,9 @@ import { useContext, useEffect, useState } from "react";
 import ApiConfiguration from "../../apiConfig"
 import { AuthenticateApi, CommonApi, DisplayActivityLocationDto, EActivityLocation } from "../../gen/api/src"
 import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Tooltip, Typography, Zoom } from "@mui/material";
-import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import { ApiContext } from "../../context/AlertContext";
+import Swal from "sweetalert2";
+import { redirect } from "react-router-dom";
 
 
 interface IFormRegister {
@@ -15,6 +16,7 @@ interface IFormRegister {
 }
 
 const Register = () => {
+    var toastr = require('toastr');
     const apiContext = useContext(ApiContext);
     const { setAlertMessage } = apiContext || {};
     const authenticateService = new AuthenticateApi(ApiConfiguration)
@@ -44,13 +46,26 @@ const Register = () => {
                 return
             }
             const result = await authenticateService.apiAuthenticateRegisterPost({
-                loginAndRegisterInputDto: {
+                registerInputDto: {
                     email: formRegister.email,
                     password: formRegister.password,
                     nickname: formRegister.nickname,
                     activityLocation: selectedCity.value as EActivityLocation
                 }
             })
+
+            if (result.isSuccess) {
+                toastr.success(result.message, 'Sucesso!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
+                setTimeout(function() {
+                    window.location.href = '/';
+                }, 2000);
+            } else {
+                Swal.fire({
+                    title: 'Erro',
+                    text: result.message,
+                    icon: 'error'
+                })               
+            }
         } catch (error) {
 
         }

@@ -16,7 +16,7 @@ namespace NewLevel.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<TokensDto?> Login(LoginAndRegisterInputDto input)
+        public async Task<TokensDto?> Login(LoginInputDto input)
         {
             TokensDto tokens = await _authenticateService.Login(input.Email, input.Password);
 
@@ -27,14 +27,14 @@ namespace NewLevel.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<IActionResult> Register(LoginAndRegisterInputDto input)
+        public async Task<NewLevelResponse<string>> Register(RegisterInputDto input)
         {
             var result = await _authenticateService.Register(input);
 
             if (result)
-                return Ok(result);
+                return new NewLevelResponse<string> { IsSuccess = true, Message = "Usuário criado com sucesso!" };
 
-            return BadRequest();
+            return new NewLevelResponse<string> {IsSuccess = false, Message = "Algo deu errado, tente novamente mais tarde! Caso o problema persista entrar em contato com o desenvolvedor" };
         }
 
         [Authorize]

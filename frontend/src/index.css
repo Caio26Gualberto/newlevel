@@ -1,7 +1,7 @@
-@font-face {
+/* @font-face {
   font-family: 'RiotFont';
   src: url('./assets/font/familiesImport/FontFont_FF.Mark.Pro.Black.otf')format('opentype');
-}
+} */
 
 body {
   font-family: 'RiotFont', Arial, sans-serif;

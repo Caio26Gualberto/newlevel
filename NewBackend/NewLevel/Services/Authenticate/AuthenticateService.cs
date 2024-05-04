@@ -68,13 +68,11 @@ namespace NewLevel.Services.Authenticate
             return new TokensDto();
         }
 
-        public async Task<bool> Register(LoginAndRegisterInputDto input)
+        public async Task<bool> Register(RegisterInputDto input)
         {
-            var user = new User(isFirstTimeLogin: true, nickName: input.Nickname, activityLocation: input.ActivityLocation)
-            {
-                UserName = input.Email,
-                Email = input.Email
-            };
+            var user = new User(isFirstTimeLogin: true, nickName: input.Nickname, activityLocation: input.ActivityLocation);
+            user.UserName = input.Email;
+            user.Email = input.Email;
 
             var result = await _userManager.CreateAsync(user, input.Password);
 
