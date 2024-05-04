@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from "react";
 import ApiConfiguration from "../../apiConfig"
 import { AuthenticateApi, CommonApi, DisplayActivityLocationDto, EActivityLocation } from "../../gen/api/src"
 import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Tooltip, Typography, Zoom } from "@mui/material";
-import { ApiContext } from "../../context/AlertContext";
 import Swal from "sweetalert2";
 import * as toastr from 'toastr';
 import { useNavigate } from "react-router-dom";
@@ -18,7 +17,6 @@ interface IFormRegister {
 
 const Register = () => {
     const navigate = useNavigate();
-    const apiContext = useContext(ApiContext);
     const authenticateService = new AuthenticateApi(ApiConfiguration)
     const commonService = new CommonApi(ApiConfiguration)
     const [cities, setCities] = useState<DisplayActivityLocationDto[]>([])
@@ -32,17 +30,18 @@ const Register = () => {
     });
 
     const registerAction = async () => {
-        try {    
+        try {   
+            debugger 
             if (formRegister.email === '' || formRegister.nickname === '' || formRegister.password === '' || formRegister.confirmPassword === '' || selectedCity.value === -1) {
                 toastr.warning('Preencha todos os campos', 'Sucesso!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
                 return
             }
             if (formRegister.password.length < 6) {
-                toastr.warning('Preencha todos os campos', 'Sucesso!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
+                toastr.warning('A senha deve ter no minímo 6 caracteres', 'Atenção!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
                 return
             }
             if (formRegister.password !== formRegister.confirmPassword) {
-                toastr.warning('As duas senhas estão diferentes', 'Sucesso!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
+                toastr.warning('As duas senhas estão diferentes', 'Atenção!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
                 return
             }
             const result = await authenticateService.apiAuthenticateRegisterPost({

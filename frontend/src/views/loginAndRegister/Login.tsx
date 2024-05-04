@@ -2,7 +2,6 @@ import { Alert, Box, Button, Dialog, Input, Modal, Typography } from "@mui/mater
 import { AuthenticateApi } from "../../gen/api/src";
 import { useContext, useEffect, useState } from "react";
 import ApiConfiguration from "../../apiConfig";
-import { ApiContext } from "../../context/AlertContext";
 import { Link, useNavigate } from "react-router-dom";
 import * as toastr from 'toastr';
 
@@ -22,8 +21,6 @@ const Login = () => {
   });
 
   const navigate = useNavigate();
-  const apiContext = useContext(ApiContext);
-  const { setAlertMessage } = apiContext || {};
 
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormLogin({ ...formLogin, login: e.target.value });
@@ -38,7 +35,7 @@ const Login = () => {
       const api = new AuthenticateApi(ApiConfiguration)
 
       if (formLogin.login === '' || formLogin.password === '') {
-        setAlertMessage!({ title: 'Atenção!', message: 'Preencha todos os campos', severity: 'warning' })
+        toastr.warning('Preencha todos os campos', 'Atenção!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"})
         return
       }
       const result = await api.apiAuthenticateLoginPost({ loginInputDto: { email: formLogin.login, password: formLogin.password } })
