@@ -4,9 +4,12 @@
 README.md
 package.json
 src/apis/AuthenticateApi.ts
+src/apis/CommonApi.ts
 src/apis/UserApi.ts
 src/apis/index.ts
 src/index.ts
+src/models/DisplayActivityLocationDto.ts
+src/models/EActivityLocation.ts
 src/models/LoginAndRegisterInputDto.ts
 src/models/TokensDto.ts
 src/models/index.ts

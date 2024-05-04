@@ -4,7 +4,6 @@
 }
 
 body {
-  margin: 0;
   font-family: 'RiotFont', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -16,5 +15,6 @@ code {
 
 .image-with-opacity {
   background-image: url('assets/HeadbangerBackground.jpg');
-  background-size: cover;
+  background-size: contain;
+  height: 100vh;
 }

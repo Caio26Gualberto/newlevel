@@ -6,6 +6,7 @@ using NewLevel.Context;
 using NewLevel.Entities;
 using NewLevel.Interfaces.Services;
 using NewLevel.Services.Authenticate;
+using NewLevel.Services.Common;
 using NewLevel.Services.UserService;
 using System.Text;
 
@@ -50,6 +51,7 @@ namespace NewLevel
             services.AddHttpContextAccessor();
             services.AddScoped<IAuthenticateService, AuthenticateService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ICommonService, CommonService>();
 
             return services;
         }

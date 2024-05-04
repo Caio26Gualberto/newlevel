@@ -1,8 +1,9 @@
 import { Alert, Box, Button, Dialog, Input, Modal, Typography } from "@mui/material"
 import { AuthenticateApi } from "../../gen/api/src";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ApiConfiguration from "../../apiConfig";
 import { ApiContext } from "../../context/AlertContext";
+import { Link } from "react-router-dom";
 
 const style = {
   transform: 'translate(-50%, -50%)',
@@ -52,6 +53,19 @@ const Login = () => {
     }
   }
 
+  useEffect(() => {
+    const rootElement = document.getElementById('root');
+    if (rootElement) {
+      if (window.location.pathname === '/') {
+        rootElement.classList.add('image-with-opacity');
+      }
+      return () => {
+        rootElement.classList.remove('image-with-opacity');
+      };
+    }
+  }
+    , [])
+
   return (
     <>
       <Box>
@@ -70,7 +84,7 @@ const Login = () => {
             <Button onClick={login} sx={{ color: "white" }}>Entrar</Button>
           </Box>
           <Box>
-            <Typography color="white" fontSize={15}>Não tem uma conta? <a href="/register">Registre-se</a></Typography>
+            <Typography color="white" fontSize={15}>Não tem uma conta? <Link to="/register">Registre-se</Link></Typography>
           </Box>
         </Box>
       </Box>

@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { EActivityLocation } from './EActivityLocation';
+import {
+    EActivityLocationFromJSON,
+    EActivityLocationFromJSONTyped,
+    EActivityLocationToJSON,
+} from './EActivityLocation';
+
 /**
  * 
  * @export
@@ -30,7 +37,19 @@ export interface LoginAndRegisterInputDto {
      * @type {string}
      * @memberof LoginAndRegisterInputDto
      */
+    nickname?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LoginAndRegisterInputDto
+     */
     password?: string;
+    /**
+     * 
+     * @type {EActivityLocation}
+     * @memberof LoginAndRegisterInputDto
+     */
+    activityLocation?: EActivityLocation;
 }
 
 /**
@@ -51,7 +70,9 @@ export function LoginAndRegisterInputDtoFromJSONTyped(json: any, ignoreDiscrimin
     return {
         
         'email': json['email'] == null ? undefined : json['email'],
+        'nickname': json['nickname'] == null ? undefined : json['nickname'],
         'password': json['password'] == null ? undefined : json['password'],
+        'activityLocation': json['activityLocation'] == null ? undefined : EActivityLocationFromJSON(json['activityLocation']),
     };
 }
 
@@ -62,7 +83,9 @@ export function LoginAndRegisterInputDtoToJSON(value?: LoginAndRegisterInputDto 
     return {
         
         'email': value['email'],
+        'nickname': value['nickname'],
         'password': value['password'],
+        'activityLocation': EActivityLocationToJSON(value['activityLocation']),
     };
 }
 

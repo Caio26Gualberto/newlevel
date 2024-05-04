@@ -29,7 +29,7 @@ namespace NewLevel.Controllers
         [HttpPost("Register")]
         public async Task<IActionResult> Register(LoginAndRegisterInputDto input)
         {
-            var result = await _authenticateService.Register(input.Email, input.Password);
+            var result = await _authenticateService.Register(input);
 
             if (result)
                 return Ok(result);

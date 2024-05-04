@@ -58,7 +58,7 @@ namespace NewLevel.Services.Authenticate
                 var user = await _signInManager.UserManager.FindByEmailAsync(email);
                 var tokenString = GenerateJwtToken(user);
 
-                user.Update(isFirstTimeLogin: null);
+                user.Update(isFirstTimeLogin: null, nickName: user.Nickname, activityLocation: user.ActivityLocation);
                 var refreshToken = await _userManager.GenerateUserTokenAsync(user, tokenProvider: "local", purpose: "email");
                 await _userManager.SetAuthenticationTokenAsync(user, loginProvider: "email", tokenName: "refresh_token", tokenValue: refreshToken);
 
@@ -68,10 +68,15 @@ namespace NewLevel.Services.Authenticate
             return new TokensDto();
         }
 
-        public async Task<bool> Register(string email, string password)
+        public async Task<bool> Register(LoginAndRegisterInputDto input)
         {
-            var user = new User { UserName = email, Email = email };
-            var result = await _userManager.CreateAsync(user, password);
+            var user = new User(isFirstTimeLogin: true, nickName: input.Nickname, activityLocation: input.ActivityLocation)
+            {
+                UserName = input.Email,
+                Email = input.Email
+            };
+
+            var result = await _userManager.CreateAsync(user, input.Password);
 
             if (result.Succeeded)
                 await _signInManager.SignInAsync(user, isPersistent: false);

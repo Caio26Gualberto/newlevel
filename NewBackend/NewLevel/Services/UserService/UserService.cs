@@ -56,7 +56,7 @@ namespace NewLevel.Services.UserService
                     throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
                 }
 
-                user.Update(isFirstTimeLogin: false);
+                user.Update(isFirstTimeLogin: false, nickName: user.Nickname, activityLocation: user.ActivityLocation);
                 await _userManager.UpdateAsync(user);
             }
             catch (Exception e)
