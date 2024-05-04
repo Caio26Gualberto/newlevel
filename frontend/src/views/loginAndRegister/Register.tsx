@@ -4,7 +4,8 @@ import { AuthenticateApi, CommonApi, DisplayActivityLocationDto, EActivityLocati
 import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Tooltip, Typography, Zoom } from "@mui/material";
 import { ApiContext } from "../../context/AlertContext";
 import Swal from "sweetalert2";
-import { redirect } from "react-router-dom";
+import * as toastr from 'toastr';
+import { useNavigate } from "react-router-dom";
 
 
 interface IFormRegister {
@@ -16,9 +17,8 @@ interface IFormRegister {
 }
 
 const Register = () => {
-    var toastr = require('toastr');
+    const navigate = useNavigate();
     const apiContext = useContext(ApiContext);
-    const { setAlertMessage } = apiContext || {};
     const authenticateService = new AuthenticateApi(ApiConfiguration)
     const commonService = new CommonApi(ApiConfiguration)
     const [cities, setCities] = useState<DisplayActivityLocationDto[]>([])
@@ -32,17 +32,17 @@ const Register = () => {
     });
 
     const registerAction = async () => {
-        try {
+        try {    
             if (formRegister.email === '' || formRegister.nickname === '' || formRegister.password === '' || formRegister.confirmPassword === '' || selectedCity.value === -1) {
-                setAlertMessage!({ message: 'Preencha todos os campos', severity: 'warning', title: 'Atenção' })
+                toastr.warning('Preencha todos os campos', 'Sucesso!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
                 return
             }
             if (formRegister.password.length < 6) {
-                setAlertMessage!({ message: 'A senha deve ter no mínimo 6 caracteres', severity: 'warning', title: 'Atenção' })
+                toastr.warning('Preencha todos os campos', 'Sucesso!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
                 return
             }
             if (formRegister.password !== formRegister.confirmPassword) {
-                setAlertMessage!({ message: 'As duas senhas estão diferentes', severity: 'warning', title: 'Atenção' })
+                toastr.warning('As duas senhas estão diferentes', 'Sucesso!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
                 return
             }
             const result = await authenticateService.apiAuthenticateRegisterPost({
@@ -55,10 +55,8 @@ const Register = () => {
             })
 
             if (result.isSuccess) {
-                toastr.success(result.message, 'Sucesso!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
-                setTimeout(function() {
-                    window.location.href = '/';
-                }, 2000);
+                toastr.success(result.message!, 'Sucesso!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
+                navigate('/')
             } else {
                 Swal.fire({
                     title: 'Erro',

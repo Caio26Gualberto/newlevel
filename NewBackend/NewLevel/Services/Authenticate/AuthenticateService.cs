@@ -62,7 +62,7 @@ namespace NewLevel.Services.Authenticate
                 var refreshToken = await _userManager.GenerateUserTokenAsync(user, tokenProvider: "local", purpose: "email");
                 await _userManager.SetAuthenticationTokenAsync(user, loginProvider: "email", tokenName: "refresh_token", tokenValue: refreshToken);
 
-                return new TokensDto { Token = tokenString, RefreshToken = refreshToken, SkipIntroduction = user.IsFirstTimeLogin };
+                return new TokensDto { Token = tokenString, RefreshToken = refreshToken, SkipIntroduction = !user.IsFirstTimeLogin };
             }
 
             return new TokensDto();
