@@ -5,15 +5,15 @@ interface MediaProps {
     src: string
     title: string
     createdAt: string
+    loading: boolean   
 }
 
-const Media = ({ src, title, createdAt }: MediaProps) => {
-    const [loading, setLoading] = useState<boolean>(false)
+const Media = ({ src, title, createdAt, loading }: MediaProps) => {
 
     return (
         <Box sx={{ width: 460, marginRight: 1, my: 5 }}>
             {!loading ? (
-                <iframe width="460" height="300" src={src} title="Bullet For My Valentine - Scream Aim Fire (Official Video)"
+                <iframe width="460" height="300" src={src} title={title}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     referrerPolicy="strict-origin-when-cross-origin" allowFullScreen style={{ border: "0px", borderRadius: "10px" }}></iframe>
             ) : (
