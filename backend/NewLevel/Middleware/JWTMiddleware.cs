@@ -18,7 +18,7 @@ namespace NewLevel.Api.Middleware
             {
                 string token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                 var userId = JwtService.RetrieveUserIdFromJwt(token);
-                context.Items["UserId"] = userId;
+                context.Items["userId"] = userId;
             }
             else if (context.Request.QueryString.Value.Contains("accessToken"))
             {

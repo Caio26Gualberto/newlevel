@@ -1,4 +1,6 @@
+import Swal from "sweetalert2";
 import { Configuration, ResponseContext } from "./gen/api/src";
+import * as toastr from 'toastr';
 
 let originalRequest: ResponseContext | null
 
@@ -22,11 +24,10 @@ const ApiConfiguration = new Configuration({
                 let ret = context.response;
                 originalRequest = context;
                 let contentType = context.response.headers.get('content-type');
-            
+            debugger
                 if (context.response.status == 401 || context.response.status == 403) {
                     const response = await fetch(`https://localhost:7082/api/Authenticate/RenewToken?accessToken=${window.localStorage.getItem('accessToken')}`);
-                    debugger
-                    if (response.ok) {
+                    if (response.ok && response.status != 204) {
                         const newTokens = await response.json();
                         if (newTokens.token && newTokens.refreshToken) {
                             window.localStorage.setItem('accessToken', newTokens.token);
@@ -50,11 +51,10 @@ const ApiConfiguration = new Configuration({
             
                             ret = await fetch(newRequest);
                         } else {
-                            console.error("Tokens de acesso ou atualização não encontrados na resposta.");
+                            
                         }
                     } else {
-                        //Todo Redirecionar para o login caso nao devolva refreshToken
-                        console.error("Falha ao renovar o token.");
+                        window.location.href = 'http://localhost:3000';
                     }
                 } else {
                     ret.json = async () => {

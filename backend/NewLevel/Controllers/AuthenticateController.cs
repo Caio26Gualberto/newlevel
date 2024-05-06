@@ -27,14 +27,11 @@ namespace NewLevel.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<NewLevelResponse<string>> Register(RegisterInputDto input)
+        public async Task<bool> Register(RegisterInputDto input)
         {
             var result = await _authenticateService.Register(input);
 
-            if (result)
-                return new NewLevelResponse<string> { IsSuccess = true, Message = "Usuário criado com sucesso!" };
-
-            return new NewLevelResponse<string> {IsSuccess = false, Message = "Algo deu errado, tente novamente mais tarde! Caso o problema persista entrar em contato com o desenvolvedor" };
+            return result;
         }
 
         [Authorize]

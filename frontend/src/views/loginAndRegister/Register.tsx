@@ -53,13 +53,13 @@ const Register = () => {
                 }
             })
 
-            if (result.isSuccess) {
-                toastr.success(result.message!, 'Sucesso!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
+            if (result) {
+                toastr.success('Conta criada!', 'Sucesso!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
                 navigate('/')
             } else {
                 Swal.fire({
                     title: 'Erro',
-                    text: result.message,
+                    text: 'Erro inesperado ao tentar criar a conta, tente novamente mais tarde',
                     icon: 'error'
                 })               
             }

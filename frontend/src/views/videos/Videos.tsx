@@ -3,77 +3,16 @@ import Media from "./components/Media";
 import { useEffect, useState } from "react";
 import SearchIcon from '@mui/icons-material/Search';
 import AddVideoModal from "./components/modal/AddVideoModal";
-
-const data = [
-  {
-    src: 'https://www.youtube.com/embed/gqI-6xag8Mg',
-    title: 'Scream Aim Fire (Official Video)',
-    views: '396k views',
-    createdAt: 'a week ago',
-  },
-  {
-    src: 'https://www.youtube.com/embed/gqI-6xag8Mg',
-    title: 'Scream Aim Fire (Official Video)',
-    views: '40M views',
-    createdAt: '3 years ago',
-  },
-  {
-    src: 'https://www.youtube.com/embed/gqI-6xag8Mg',
-    title: 'Scream Aim Fire (Official Video)',
-    createdAt: '10 months ago',
-  },
-  {
-    src: 'https://www.youtube.com/embed/gqI-6xag8Mg',
-    title: 'Scream Aim Fire (Official Video)',
-    createdAt: '10 months ago',
-  },
-  {
-    src: 'https://www.youtube.com/embed/BkCpGWMwcSA',
-    title: 'Valorant',
-    createdAt: '10 months ago',
-  },
-  // {
-  //   src: 'https://www.youtube.com/embed/q2I0ulTZWXA',
-  //   title: 'Scream Aim Fire (Official Video)',
-  //   createdAt: '10 months ago',
-  // },
-  // {
-  //   src: 'https://www.youtube.com/embed/q2I0ulTZWXA',
-  //   title: 'Scream Aim Fire (Official Video)',   
-  //   createdAt: '10 months ago',
-  // },
-  {
-    src: 'https://www.youtube.com/embed/gqI-6xag8Mg',
-    title: 'Scream Aim Fire (Official Video)',
-    createdAt: '10 months ago',
-  },
-  {
-    src: 'https://www.youtube.com/embed/gqI-6xag8Mg',
-    title: 'Scream Aim Fire (Official Video)',
-    createdAt: '10 months ago',
-  },
-  {
-    src: 'https://www.youtube.com/embed/gqI-6xag8Mg',
-    title: 'Scream Aim Fire (Official Video)',
-    createdAt: '10 months ago',
-  },
-  {
-    src: 'https://www.youtube.com/embed/gqI-6xag8Mg',
-    title: 'Scream Aim Fire (Official Video)',
-    createdAt: '10 months ago',
-  },
-  {
-    src: 'https://www.youtube.com/embed/gqI-6xag8Mg',
-    title: 'Scream Aim Fire (Official Video)',
-    createdAt: '10 months ago',
-  },
-];
-
+import { MediaApi, MediaDto } from "../../gen/api/src";
+import ApiConfiguration from "../../apiConfig";
+import Swal from "sweetalert2";
 
 const Videos = () => {
+  const mediaService = new MediaApi(ApiConfiguration);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [openModal, setOpenModal] = useState(false);
+  const [data, setData] = useState<MediaDto[]>([]);
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -83,14 +22,6 @@ const Videos = () => {
     setOpenModal(false);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      // Fetch data here
-    }
-
-    fetchData();
-  }, []);
-
   const search = () => {
     setSearchTerm('');
   }
@@ -99,13 +30,41 @@ const Videos = () => {
     setSearchTerm(event.target.value);
   }
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const mediasResult = await mediaService.apiMediaGetMediaGet();;
+
+        if (mediasResult.isSuccess) {
+          setData(mediasResult.data!);
+        } else {
+          Swal.fire({
+            title: 'Erro',
+            text: mediasResult.message,
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          });
+        }
+
+      } catch (error) {
+
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }
+    , []);
+
   return (
     <>
       <AddVideoModal
         open={openModal}
         onClose={handleCloseModal}
       />
-      <Box height="100%" bgcolor="#F3F3F3">
+      <Box height="100vh" flex={1} bgcolor="#F3F3F3">
         <Box display="flex" pl={3.4} mt={5}>
           <Box width="100%" display="flex" alignItems="center" justifyContent="space-between" mr={1}>
             <Box>
@@ -123,7 +82,7 @@ const Videos = () => {
         </Box>
         <Grid container pl={3.4}>
           {data.map((item, index) => (
-            <Media key={index} src={item.src} title={item.title} createdAt={item.createdAt} loading={loading} />
+            <Media key={index} src={item.src!} title={item.title!} description={item.description!} nickname={item.nickname!} createdAt={new Date(item.creationTime!)} loading={loading} />
           ))}
         </Grid>
       </Box>

@@ -16,41 +16,41 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface StringNewLevelResponse
+ * @interface BooleanNewLevelResponse
  */
-export interface StringNewLevelResponse {
+export interface BooleanNewLevelResponse {
     /**
      * 
      * @type {boolean}
-     * @memberof StringNewLevelResponse
+     * @memberof BooleanNewLevelResponse
      */
     isSuccess?: boolean;
     /**
      * 
      * @type {string}
-     * @memberof StringNewLevelResponse
+     * @memberof BooleanNewLevelResponse
      */
     message?: string;
     /**
      * 
-     * @type {string}
-     * @memberof StringNewLevelResponse
+     * @type {boolean}
+     * @memberof BooleanNewLevelResponse
      */
-    data?: string;
+    data?: boolean;
 }
 
 /**
- * Check if a given object implements the StringNewLevelResponse interface.
+ * Check if a given object implements the BooleanNewLevelResponse interface.
  */
-export function instanceOfStringNewLevelResponse(value: object): boolean {
+export function instanceOfBooleanNewLevelResponse(value: object): boolean {
     return true;
 }
 
-export function StringNewLevelResponseFromJSON(json: any): StringNewLevelResponse {
-    return StringNewLevelResponseFromJSONTyped(json, false);
+export function BooleanNewLevelResponseFromJSON(json: any): BooleanNewLevelResponse {
+    return BooleanNewLevelResponseFromJSONTyped(json, false);
 }
 
-export function StringNewLevelResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): StringNewLevelResponse {
+export function BooleanNewLevelResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): BooleanNewLevelResponse {
     if (json == null) {
         return json;
     }
@@ -62,7 +62,7 @@ export function StringNewLevelResponseFromJSONTyped(json: any, ignoreDiscriminat
     };
 }
 
-export function StringNewLevelResponseToJSON(value?: StringNewLevelResponse | null): any {
+export function BooleanNewLevelResponseToJSON(value?: BooleanNewLevelResponse | null): any {
     if (value == null) {
         return value;
     }

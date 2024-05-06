@@ -17,7 +17,6 @@ import * as runtime from '../runtime';
 import type {
   LoginInputDto,
   RegisterInputDto,
-  StringNewLevelResponse,
   TokensDto,
 } from '../models/index';
 import {
@@ -25,8 +24,6 @@ import {
     LoginInputDtoToJSON,
     RegisterInputDtoFromJSON,
     RegisterInputDtoToJSON,
-    StringNewLevelResponseFromJSON,
-    StringNewLevelResponseToJSON,
     TokensDtoFromJSON,
     TokensDtoToJSON,
 } from '../models/index';
@@ -116,7 +113,7 @@ export class AuthenticateApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiAuthenticateRegisterPostRaw(requestParameters: ApiAuthenticateRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<StringNewLevelResponse>> {
+    async apiAuthenticateRegisterPostRaw(requestParameters: ApiAuthenticateRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<boolean>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -139,12 +136,16 @@ export class AuthenticateApi extends runtime.BaseAPI {
             body: RegisterInputDtoToJSON(requestParameters['registerInputDto']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => StringNewLevelResponseFromJSON(jsonValue));
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<boolean>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
     }
 
     /**
      */
-    async apiAuthenticateRegisterPost(requestParameters: ApiAuthenticateRegisterPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<StringNewLevelResponse> {
+    async apiAuthenticateRegisterPost(requestParameters: ApiAuthenticateRegisterPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<boolean> {
         const response = await this.apiAuthenticateRegisterPostRaw(requestParameters, initOverrides);
         return await response.value();
     }
