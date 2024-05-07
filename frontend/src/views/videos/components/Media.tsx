@@ -20,7 +20,7 @@ const Media = ({ src, title, description, nickname, createdAt, loading }: MediaP
         setShowDescription(false);
     };
     return (
-        <Box sx={{ width: 460, marginRight: 1, my: 5 }}>
+        <Box sx={{ width: 460, marginRight: 1, my: 2 }}>
             {!loading ? (
                 <iframe width="460" height="300" src={src} title={title}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -47,7 +47,7 @@ const Media = ({ src, title, description, nickname, createdAt, loading }: MediaP
                             displayData={description}
                         />
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" color="text.secondary" fontSize={17}>
                         {`${formatCreationTime(createdAt)} por ${nickname}`}
                     </Typography>
                 </Box>
@@ -79,7 +79,7 @@ function formatCreationTime(creationTime: Date): string {
     } else if (diffMinutes > 0) {
         return `${diffMinutes} minuto${diffMinutes > 1 ? 's' : ''} atrás`;
     } else {
-        return `alguns segundos atrás`;
+        return `Alguns segundos atrás`;
     }
 }
 

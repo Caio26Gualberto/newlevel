@@ -4,7 +4,7 @@ namespace NewLevel.Interfaces.Services
 {
     public interface IMediaService
     {
-        Task<List<MediaDto>> GetAllMedias();
+        Task<GenericList<MediaDto>> GetAllMedias(Pagination input);
         Task<bool> RequestMedia(RequestMediaDto input);
     }
 }

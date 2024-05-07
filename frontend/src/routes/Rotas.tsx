@@ -3,10 +3,12 @@ import Login from '../views/loginAndRegister/Login';
 import Register from '../views/loginAndRegister/Register';
 import Apresentation from '../views/apresentation/Apresentation';
 import Videos from '../views/videos/Videos';
+import Navbar from '../components/layouts/Navbar';
 
 const Rotas = () => {
   return (
     <Router>
+      <Navbar />
       <Switch>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />

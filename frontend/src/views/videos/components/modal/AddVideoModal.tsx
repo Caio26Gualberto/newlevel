@@ -45,6 +45,7 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({ open, onClose }) => {
         }
         setTituloVideo('');
         setUrlVideo('');
+        setDescricaoVideo('');
         onClose();
     };
 

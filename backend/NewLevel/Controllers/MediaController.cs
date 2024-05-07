@@ -15,15 +15,15 @@ namespace NewLevel.Controllers
             _mediaService = mediaService;
         }
 
-        [HttpGet("GetMedia")]
-        public async Task<NewLevelResponse<List<MediaDto>>> GetMedia()
+        [HttpPost("GetMedia")]
+        public async Task<NewLevelResponse<GenericList<MediaDto>>> GetMedia(Pagination input)
         {
-            var media = await _mediaService.GetAllMedias();
+            var media = await _mediaService.GetAllMedias(input);
 
             if (media != null)
-                return new NewLevelResponse<List<MediaDto>> { Data = media, IsSuccess = true };
+                return new NewLevelResponse<GenericList<MediaDto>> { Data = media, IsSuccess = true };
 
-            return new NewLevelResponse<List<MediaDto>> { Data = media, IsSuccess = false, Message = "Não foi possível carregar os vídeos, se o problema persistir entre em contato com o desenvolvedor" };
+            return new NewLevelResponse<GenericList<MediaDto>> { Data = media, IsSuccess = false, Message = "Não foi possível carregar os vídeos, se o problema persistir entre em contato com o desenvolvedor" };
         }
 
         [HttpPost("RequestMedia")]

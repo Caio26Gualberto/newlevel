@@ -1,6 +1,4 @@
-import Swal from "sweetalert2";
 import { Configuration, ResponseContext } from "./gen/api/src";
-import * as toastr from 'toastr';
 
 let originalRequest: ResponseContext | null
 
@@ -24,7 +22,6 @@ const ApiConfiguration = new Configuration({
                 let ret = context.response;
                 originalRequest = context;
                 let contentType = context.response.headers.get('content-type');
-            debugger
                 if (context.response.status == 401 || context.response.status == 403) {
                     const response = await fetch(`https://localhost:7082/api/Authenticate/RenewToken?accessToken=${window.localStorage.getItem('accessToken')}`);
                     if (response.ok && response.status != 204) {

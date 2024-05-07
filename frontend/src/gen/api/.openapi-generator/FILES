@@ -14,7 +14,9 @@ src/models/DisplayActivityLocationDto.ts
 src/models/EActivityLocation.ts
 src/models/LoginInputDto.ts
 src/models/MediaDto.ts
-src/models/MediaDtoListNewLevelResponse.ts
+src/models/MediaDtoGenericList.ts
+src/models/MediaDtoGenericListNewLevelResponse.ts
+src/models/Pagination.ts
 src/models/RegisterInputDto.ts
 src/models/RequestMediaDto.ts
 src/models/TokensDto.ts

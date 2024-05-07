@@ -16,17 +16,24 @@
 import * as runtime from '../runtime';
 import type {
   BooleanNewLevelResponse,
-  MediaDtoListNewLevelResponse,
+  MediaDtoGenericListNewLevelResponse,
+  Pagination,
   RequestMediaDto,
 } from '../models/index';
 import {
     BooleanNewLevelResponseFromJSON,
     BooleanNewLevelResponseToJSON,
-    MediaDtoListNewLevelResponseFromJSON,
-    MediaDtoListNewLevelResponseToJSON,
+    MediaDtoGenericListNewLevelResponseFromJSON,
+    MediaDtoGenericListNewLevelResponseToJSON,
+    PaginationFromJSON,
+    PaginationToJSON,
     RequestMediaDtoFromJSON,
     RequestMediaDtoToJSON,
 } from '../models/index';
+
+export interface ApiMediaGetMediaPostRequest {
+    pagination?: Pagination;
+}
 
 export interface ApiMediaRequestMediaPostRequest {
     requestMediaDto?: RequestMediaDto;
@@ -39,10 +46,12 @@ export class MediaApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiMediaGetMediaGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MediaDtoListNewLevelResponse>> {
+    async apiMediaGetMediaPostRaw(requestParameters: ApiMediaGetMediaPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MediaDtoGenericListNewLevelResponse>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -54,18 +63,19 @@ export class MediaApi extends runtime.BaseAPI {
         }
         const response = await this.request({
             path: `/api/Media/GetMedia`,
-            method: 'GET',
+            method: 'POST',
             headers: headerParameters,
             query: queryParameters,
+            body: PaginationToJSON(requestParameters['pagination']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => MediaDtoListNewLevelResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => MediaDtoGenericListNewLevelResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async apiMediaGetMediaGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MediaDtoListNewLevelResponse> {
-        const response = await this.apiMediaGetMediaGetRaw(initOverrides);
+    async apiMediaGetMediaPost(requestParameters: ApiMediaGetMediaPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MediaDtoGenericListNewLevelResponse> {
+        const response = await this.apiMediaGetMediaPostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

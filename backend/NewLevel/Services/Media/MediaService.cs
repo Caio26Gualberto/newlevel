@@ -4,6 +4,7 @@ using NewLevel.Context;
 using NewLevel.Dtos;
 using NewLevel.Entities;
 using NewLevel.Interfaces.Services;
+using NewLevel.Utils;
 
 namespace NewLevel.Services.Media
 {
@@ -19,16 +20,35 @@ namespace NewLevel.Services.Media
             _userManager = userManager;
         }
         //TODO limitar para publicos
-        public async Task<List<MediaDto>> GetAllMedias()
+        public async Task<GenericList<MediaDto>> GetAllMedias(Pagination input)
         {
-            return await _context.Medias.Include(x => x.User).Select(media => new MediaDto
+            var totalMedias = await _context.Medias
+                .WhereIf(!string.IsNullOrEmpty(input.Search), media => media.Title.ToLower().Contains(input.Search.ToLower()) || media.Title.ToLower() == input.Search.ToLower())
+                .CountAsync();
+
+            var skip = (input.Page - 1) * input.PageSize;
+
+            var medias = await _context.Medias
+                .Include(x => x.User)
+                .WhereIf(!string.IsNullOrEmpty(input.Search), media => media.Title.ToLower().Contains(input.Search.ToLower()) || media.Title.ToLower() == input.Search.ToLower())
+                .OrderByDescending(media => media.CreationTime)
+                .Skip(skip)
+                .Take(input.PageSize)
+                .Select(media => new MediaDto
+                {
+                    Src = media.Src,
+                    Title = media.Title,
+                    CreationTime = media.CreationTime,
+                    Nickname = media.User.Nickname,
+                    Description = media.Description,
+                })
+                .ToListAsync();
+
+            return new GenericList<MediaDto>
             {
-                Src = media.Src,
-                Title = media.Title,
-                CreationTime = media.CreationTime,
-                Nickname = media.User.Nickname,
-                Description = media.Description
-            }).ToListAsync();
+                Items = medias, 
+                TotalCount = totalMedias
+            };
         }
 
         public async Task<bool> RequestMedia(RequestMediaDto input)
