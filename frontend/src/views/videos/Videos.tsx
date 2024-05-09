@@ -88,7 +88,7 @@ const Videos = () => {
         onClose={handleCloseModal}
       />
       <Box height="100%" flex={1} bgcolor="#F3F3F3">
-        <Box display="flex" pl={3.4} mt={5}>
+        <Box display="flex" pl={3.4} pt={2}>
           <Box width="100%" display="flex" alignItems="center" justifyContent="space-between" mr={1}>
             <Box>
               <Input value={searchTerm} placeholder="Pesquisa por título" sx={{ width: 460 }} onChange={handleInputChange} />

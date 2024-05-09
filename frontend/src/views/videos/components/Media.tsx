@@ -39,7 +39,7 @@ const Media = ({ src, title, description, nickname, createdAt, loading }: MediaP
                             color="primary"
                             size="small"
                             onClick={handleClickOpen}
-                            sx={{ mb: 1, color: "white", backgroundColor: "blue", "&:hover": { backgroundColor: "#F3F3F3", color: "blue", border: "none" } }}>Ver descrição</Button>
+                            sx={{ mb: 1, color: "white", backgroundColor: "red", border: "none", "&:hover": { backgroundColor: "#F3F3F3", color: "black", border: "none" } }}>Ver descrição</Button>
                         <SimpleDialog
                             open={showDescription}
                             onClose={handleClose}
