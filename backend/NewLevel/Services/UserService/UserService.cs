@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using NewLevel.Entities;
-using NewLevel.Interfaces.Services;
+using NewLevel.Interfaces.Services.User;
 
 namespace NewLevel.Services.UserService
 {

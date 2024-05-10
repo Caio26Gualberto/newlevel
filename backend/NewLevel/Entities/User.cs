@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using NewLevel.Enums;
+using NewLevel.Enums.Authenticate;
 using NewLevel.Validation;
 using System.ComponentModel.DataAnnotations.Schema;
 

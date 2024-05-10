@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NewLevel.Context;
-using NewLevel.Dtos;
+using NewLevel.Dtos.Medias;
+using NewLevel.Dtos.Utils;
 using NewLevel.Entities;
-using NewLevel.Interfaces.Services;
+using NewLevel.Interfaces.Services.Media;
 using NewLevel.Utils;
 
 namespace NewLevel.Services.Media

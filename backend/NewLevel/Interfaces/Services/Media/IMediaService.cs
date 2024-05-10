@@ -1,6 +1,7 @@
-﻿using NewLevel.Dtos;
+﻿using NewLevel.Dtos.Medias;
+using NewLevel.Dtos.Utils;
 
-namespace NewLevel.Interfaces.Services
+namespace NewLevel.Interfaces.Services.Media
 {
     public interface IMediaService
     {

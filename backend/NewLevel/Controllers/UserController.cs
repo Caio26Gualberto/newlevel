@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NewLevel.Interfaces.Services;
+using NewLevel.Interfaces.Services.User;
 
 namespace NewLevel.Controllers
 {

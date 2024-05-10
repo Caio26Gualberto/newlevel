@@ -1,4 +1,4 @@
-﻿namespace NewLevel.Dtos
+﻿namespace NewLevel.Dtos.Utils
 {
     public class GenericList<T>
     {

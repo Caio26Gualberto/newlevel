@@ -1,4 +1,4 @@
-﻿namespace NewLevel.Interfaces.Services
+﻿namespace NewLevel.Interfaces.Services.User
 {
     public interface IUserService
     {

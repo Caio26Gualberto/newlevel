@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NewLevel.Enums
+namespace NewLevel.Enums.Authenticate
 {
     public enum EActivityLocation
     {

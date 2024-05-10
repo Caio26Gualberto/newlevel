@@ -1,6 +1,6 @@
-﻿using NewLevel.Dtos;
-using NewLevel.Enums;
-using NewLevel.Interfaces.Services;
+﻿using NewLevel.Dtos.Authenticate;
+using NewLevel.Enums.Authenticate;
+using NewLevel.Interfaces.Services.Common;
 using System.ComponentModel.DataAnnotations;
 
 namespace NewLevel.Services.Common

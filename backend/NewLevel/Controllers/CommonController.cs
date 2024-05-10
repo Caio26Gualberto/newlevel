@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NewLevel.Dtos;
-using NewLevel.Interfaces.Services;
+using NewLevel.Dtos.Authenticate;
+using NewLevel.Interfaces.Services.Common;
 
 namespace NewLevel.Controllers
 {

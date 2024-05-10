@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NewLevel.Dtos;
-using NewLevel.Interfaces.Services;
+using NewLevel.Dtos.ApiResponse;
+using NewLevel.Dtos.Authenticate;
+using NewLevel.Interfaces.Services.Authenticate;
 
 namespace NewLevel.Controllers
 {
@@ -27,11 +28,16 @@ namespace NewLevel.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<bool> Register(RegisterInputDto input)
+        public async Task<NewLevelResponse<bool>> Register(RegisterInputDto input)
         {
             var result = await _authenticateService.Register(input);
 
-            return result;
+            return new NewLevelResponse<bool>() 
+            {
+                Data = result,
+                IsSuccess = result,
+                Message = result ? "User registered successfully" : "User registration failed"
+            };
         }
 
         [Authorize]

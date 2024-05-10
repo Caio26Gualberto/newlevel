@@ -1,6 +1,6 @@
-﻿using NewLevel.Dtos;
+﻿using NewLevel.Dtos.Authenticate;
 
-namespace NewLevel.Interfaces.Services
+namespace NewLevel.Interfaces.Services.Common
 {
     public interface ICommonService
     {

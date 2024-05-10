@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using NewLevel.Context;
-using NewLevel.Dtos;
+using NewLevel.Dtos.Authenticate;
 using NewLevel.Entities;
-using NewLevel.Interfaces.Services;
+using NewLevel.Interfaces.Services.Authenticate;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;

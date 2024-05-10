@@ -30,10 +30,9 @@ const Register = () => {
     });
 
     const registerAction = async () => {
-        try {   
-            debugger 
+        try {    
             if (formRegister.email === '' || formRegister.nickname === '' || formRegister.password === '' || formRegister.confirmPassword === '' || selectedCity.value === -1) {
-                toastr.warning('Preencha todos os campos', 'Sucesso!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
+                toastr.warning('Preencha todos os campos', 'Atenção!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
                 return
             }
             if (formRegister.password.length < 6) {
@@ -44,6 +43,10 @@ const Register = () => {
                 toastr.warning('As duas senhas estão diferentes', 'Atenção!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
                 return
             }
+            if (!formRegister.email.includes('@')) {
+                toastr.warning('Email inválido', 'Atenção!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
+                return
+            }
             const result = await authenticateService.apiAuthenticateRegisterPost({
                 registerInputDto: {
                     email: formRegister.email,
@@ -52,6 +55,8 @@ const Register = () => {
                     activityLocation: selectedCity.value as EActivityLocation
                 }
             })
+
+            debugger
 
             if (result) {
                 toastr.success('Conta criada!', 'Sucesso!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});

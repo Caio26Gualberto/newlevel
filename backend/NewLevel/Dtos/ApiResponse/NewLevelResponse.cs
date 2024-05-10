@@ -1,4 +1,4 @@
-﻿namespace NewLevel.Dtos
+﻿namespace NewLevel.Dtos.ApiResponse
 {
     public class NewLevelResponse<T>
     {
