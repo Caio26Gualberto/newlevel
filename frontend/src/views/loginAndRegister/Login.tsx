@@ -35,15 +35,20 @@ const Login = () => {
       const api = new AuthenticateApi(ApiConfiguration)
 
       if (formLogin.login === '' || formLogin.password === '') {
-        toastr.warning('Preencha todos os campos', 'Atenção!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"})
+        toastr.warning('Preencha todos os campos', 'Atenção!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" })
         return
       }
       const result = await api.apiAuthenticateLoginPost({ loginInputDto: { email: formLogin.login, password: formLogin.password } })
-      window.localStorage.setItem('accessToken', result.token!)
-      window.localStorage.setItem('refreshToken', result.refreshToken!)
-      toastr.success('Login efetuado com sucesso', 'Sucesso!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
-      if (!result.skipIntroduction) {
-        navigate('/welcome')
+      
+      if (result.isSuccess) {
+        window.localStorage.setItem('accessToken', result.data?.tokens?.token!)
+        window.localStorage.setItem('refreshToken', result.data?.tokens?.refreshToken!)
+        toastr.success('Login efetuado com sucesso', 'Sucesso!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
+        if (!result.data?.tokens?.skipIntroduction) {
+          navigate('/welcome')
+        }
+      } else {
+        toastr.error(result.message!, 'Erro!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
       }
     } catch (error) {
 

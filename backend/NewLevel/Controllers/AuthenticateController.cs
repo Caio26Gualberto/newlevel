@@ -17,26 +17,28 @@ namespace NewLevel.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<TokensDto?> Login(LoginInputDto input)
+        public async Task<NewLevelResponse<LoginResponseDto>> Login(LoginInputDto input)
         {
-            TokensDto tokens = await _authenticateService.Login(input.Email, input.Password);
+            LoginResponseDto resultLogin = await _authenticateService.Login(input.Email, input.Password);
 
-            if (!string.IsNullOrEmpty(tokens.Token) && !string.IsNullOrEmpty(tokens.RefreshToken))
-                return tokens;
-
-            return null;
+            return new NewLevelResponse<LoginResponseDto>()
+            {
+                Data = resultLogin,
+                IsSuccess = resultLogin.IsSuccess,
+                Message = resultLogin.Message
+            };
         }
 
         [HttpPost("Register")]
-        public async Task<NewLevelResponse<bool>> Register(RegisterInputDto input)
+        public async Task<NewLevelResponse<RegisterResponseDto>> Register(RegisterInputDto input)
         {
             var result = await _authenticateService.Register(input);
 
-            return new NewLevelResponse<bool>() 
+            return new NewLevelResponse<RegisterResponseDto>()
             {
                 Data = result,
-                IsSuccess = result,
-                Message = result ? "User registered successfully" : "User registration failed"
+                IsSuccess = result.Result,
+                Message = result.Message
             };
         }
 

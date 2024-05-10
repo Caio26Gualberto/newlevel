@@ -27,10 +27,18 @@ namespace NewLevel
             {
                 options.TokenLifespan = TimeSpan.FromMinutes(2);
             });
-            services.AddIdentity<User, IdentityRole>()
-                    .AddEntityFrameworkStores<NewLevelDbContext>()
-                    .AddDefaultTokenProviders()
-                    .AddTokenProvider<DataProtectorTokenProvider<User>>("local");
+            services.AddIdentity<User, IdentityRole>(options =>
+            {
+                // Configure a política de senha aqui
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 6;
+            })
+            .AddEntityFrameworkStores<NewLevelDbContext>()
+            .AddDefaultTokenProviders()
+            .AddTokenProvider<DataProtectorTokenProvider<User>>("local");
 
             var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("jwtkey")!);
             services.AddAuthentication(options =>

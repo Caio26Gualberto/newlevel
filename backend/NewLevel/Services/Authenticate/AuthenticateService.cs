@@ -49,7 +49,7 @@ namespace NewLevel.Services.Authenticate
             return new TokensDto();
         }
 
-        public async Task<TokensDto> Login(string email, string password)
+        public async Task<LoginResponseDto> Login(string email, string password)
         {
             var result = await _signInManager.PasswordSignInAsync(email, password, false, lockoutOnFailure: false);
 
@@ -62,14 +62,28 @@ namespace NewLevel.Services.Authenticate
                 var refreshToken = await _userManager.GenerateUserTokenAsync(user, tokenProvider: "local", purpose: "email");
                 await _userManager.SetAuthenticationTokenAsync(user, loginProvider: "email", tokenName: "refresh_token", tokenValue: refreshToken);
 
-                return new TokensDto { Token = tokenString, RefreshToken = refreshToken, SkipIntroduction = !user.IsFirstTimeLogin };
+                return new LoginResponseDto
+                {
+                    IsSuccess = result.Succeeded,
+                    Message = $"Bem vindo {user.Nickname}!",
+                    Tokens = new TokensDto { Token = tokenString, RefreshToken = refreshToken, SkipIntroduction = !user.IsFirstTimeLogin }
+                };
             }
 
-            return new TokensDto();
+            return new LoginResponseDto { IsSuccess = result.Succeeded, Message = "Usuário ou senha inválidos" };
         }
 
-        public async Task<bool> Register(RegisterInputDto input)
+        public async Task<RegisterResponseDto> Register(RegisterInputDto input)
         {
+            Dictionary<string, string> errors = new Dictionary<string, string>()
+            {
+                { "PasswordTooShort", "Senha muito curta" },
+                { "PasswordRequiresNonAlphanumeric", "Senha requer caractere não alfanumérico" },
+                { "PasswordRequiresDigit", "Senha requer números" },
+                { "PasswordRequiresLower", "Senha requer letra minúscula" },
+                { "PasswordRequiresUpper", "Senha requer letra maiúscula" }
+            };
+
             var user = new User(isFirstTimeLogin: true, nickName: input.Nickname, activityLocation: input.ActivityLocation);
             user.UserName = input.Email;
             user.Email = input.Email;
@@ -77,9 +91,23 @@ namespace NewLevel.Services.Authenticate
             var result = await _userManager.CreateAsync(user, input.Password);
 
             if (result.Succeeded)
+            {
                 await _signInManager.SignInAsync(user, isPersistent: false);
+                return new RegisterResponseDto { Result = true, Message = "Bem vindo!" };
+            }
+            else if (result.Errors.Any(e => errors.ContainsKey(e.Code)) && result.Errors.Count() == 1)
+            {
+                var errorMessage = result.Errors.First();
+                return new RegisterResponseDto { Result = false, Message = errors[errorMessage.Code] };
+            }
+            else if (result.Errors.Any(e => errors.ContainsKey(e.Code)) && result.Errors.Count() > 1)
+            {
+                var errorMessages = result.Errors.Where(e => errors.ContainsKey(e.Code)).Select(e => errors[e.Code]);
+                var error = string.Join("\n - ", errorMessages);
+                return new RegisterResponseDto { Result = false, Message = error };
+            }
 
-            return result.Succeeded;
+            return new RegisterResponseDto { Result = false, Message = "Erro ao registrar usuário" };
         }
 
         private string GenerateJwtToken(User user)

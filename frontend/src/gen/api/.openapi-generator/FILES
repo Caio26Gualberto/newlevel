@@ -13,11 +13,15 @@ src/models/BooleanNewLevelResponse.ts
 src/models/DisplayActivityLocationDto.ts
 src/models/EActivityLocation.ts
 src/models/LoginInputDto.ts
+src/models/LoginResponseDto.ts
+src/models/LoginResponseDtoNewLevelResponse.ts
 src/models/MediaDto.ts
 src/models/MediaDtoGenericList.ts
 src/models/MediaDtoGenericListNewLevelResponse.ts
 src/models/Pagination.ts
 src/models/RegisterInputDto.ts
+src/models/RegisterResponseDto.ts
+src/models/RegisterResponseDtoNewLevelResponse.ts
 src/models/RequestMediaDto.ts
 src/models/TokensDto.ts
 src/models/index.ts
