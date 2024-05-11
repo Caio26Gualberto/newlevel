@@ -121,7 +121,7 @@ namespace NewLevel.Services.Authenticate
                 {
                     new Claim("userId", user.Id)
                 }),
-                Expires = DateTime.UtcNow.AddSeconds(30),
+                Expires = DateTime.UtcNow.AddMinutes(10),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 

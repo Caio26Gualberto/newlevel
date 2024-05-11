@@ -20,6 +20,82 @@ namespace NewLevel.Services.Media
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
         }
+
+        public async Task<bool> UpdateMediaById(UpdateMediaByIdInput input)
+        {
+            try
+            {
+                var media = await _context.Medias.FirstOrDefaultAsync(media => media.Id == input.MediaId);
+
+                if (media == null)
+                    return false;
+
+                media.UpdateMedia(media.Src, media.Title, input.Description, media.IsPublic);
+                _context.Medias.Update(media);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }    
+        }
+
+        public async Task<GenericList<MediaByUserIdDto>> GetMediaByUserId(Pagination input)
+        {
+            var userId = _httpContextAccessor.HttpContext.Items["userId"].ToString();
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+                throw new Exception("Usuário não encontrado");
+
+            var totalMedias = await _context.Medias
+                .Where(media => media.UserId == userId)
+                .WhereIf(!string.IsNullOrEmpty(input.Search), media => media.Title.ToLower().Contains(input.Search.ToLower()) || media.Title.ToLower() == input.Search.ToLower())
+                .CountAsync();
+
+            var skip = (input.Page - 1) * input.PageSize;
+
+            var mediaList = await _context.Medias
+                .Where(media => media.UserId == userId)
+                .WhereIf(!string.IsNullOrEmpty(input.Search), media => media.Title.ToLower().Contains(input.Search.ToLower()) || media.Title.ToLower() == input.Search.ToLower())
+                .Skip(skip)
+                .Take(input.PageSize)
+                .Select(media => new MediaByUserIdDto
+                {
+                    Id = media.Id,
+                    Url = media.Src,
+                    Title = media.Title,
+                    Description = media.Description,
+                })
+                .ToListAsync();
+
+            return new GenericList<MediaByUserIdDto>
+            {
+                Items = mediaList,
+                TotalCount = totalMedias
+            };
+        }
+
+        public async Task<bool> DeleteMediaById(int id)
+        {
+            try
+            {
+                var media = await _context.Medias.FirstOrDefaultAsync(media => media.Id == id);
+                if (media == null)
+                    return false;
+
+                _context.Medias.Remove(media);
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
         //TODO limitar para publicos
         public async Task<GenericList<MediaDto>> GetAllMedias(Pagination input)
         {
@@ -47,7 +123,7 @@ namespace NewLevel.Services.Media
 
             return new GenericList<MediaDto>
             {
-                Items = medias, 
+                Items = medias,
                 TotalCount = totalMedias
             };
         }

@@ -16,22 +16,36 @@
 import * as runtime from '../runtime';
 import type {
   BooleanNewLevelResponse,
+  MediaByUserIdDtoGenericListNewLevelResponse,
   MediaDtoGenericListNewLevelResponse,
   Pagination,
   RequestMediaDto,
+  UpdateMediaByIdInput,
 } from '../models/index';
 import {
     BooleanNewLevelResponseFromJSON,
     BooleanNewLevelResponseToJSON,
+    MediaByUserIdDtoGenericListNewLevelResponseFromJSON,
+    MediaByUserIdDtoGenericListNewLevelResponseToJSON,
     MediaDtoGenericListNewLevelResponseFromJSON,
     MediaDtoGenericListNewLevelResponseToJSON,
     PaginationFromJSON,
     PaginationToJSON,
     RequestMediaDtoFromJSON,
     RequestMediaDtoToJSON,
+    UpdateMediaByIdInputFromJSON,
+    UpdateMediaByIdInputToJSON,
 } from '../models/index';
 
+export interface ApiMediaDeleteMediaByIdPostRequest {
+    id?: number;
+}
+
 export interface ApiMediaGetMediaPostRequest {
+    pagination?: Pagination;
+}
+
+export interface ApiMediaGetMediasByUserIdPostRequest {
     pagination?: Pagination;
 }
 
@@ -39,10 +53,50 @@ export interface ApiMediaRequestMediaPostRequest {
     requestMediaDto?: RequestMediaDto;
 }
 
+export interface ApiMediaUpdateMediaByIdPostRequest {
+    updateMediaByIdInput?: UpdateMediaByIdInput;
+}
+
 /**
  * 
  */
 export class MediaApi extends runtime.BaseAPI {
+
+    /**
+     */
+    async apiMediaDeleteMediaByIdPostRaw(requestParameters: ApiMediaDeleteMediaByIdPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['id'] != null) {
+            queryParameters['id'] = requestParameters['id'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/Media/DeleteMediaById`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiMediaDeleteMediaByIdPost(requestParameters: ApiMediaDeleteMediaByIdPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiMediaDeleteMediaByIdPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      */
@@ -81,6 +135,41 @@ export class MediaApi extends runtime.BaseAPI {
 
     /**
      */
+    async apiMediaGetMediasByUserIdPostRaw(requestParameters: ApiMediaGetMediasByUserIdPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MediaByUserIdDtoGenericListNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/Media/GetMediasByUserId`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: PaginationToJSON(requestParameters['pagination']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MediaByUserIdDtoGenericListNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiMediaGetMediasByUserIdPost(requestParameters: ApiMediaGetMediasByUserIdPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MediaByUserIdDtoGenericListNewLevelResponse> {
+        const response = await this.apiMediaGetMediasByUserIdPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
     async apiMediaRequestMediaPostRaw(requestParameters: ApiMediaRequestMediaPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
         const queryParameters: any = {};
 
@@ -111,6 +200,41 @@ export class MediaApi extends runtime.BaseAPI {
      */
     async apiMediaRequestMediaPost(requestParameters: ApiMediaRequestMediaPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
         const response = await this.apiMediaRequestMediaPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiMediaUpdateMediaByIdPostRaw(requestParameters: ApiMediaUpdateMediaByIdPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/Media/UpdateMediaById`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateMediaByIdInputToJSON(requestParameters['updateMediaByIdInput']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiMediaUpdateMediaByIdPost(requestParameters: ApiMediaUpdateMediaByIdPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiMediaUpdateMediaByIdPostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

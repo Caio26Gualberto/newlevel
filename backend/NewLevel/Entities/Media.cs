@@ -20,9 +20,13 @@ namespace NewLevel.Entities
         [ForeignKey("UserId")]
         public User User { get; set; }
 
+        public void UpdateMedia(string src, string title, string description, bool isPublic)
+        {
+            ValidateDomainEntity(src, title, description, isPublic, CreationTime, UserId);
+        }
+
         private void ValidateDomainEntity(string src, string title, string description, bool isPublic, DateTime creationTime, string userId)
         {
-            DomainExceptionValidation.When(!src.Contains("watch"), "Link Youtube inválido");
             DomainExceptionValidation.When(string.IsNullOrEmpty(userId), "userId nulo");
             DomainExceptionValidation.When(string.IsNullOrEmpty(description), "descrição nula");
 

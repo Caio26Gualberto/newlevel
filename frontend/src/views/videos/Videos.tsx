@@ -113,6 +113,7 @@ const Videos = () => {
           rowsPerPageOptions={[12, 24, 48]}
           component="div"
           count={data.data!.totalCount!}
+          labelRowsPerPage="Vídeos por página"
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

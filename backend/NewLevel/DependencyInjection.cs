@@ -25,7 +25,7 @@ namespace NewLevel
 
             services.Configure<DataProtectionTokenProviderOptions>(options =>
             {
-                options.TokenLifespan = TimeSpan.FromMinutes(2);
+                options.TokenLifespan = TimeSpan.FromMinutes(30);
             });
             services.AddIdentity<User, IdentityRole>(options =>
             {

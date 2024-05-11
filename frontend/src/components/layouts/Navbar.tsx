@@ -58,7 +58,7 @@ const Navbar = () => {
                     </Box>
                     <Box display="flex" width="95%" pr={2} pl={2}>
                         <Grid container>
-                            <Grid display="flex" justifyContent="center" xs={1}>
+                            <Grid display="flex" justifyContent="center" item xs={1}>
                                 <Menu
                                     id="basic-menu"
                                     anchorEl={anchorEl}
@@ -75,13 +75,13 @@ const Navbar = () => {
                                     onMouseLeave={(e) => (e.target as HTMLAnchorElement).style.color = "white"}
                                     style={{ textDecoration: "none", color: "white", transition: "color 0.3s ease", cursor: "pointer" }}>Álbuns</a>
                             </Grid>
-                            <Grid display="flex" justifyContent="center" xs={1}>
+                            <Grid display="flex" justifyContent="center" item xs={1}>
                                 <StyledLink to="/podcasts">Podcasts</StyledLink>
                             </Grid>
-                            <Grid display="flex" justifyContent="center" xs={1}>
+                            <Grid display="flex" justifyContent="center" item xs={1}>
                                 <StyledLink to="/aboutMe">Sobre mim</StyledLink>
                             </Grid>
-                            <Grid display="flex" justifyContent="center" xs={1}>
+                            <Grid display="flex" justifyContent="center" item xs={1}>
                                 
                             </Grid>
                         </Grid>

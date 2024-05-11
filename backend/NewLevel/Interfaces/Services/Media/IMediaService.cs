@@ -7,5 +7,8 @@ namespace NewLevel.Interfaces.Services.Media
     {
         Task<GenericList<MediaDto>> GetAllMedias(Pagination input);
         Task<bool> RequestMedia(RequestMediaDto input);
+        Task<bool> DeleteMediaById(int id);
+        Task<GenericList<MediaByUserIdDto>> GetMediaByUserId(Pagination input);
+        Task<bool> UpdateMediaById(UpdateMediaByIdInput input);
     }
 }

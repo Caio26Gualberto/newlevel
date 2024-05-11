@@ -15,6 +15,9 @@ src/models/EActivityLocation.ts
 src/models/LoginInputDto.ts
 src/models/LoginResponseDto.ts
 src/models/LoginResponseDtoNewLevelResponse.ts
+src/models/MediaByUserIdDto.ts
+src/models/MediaByUserIdDtoGenericList.ts
+src/models/MediaByUserIdDtoGenericListNewLevelResponse.ts
 src/models/MediaDto.ts
 src/models/MediaDtoGenericList.ts
 src/models/MediaDtoGenericListNewLevelResponse.ts
@@ -24,6 +27,7 @@ src/models/RegisterResponseDto.ts
 src/models/RegisterResponseDtoNewLevelResponse.ts
 src/models/RequestMediaDto.ts
 src/models/TokensDto.ts
+src/models/UpdateMediaByIdInput.ts
 src/models/index.ts
 src/runtime.ts
 tsconfig.esm.json
