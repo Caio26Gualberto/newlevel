@@ -171,11 +171,13 @@ const MyVideos = () => {
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         referrerPolicy="strict-origin-when-cross-origin" allowFullScreen style={{ border: "0px", borderRadius: "10px" }}></iframe>
                       <Divider orientation="vertical" flexItem sx={{ marginLeft: "16px" }} />
-                      <Box display="flex" alignItems="center" ml={5}>
+                      <Box display="flex" alignItems="center" ml={5} width="100vh">
                         <TextField
                           value={editIsActive ? descriptionEdit : data.description}
                           onChange={(e) => setDescriptionEdit(e.target.value)}
                           fullWidth
+                          multiline
+                          rows={6}
                           disabled={!editIsActive}
                         />
                       </Box>

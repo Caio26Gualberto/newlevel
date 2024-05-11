@@ -6,6 +6,7 @@ import AddVideoModal from "./components/modal/AddVideoModal";
 import { MediaApi, MediaDtoGenericListNewLevelResponse } from "../../gen/api/src";
 import ApiConfiguration from "../../apiConfig";
 import Swal from "sweetalert2";
+import NewLevelLoading from "../../components/NewLevelLoading";
 
 const Videos = () => {
   const mediaService = new MediaApi(ApiConfiguration);
@@ -83,6 +84,7 @@ const Videos = () => {
 
   return (
     <>
+      <NewLevelLoading isLoading={loading} />
       <AddVideoModal
         open={openModal}
         onClose={handleCloseModal}
