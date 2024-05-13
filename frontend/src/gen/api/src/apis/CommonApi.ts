@@ -15,11 +15,11 @@
 
 import * as runtime from '../runtime';
 import type {
-  DisplayActivityLocationDto,
+  DisplayActivityLocationDtoListNewLevelResponse,
 } from '../models/index';
 import {
-    DisplayActivityLocationDtoFromJSON,
-    DisplayActivityLocationDtoToJSON,
+    DisplayActivityLocationDtoListNewLevelResponseFromJSON,
+    DisplayActivityLocationDtoListNewLevelResponseToJSON,
 } from '../models/index';
 
 /**
@@ -29,7 +29,7 @@ export class CommonApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiCommonGetDisplayCitiesGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<DisplayActivityLocationDto>>> {
+    async apiCommonGetDisplayCitiesGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DisplayActivityLocationDtoListNewLevelResponse>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -49,12 +49,12 @@ export class CommonApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(DisplayActivityLocationDtoFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => DisplayActivityLocationDtoListNewLevelResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async apiCommonGetDisplayCitiesGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<DisplayActivityLocationDto>> {
+    async apiCommonGetDisplayCitiesGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DisplayActivityLocationDtoListNewLevelResponse> {
         const response = await this.apiCommonGetDisplayCitiesGetRaw(initOverrides);
         return await response.value();
     }

@@ -83,8 +83,8 @@ const Register = () => {
         const fetchData = async () => {
             try {
                 const result = await commonService.apiCommonGetDisplayCitiesGet()
-                result.push({ name: 'Selecione uma cidade', value: -1 })
-                setCities(result)
+                result.data!.push({ name: 'Selecione uma cidade', value: -1 })
+                setCities(result.data!)
             } catch (error) {
 
             } finally {

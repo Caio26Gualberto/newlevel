@@ -68,8 +68,8 @@ const Navbar = () => {
                                         'aria-labelledby': 'basic-button',
                                     }}
                                 >
-                                    <StyledLink sx={{ color: "black" }} to="/videos"><MenuItem>Vídeos</MenuItem></StyledLink>
-                                    <StyledLink sx={{ color: "black" }} to="/photos"><MenuItem>Fotos</MenuItem></StyledLink>
+                                    <StyledLink sx={{ color: "black" }} onClick={handleClose} to="/videos"><MenuItem>Vídeos</MenuItem></StyledLink>
+                                    <StyledLink sx={{ color: "black" }} onClick={handleClose} to="/photos"><MenuItem>Fotos</MenuItem></StyledLink>
                                 </Menu>
                                 <a onClick={handleClick} onMouseEnter={(e) => (e.target as HTMLAnchorElement).style.color = "red"}
                                     onMouseLeave={(e) => (e.target as HTMLAnchorElement).style.color = "white"}
@@ -97,9 +97,9 @@ const Navbar = () => {
                                 'aria-labelledby': 'basic-button',
                             }}
                         >
-                            <MenuItem><StyledLink sx={{ color: "black" }} to="/myProfile">Meu perfil</StyledLink></MenuItem>
-                            <MenuItem><StyledLink sx={{ color: "black" }} to="/myVideos">Meus vídeos</StyledLink></MenuItem>
-                            <MenuItem><StyledLink sx={{ color: "black" }} to="/">Sair</StyledLink></MenuItem>
+                            <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myProfile"><MenuItem>Meu perfil</MenuItem></StyledLink>
+                            <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myVideos"><MenuItem>Meus vídeos</MenuItem></StyledLink>
+                            <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/"><MenuItem>Sair</MenuItem></StyledLink>
                         </Menu>
                     </Box>
                 </Box>

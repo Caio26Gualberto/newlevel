@@ -31,7 +31,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "generate-api": "if exist src\\gen rmdir /s /q src\\gen && openapi-generator-cli generate -i http://localhost:5011/swagger/v1/swagger.json --generator-name typescript-fetch -o src\\gen\\api --config api.json && if exist node_modules\\generate-api rmdir /s /q node_modules\\generate-api && npm install generate-api"
+    "generate-api": "if exist src\\gen rmdir /s /q src\\gen && openapi-generator-cli generate -i http://localhost:5011/swagger/v1/swagger.json --generator-name typescript-fetch -o src\\gen\\api --config api.json && powershell -Command \"& { $content = Get-Content 'src\\gen\\api\\src\\runtime.ts'; $content = $content[0..132] + @( '    protected async request(context: RequestOpts, initOverrides?: RequestInit | InitOverrideFunction): Promise<Response> {', '        const { url, init } = await this.createFetchParams(context, initOverrides);', '        const response = await this.fetchApi(url, init);', '        return response;', '    }' ) + $content[142..($content.Length - 1)]; $content | Set-Content 'src\\gen\\api\\src\\runtime.ts'; }\""
   },
   "eslintConfig": {
     "extends": [

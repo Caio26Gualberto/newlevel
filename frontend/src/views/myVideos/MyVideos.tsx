@@ -1,4 +1,4 @@
-import { Accordion, AccordionDetails, AccordionSummary, Box, Button, CircularProgress, Divider, Input, InputAdornment, Paper, TablePagination, TextField, Typography } from "@mui/material"
+import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Divider, Input, Paper, TablePagination, TextField, Typography } from "@mui/material"
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import React, { useEffect } from "react";
 import { MediaApi, MediaByUserIdDto, MediaByUserIdDtoGenericListNewLevelResponse } from "../../gen/api/src";
@@ -6,6 +6,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ApiConfiguration from "../../apiConfig";
 import * as toastr from 'toastr';
 import NewLevelLoading from "../../components/NewLevelLoading";
+import Swal from "sweetalert2";
 
 const MyVideos = () => {
   const mediaApi = new MediaApi(ApiConfiguration);
@@ -24,7 +25,6 @@ const MyVideos = () => {
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
   };
 
   const search = () => {
@@ -123,11 +123,17 @@ const MyVideos = () => {
           search: searchTerm
         }
       });
+
       if (userVideos.isSuccess) {
         setUserVideosData(userVideos);
+      } else {
+        Swal.fire({
+          title: 'Erro',
+          text: userVideos.message!,
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
       }
-    } catch (error) {
-
     } finally {
       setLoading(false);
     }
@@ -146,7 +152,7 @@ const MyVideos = () => {
       <NewLevelLoading isLoading={loading} />
       <Box height="100vh" display="flex" justifyContent="center" alignItems="center">
         {userVideosData.data?.items?.length! > 0 && (
-          <Paper elevation={4} sx={{ width: "80%", height: "auto" }}>
+          <Paper elevation={4} sx={{ width: "80%" }}>
             <Box display="flex" justifyContent="end" m={1}>
               <Input value={searchTerm} placeholder="Pesquisa por título" sx={{ width: 460 }} onChange={handleInputChange} />
               <Button className="btn btn-primary" onClick={search}>

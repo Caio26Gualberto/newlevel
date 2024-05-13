@@ -134,12 +134,8 @@ export class BaseAPI {
     protected async request(context: RequestOpts, initOverrides?: RequestInit | InitOverrideFunction): Promise<Response> {
         const { url, init } = await this.createFetchParams(context, initOverrides);
         const response = await this.fetchApi(url, init);
-        if (response && (response.status >= 200 && response.status < 300)) {
-            return response;
-        }
-        throw new ResponseError(response, 'Response returned an error code');
+        return response;
     }
-
     private async createFetchParams(context: RequestOpts, initOverrides?: RequestInit | InitOverrideFunction) {
         let url = this.configuration.basePath + context.path;
         if (context.query !== undefined && Object.keys(context.query).length !== 0) {

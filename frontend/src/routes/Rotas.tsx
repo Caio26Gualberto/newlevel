@@ -8,6 +8,7 @@ import Photos from '../views/photos/Photos';
 import Podcast from '../views/podcast/Podcast';
 import AboutMe from '../views/aboutMe/AboutMe';
 import MyVideos from '../views/myVideos/MyVideos';
+import MyProfile from '../views/myProfile/MyProfile';
 
 const Rotas = () => {
   return (
@@ -22,6 +23,7 @@ const Rotas = () => {
         <Route path="/podcasts" element={<Podcast />} />
         <Route path="/aboutMe" element={<AboutMe />} />
         <Route path="/myVideos" element={<MyVideos />} />
+        <Route path="/myProfile" element={<MyProfile />} />
       </Switch>
     </Router>
   )

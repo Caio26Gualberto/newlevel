@@ -2,6 +2,7 @@
 /* eslint-disable */
 export * from './BooleanNewLevelResponse';
 export * from './DisplayActivityLocationDto';
+export * from './DisplayActivityLocationDtoListNewLevelResponse';
 export * from './EActivityLocation';
 export * from './LoginInputDto';
 export * from './LoginResponseDto';

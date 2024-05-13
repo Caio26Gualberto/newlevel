@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NewLevel.Dtos.ApiResponse;
 using NewLevel.Dtos.Authenticate;
+using NewLevel.Dtos.Utils;
 using NewLevel.Interfaces.Services.Common;
 
 namespace NewLevel.Controllers
@@ -15,10 +17,15 @@ namespace NewLevel.Controllers
         }
 
         [HttpGet("GetDisplayCities")]
-        public async Task<List<DisplayActivityLocationDto>> GetDisplayCities()
+        public async Task<ActionResult<NewLevelResponse<List<DisplayActivityLocationDto>>>> GetDisplayCities()
         {
             var displayList = _commonService.GetDisplayActivityLocation();
-            return displayList;
+            if (displayList == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new NewLevelResponse<List<DisplayActivityLocationDto>> { IsSuccess = true, Data = displayList});
         }
     }
 }

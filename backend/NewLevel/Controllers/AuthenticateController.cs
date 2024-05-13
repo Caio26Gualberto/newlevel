@@ -17,29 +17,43 @@ namespace NewLevel.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<NewLevelResponse<LoginResponseDto>> Login(LoginInputDto input)
+        public async Task<ActionResult<NewLevelResponse<LoginResponseDto>>> Login(LoginInputDto input)
         {
-            LoginResponseDto resultLogin = await _authenticateService.Login(input.Email, input.Password);
-
-            return new NewLevelResponse<LoginResponseDto>()
+            try
             {
-                Data = resultLogin,
-                IsSuccess = resultLogin.IsSuccess,
-                Message = resultLogin.Message
-            };
+                LoginResponseDto resultLogin = await _authenticateService.Login(input.Email, input.Password);
+
+                return new NewLevelResponse<LoginResponseDto>()
+                {
+                    Data = resultLogin,
+                    IsSuccess = resultLogin.IsSuccess,
+                    Message = resultLogin.Message
+                };
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<LoginResponseDto> { IsSuccess = false, Message = ex.Message });
+            }
         }
 
         [HttpPost("Register")]
-        public async Task<NewLevelResponse<RegisterResponseDto>> Register(RegisterInputDto input)
+        public async Task<ActionResult<NewLevelResponse<RegisterResponseDto>>> Register(RegisterInputDto input)
         {
-            var result = await _authenticateService.Register(input);
-
-            return new NewLevelResponse<RegisterResponseDto>()
+            try
             {
-                Data = result,
-                IsSuccess = result.Result,
-                Message = result.Message
-            };
+                var result = await _authenticateService.Register(input);
+
+                return Ok(new NewLevelResponse<RegisterResponseDto>()
+                {
+                    Data = result,
+                    IsSuccess = result.Result,
+                    Message = result.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<RegisterResponseDto> { IsSuccess = false, Message = ex.Message });
+            }
         }
 
         [Authorize]

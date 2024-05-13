@@ -1,4 +1,5 @@
 ﻿using NewLevel.Dtos.Authenticate;
+using NewLevel.Dtos.Utils;
 using NewLevel.Enums.Authenticate;
 using NewLevel.Interfaces.Services.Common;
 using System.ComponentModel.DataAnnotations;

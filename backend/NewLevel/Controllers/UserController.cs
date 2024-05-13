@@ -26,5 +26,11 @@ namespace NewLevel.Controllers
         {
             await _userService.SkipIntroduction();
         }
+
+        [HttpGet("GetUserInfo")]
+        public async Task GetUserInfo()
+        {
+            await _userService.SkipIntroduction();
+        }
     }
 }

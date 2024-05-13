@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using NewLevel.Dtos.User;
 using NewLevel.Entities;
 using NewLevel.Interfaces.Services.User;
 
@@ -12,6 +13,31 @@ namespace NewLevel.Services.UserService
         {
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
+        }
+
+        public async Task<UserInfoResponseDto> GetUserInfo()
+        {
+            var userId = _httpContextAccessor.HttpContext.Items["userId"];
+
+            if (userId == null)
+            {
+                throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
+            }
+            var user = await _userManager.FindByIdAsync(userId.ToString()!);
+
+            if (user == null)
+            {
+                throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
+            }
+
+            return new UserInfoResponseDto
+            {
+                Nickname = user.Nickname,
+                ActivityLocation = user.ActivityLocation,
+                Email = user.Email,
+                Password = user.PasswordHash,
+                ProfilePicture = null,
+            };
         }
         public async Task<bool> Delete()
         {

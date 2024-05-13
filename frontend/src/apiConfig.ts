@@ -1,4 +1,4 @@
-import { Configuration, ResponseContext } from "./gen/api/src";
+import { Configuration, ErrorContext, ResponseContext } from "./gen/api/src";
 
 let originalRequest: ResponseContext | null
 

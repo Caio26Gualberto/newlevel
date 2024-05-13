@@ -1,4 +1,5 @@
 ﻿using NewLevel.Dtos.Authenticate;
+using NewLevel.Dtos.Utils;
 
 namespace NewLevel.Interfaces.Services.Common
 {

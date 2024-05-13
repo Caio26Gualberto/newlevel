@@ -44,7 +44,7 @@ const AboutMe = () => {
         <Divider orientation="vertical" />
         <Grid item xs={9}>
           <Box m={2}>
-            <Typography fontSize={20}>
+            <Typography fontSize={17} fontWeight="bold" lineHeight={1.7}>
               Sejam todos bem-vindos! Meu nome é Caio, e se há algo que posso garantir é que música corre em minhas veias. Desde pequeno, fui imerso em um mundo de riffs de guitarra, batidas pesadas e letras que transcendem o comum.
 
               Cresci ouvindo Metal. Bandas como Overkill, Slayer, Whiplash, Dark Angel, Exodus, Anthrax, e At War foram trilhas sonoras constantes da minha juventude. Mas, ao mesmo tempo, minha jornada musical foi enriquecida pelas influências do passado, graças ao meu avô. Paulo Sérgio, Vicente Celestino, Carlos Galhardo, Adoniran Barbosa, e muitos outros nomes ecoavam pelas paredes de nossa casa.
