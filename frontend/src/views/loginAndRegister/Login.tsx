@@ -4,6 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import ApiConfiguration from "../../apiConfig";
 import { Link, useNavigate } from "react-router-dom";
 import * as toastr from 'toastr';
+import ModalPassword from "./modalResetPassword/ModalPassword";
 
 const style = {
   transform: 'translate(-50%, -50%)',
@@ -19,6 +20,7 @@ const Login = () => {
     login: '',
     password: ''
   });
+  const [openModal, setOpenModal] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -30,6 +32,10 @@ const Login = () => {
     setFormLogin({ ...formLogin, password: e.target.value });
   };
 
+  const handleSetModal = () => {
+    setOpenModal(!openModal);
+  }
+
   const login = async () => {
     try {
       const api = new AuthenticateApi(ApiConfiguration)
@@ -39,7 +45,7 @@ const Login = () => {
         return
       }
       const result = await api.apiAuthenticateLoginPost({ loginInputDto: { email: formLogin.login, password: formLogin.password } })
-      
+
       if (result.isSuccess) {
         window.localStorage.setItem('accessToken', result.data?.tokens?.token!)
         window.localStorage.setItem('refreshToken', result.data?.tokens?.refreshToken!)
@@ -70,6 +76,7 @@ const Login = () => {
 
   return (
     <>
+      <ModalPassword open={openModal} onClose={handleSetModal} />
       <Box>
         <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center"
           position="absolute" top="50%" left="50%" width="768px" minHeight="480px" borderRadius="10px"
@@ -86,7 +93,10 @@ const Login = () => {
             <Button onClick={login} sx={{ color: "white" }}>Entrar</Button>
           </Box>
           <Box>
-            <Typography color="white" fontSize={15}>Não tem uma conta? <Link to="/register">Registre-se</Link></Typography>
+            <Typography color="white" fontSize={15}>Não tem uma conta? <Link to="/register" style={{ color: "white" }}>Registre-se</Link></Typography>
+          </Box>
+          <Box>
+            <Typography color="white" fontSize={15}>Esqueceu sua senha? <Link to="" onClick={handleSetModal} style={{ color: "white" }}>Clique aqui!</Link></Typography>
           </Box>
         </Box>
       </Box>

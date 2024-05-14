@@ -9,6 +9,7 @@ import Podcast from '../views/podcast/Podcast';
 import AboutMe from '../views/aboutMe/AboutMe';
 import MyVideos from '../views/myVideos/MyVideos';
 import MyProfile from '../views/myProfile/MyProfile';
+import ResetPassword from '../views/resetPassword/ResetPassword';
 
 const Rotas = () => {
   return (
@@ -24,6 +25,7 @@ const Rotas = () => {
         <Route path="/aboutMe" element={<AboutMe />} />
         <Route path="/myVideos" element={<MyVideos />} />
         <Route path="/myProfile" element={<MyProfile />} />
+        <Route path="/security/resetPassword" element={<ResetPassword />} />
       </Switch>
     </Router>
   )
