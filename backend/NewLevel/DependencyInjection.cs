@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NewLevel.Context;
 using NewLevel.Entities;
+using NewLevel.Interfaces.Email;
 using NewLevel.Interfaces.Services.Authenticate;
 using NewLevel.Interfaces.Services.Common;
 using NewLevel.Interfaces.Services.Media;
@@ -65,6 +66,7 @@ namespace NewLevel
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICommonService, CommonService>();
             services.AddScoped<IMediaService, MediaService>();
+            services.AddScoped<IEmailService, EmailService>();
 
             return services;
         }
