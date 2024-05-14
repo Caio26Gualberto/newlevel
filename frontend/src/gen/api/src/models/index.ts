@@ -18,8 +18,5 @@ export * from './RegisterInputDto';
 export * from './RegisterResponseDto';
 export * from './RegisterResponseDtoNewLevelResponse';
 export * from './RequestMediaDto';
-export * from './StringNewLevelResponse';
 export * from './TokensDto';
 export * from './UpdateMediaByIdInput';
-export * from './UserInfoResponseDto';
-export * from './UserInfoResponseDtoNewLevelResponse';

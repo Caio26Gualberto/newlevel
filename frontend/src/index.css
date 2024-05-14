@@ -17,39 +17,25 @@ code {
   background-image: url('assets/HeadbangerBackground.jpg');
   background-size: contain;
   height: 100vh;
-  width: 100%;
-}
-
-.image-with-opacity-reset-password {
-  background-image: url('assets/Slayer4.png');
-  background-size: cover; /* Faz a imagem cobrir todo o elemento */
-  background-position: center; 
-  background-repeat: no-repeat;
-  height: 100vh; 
 }
 
 /* Estilizando a barra de rolagem */
 ::-webkit-scrollbar {
-  width: 10px;
-  /* Largura da barra de rolagem */
+    width: 10px; /* Largura da barra de rolagem */
 }
 
 /* Estilizando a pista da barra de rolagem */
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  /* Cor de fundo da pista */
+    background: #f1f1f1; /* Cor de fundo da pista */
 }
 
 /* Estilizando o polegar da barra de rolagem */
 ::-webkit-scrollbar-thumb {
-  background: #888;
-  /* Cor do polegar */
-  border-radius: 5px;
-  /* Borda arredondada do polegar */
+    background: #888; /* Cor do polegar */
+    border-radius: 5px; /* Borda arredondada do polegar */
 }
 
 /* Estilizando o polegar da barra de rolagem quando hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
-  /* Cor do polegar quando hover */
+    background: #555; /* Cor do polegar quando hover */
 }

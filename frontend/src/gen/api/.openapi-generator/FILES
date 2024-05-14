@@ -27,11 +27,8 @@ src/models/RegisterInputDto.ts
 src/models/RegisterResponseDto.ts
 src/models/RegisterResponseDtoNewLevelResponse.ts
 src/models/RequestMediaDto.ts
-src/models/StringNewLevelResponse.ts
 src/models/TokensDto.ts
 src/models/UpdateMediaByIdInput.ts
-src/models/UserInfoResponseDto.ts
-src/models/UserInfoResponseDtoNewLevelResponse.ts
 src/models/index.ts
 src/runtime.ts
 tsconfig.esm.json

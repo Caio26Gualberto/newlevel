@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NewLevel.Dtos.ApiResponse;
-using NewLevel.Dtos.User;
 using NewLevel.Interfaces.Services.User;
 
 namespace NewLevel.Controllers
@@ -30,67 +28,9 @@ namespace NewLevel.Controllers
         }
 
         [HttpGet("GetUserInfo")]
-        public async Task<ActionResult<NewLevelResponse<UserInfoResponseDto>>> GetUserInfo()
+        public async Task GetUserInfo()
         {
-            try
-            {
-                var result = await _userService.GetUserInfo();
-                return Ok(new NewLevelResponse<UserInfoResponseDto>
-                {
-                    Data = result,
-                    IsSuccess = true
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new NewLevelResponse<UserInfoResponseDto>
-                {
-                    Message = ex.Message,
-                    IsSuccess = false
-                });
-            }
-        }
-
-        [HttpPost("GenerateTokenToResetPassword")]
-        public async Task<ActionResult<NewLevelResponse<string>>> GenerateTokenToResetPassword()
-        {
-            try
-            {
-                await _userService.GenerateTokenToResetPassword();
-                return Ok(new NewLevelResponse<string>
-                {
-                    IsSuccess = true
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new NewLevelResponse<string>
-                {
-                    Message = ex.Message,
-                    IsSuccess = false
-                });
-            }
-        }
-
-        [HttpPost("GenerateTokenToResetPasswordByEmail")]
-        public async Task<ActionResult<NewLevelResponse<string>>> ResetPassword(string email)
-        {
-            try
-            {
-                await _userService.GenerateTokenToResetPasswordByEmail(email);
-                return Ok(new NewLevelResponse<string>
-                {
-                    IsSuccess = true
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new NewLevelResponse<string>
-                {
-                    Message = ex.Message,
-                    IsSuccess = false
-                });
-            }
+            await _userService.SkipIntroduction();
         }
     }
 }

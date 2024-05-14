@@ -1,12 +1,8 @@
-import { Avatar, Box, Button, Divider, FormControl, Grid, IconButton, Input, InputLabel, MenuItem, Paper, Select, TextField, Typography } from "@mui/material"
+import { Avatar, Box, Button, Divider, Grid, IconButton, Input, InputLabel, Paper, TextField, Typography } from "@mui/material"
 import TestImage from "../../assets/slayer_86.jpg"
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import * as toastr from 'toastr';
-import { CommonApi, DisplayActivityLocationDto, UserApi } from "../../gen/api/src";
-import ApiConfiguration from "../../apiConfig";
-import { UserInfoResponseDto } from "../../gen/api/src/models/UserInfoResponseDto";
-import Swal from "sweetalert2";
 
 interface IFormUpdateRegister {
     email: {
@@ -33,14 +29,9 @@ interface IFormUpdateRegister {
 }
 
 const MyProfile = () => {
-    const userService = new UserApi(ApiConfiguration);
-    const commonService = new CommonApi(ApiConfiguration);
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [isHovered, setIsHovered] = useState<boolean>(false);
     const [isEditing, setIsEditing] = useState<boolean>(false);
-    const [userInfos, setUserInfos] = useState<UserInfoResponseDto>({ email: '', nickname: '', activityLocation: 1 });
-    const [userLocation, setUserLocation] = useState<DisplayActivityLocationDto>({ name: '', value: 0 });
-    const [locations, setLocation] = useState<DisplayActivityLocationDto[]>([]);
     const [formUpdateRegister, setFormUpdateRegister] = useState<IFormUpdateRegister>({
         email: {
             value: '',
@@ -64,18 +55,11 @@ const MyProfile = () => {
         }
     });
 
-    const handleCityChange = (event: any) => {
-        const selectedCityValue = event.target.value as number;
-        const selectedCity = locations.find(city => city.value === selectedCityValue);
-        setUserLocation(selectedCity!);
-    }
-
     const handleEditProfile = () => {
-        if (!isEditing) {
-            setIsEditing(true);
+        setIsEditing(!isEditing);
+        if (isEditing) {
             toastr.info('Edição ativa', '', { timeOut: 3000, positionClass: "toast-bottom-right" });
         } else {
-            setIsEditing(false);
             toastr.info('Edição desativada', '', { timeOut: 3000, positionClass: "toast-bottom-right" });
         }
     }
@@ -86,31 +70,6 @@ const MyProfile = () => {
 
     const handleMouseLeave = () => {
         setIsHovered(false);
-    };
-
-    const editingPassword = () => {
-        editingPasswordModal();
-    }
-
-    const editingPasswordModal = async () => {
-        const { value: formValues, dismiss } = await Swal.fire({
-            title: 'Alterar Senha',
-            html: '<p>Deseja enviar um email para a redefinição de senha?</p>',
-            focusConfirm: false,
-            confirmButtonColor: '#4caf50',
-            showCancelButton: true,
-            cancelButtonColor: '#f44336',
-            preConfirm: () => {
-                return true;
-            }
-        });
-        
-        if (formValues) {
-            await userService.apiUserGenerateTokenToResetPasswordPost({});
-            Swal.fire('E-mail de redefinição enviado com sucesso!', '', 'success');
-        } else if (dismiss === Swal.DismissReason.cancel) {
-            Swal.fire('Operação cancelada', '', 'info');
-        }
     };
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,29 +108,6 @@ const MyProfile = () => {
         }
     };
 
-    useEffect(() => {
-        const userInformations = async () => {
-            const userInfos = await userService.apiUserGetUserInfoGet();
-            const userLocation = await commonService.apiCommonGetDisplayCitiesGet();
-
-            if (userInfos.isSuccess) {
-                setUserInfos(userInfos.data!);
-            } else {
-                toastr.error(userInfos.message!, '', { timeOut: 3000, positionClass: "toast-bottom-right" });
-            }
-            debugger
-            if (userLocation.isSuccess) {
-                setLocation(userLocation.data!);
-                setUserLocation(locations.find(x => x.value === userInfos.data!.activityLocation!)!);
-            } else {
-                toastr.error(userLocation.message!, '', { timeOut: 3000, positionClass: "toast-bottom-right" });
-            }
-        }
-
-        userInformations();
-    }
-        , []);
-
     return (
         <Box display="flex" alignItems="center" justifyContent="center" flex={1} height="92.5vh" bgcolor="#F3F3F3">
             <Paper elevation={4} sx={{ width: "85%", height: "50rem" }}>
@@ -179,7 +115,7 @@ const MyProfile = () => {
                     <Grid container height="100%">
                         <Grid item xs={3}>
                             <Box mt={2} height="100%" display="flex" justifyContent="flex-start" flexDirection="column" alignItems="center">
-                                {!isEditing ?
+                                {isEditing ?
                                     (<Avatar
                                         src={selectedImage || TestImage}
                                         sx={{
@@ -237,32 +173,19 @@ const MyProfile = () => {
                             <Box mt={3} height="100%" display="flex" flexDirection="column" justifyContent="flex-start">
                                 <Box width="100%" mt={2}>
                                     <InputLabel><Typography fontWeight="bold">Email:</Typography></InputLabel>
-                                    <TextField value={userInfos.email} disabled={!isEditing} size="small" sx={{ width: "60%" }} variant="outlined" />
+                                    <TextField defaultValue="Caio" disabled={isEditing} size="small" sx={{ width: "60%" }} variant="outlined" />
                                 </Box>
                                 <Box width="100%" mt={2}>
                                     <InputLabel><Typography fontWeight="bold">Apelido:</Typography></InputLabel>
-                                    <TextField value={userInfos.nickname} disabled={!isEditing} size="small" sx={{ width: "60%" }} variant="outlined" />
+                                    <TextField defaultValue="Caio" disabled={isEditing} size="small" sx={{ width: "60%" }} variant="outlined" />
                                 </Box>
                                 <Box width="100%" mt={2}>
                                     <InputLabel><Typography fontWeight="bold">Senha:</Typography></InputLabel>
-                                    <TextField value="******" disabled={!isEditing} size="small" sx={{ width: "60%" }} variant="outlined" />
-                                    {isEditing && <Button onClick={editingPassword} size="small" sx={{ marginLeft: "8px", marginTop: "5px" }} variant="contained">Alteração de senha</Button>}
+                                    <TextField defaultValue="******" disabled={isEditing} size="small" sx={{ width: "60%" }} variant="outlined" />
                                 </Box>
                                 <Box width="100%" mt={2}>
                                     <InputLabel><Typography fontWeight="bold">Cidade:</Typography></InputLabel>
-                                    <FormControl size="small" sx={{ width: "60%" }}>
-                                        <Select
-                                            labelId="demo-simple-select-label"
-                                            id="demo-simple-select"
-                                            value={1}
-                                            onChange={handleCityChange}
-                                            disabled={!isEditing}
-                                        >
-                                            {locations.map((city) => {
-                                                return <MenuItem key={city.value} value={city.value}>{city.name}</MenuItem>
-                                            })}
-                                        </Select>
-                                    </FormControl>
+                                    <TextField defaultValue="Caio" disabled={isEditing} size="small" sx={{ width: "60%" }} variant="outlined" />
                                 </Box>
                                 <Box>
 
