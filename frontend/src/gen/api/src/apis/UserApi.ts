@@ -14,6 +14,20 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  StringNewLevelResponse,
+  UserInfoResponseDtoNewLevelResponse,
+} from '../models/index';
+import {
+    StringNewLevelResponseFromJSON,
+    StringNewLevelResponseToJSON,
+    UserInfoResponseDtoNewLevelResponseFromJSON,
+    UserInfoResponseDtoNewLevelResponseToJSON,
+} from '../models/index';
+
+export interface ApiUserGenerateTokenToResetPasswordByEmailPostRequest {
+    email?: string;
+}
 
 /**
  * 
@@ -58,7 +72,75 @@ export class UserApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiUserGetUserInfoGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiUserGenerateTokenToResetPasswordByEmailPostRaw(requestParameters: ApiUserGenerateTokenToResetPasswordByEmailPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<StringNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['email'] != null) {
+            queryParameters['email'] = requestParameters['email'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/User/GenerateTokenToResetPasswordByEmail`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => StringNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiUserGenerateTokenToResetPasswordByEmailPost(requestParameters: ApiUserGenerateTokenToResetPasswordByEmailPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<StringNewLevelResponse> {
+        const response = await this.apiUserGenerateTokenToResetPasswordByEmailPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiUserGenerateTokenToResetPasswordPostRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<StringNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/User/GenerateTokenToResetPassword`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => StringNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiUserGenerateTokenToResetPasswordPost(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<StringNewLevelResponse> {
+        const response = await this.apiUserGenerateTokenToResetPasswordPostRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiUserGetUserInfoGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserInfoResponseDtoNewLevelResponse>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -78,13 +160,14 @@ export class UserApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserInfoResponseDtoNewLevelResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async apiUserGetUserInfoGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiUserGetUserInfoGetRaw(initOverrides);
+    async apiUserGetUserInfoGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserInfoResponseDtoNewLevelResponse> {
+        const response = await this.apiUserGetUserInfoGetRaw(initOverrides);
+        return await response.value();
     }
 
     /**

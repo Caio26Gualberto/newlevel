@@ -40,7 +40,7 @@ const Navbar = () => {
     };
 
     useEffect(() => {
-        if (location.pathname === "/" || location.pathname === "/welcome" || location.pathname === "/register") {
+        if (location.pathname === "/" || location.pathname === "/welcome" || location.pathname === "/register" || location.pathname === "/security/resetPassword") {
             setShowNavbar(false)
         } else {
             setShowNavbar(true)
