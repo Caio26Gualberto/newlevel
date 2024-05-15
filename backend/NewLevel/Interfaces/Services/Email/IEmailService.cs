@@ -1,4 +1,4 @@
-﻿namespace NewLevel.Interfaces.Email
+﻿namespace NewLevel.Interfaces.Services.Email
 {
     public interface IEmailService
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using NewLevel.Dtos.User;
 using NewLevel.Entities;
-using NewLevel.Interfaces.Email;
+using NewLevel.Interfaces.Services.Email;
 using NewLevel.Interfaces.Services.User;
 
 namespace NewLevel.Services.UserService
@@ -16,7 +16,6 @@ namespace NewLevel.Services.UserService
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
             _emailService = emailService;
-
         }
 
         public async Task GenerateTokenToResetPasswordByEmail(string email)

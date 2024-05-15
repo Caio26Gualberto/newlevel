@@ -64,7 +64,7 @@ namespace NewLevel.Controllers
             try
             {
                 var result = await _mediaService.DeleteMediaById(id);
-                return StatusCode(204, new NewLevelResponse<bool> { IsSuccess = true, Message = "Vídeo deletado com sucesso!" });
+                return StatusCode(200, new NewLevelResponse<bool> { IsSuccess = true, Message = "Vídeo deletado com sucesso!" });
             }
             catch (Exception ex)
             {
@@ -100,7 +100,7 @@ namespace NewLevel.Controllers
             try
             {
                 var result = await _mediaService.UpdateMediaById(input);
-                return StatusCode(204, new NewLevelResponse<bool> { IsSuccess = result, Message = "Alterações salvas!" });
+                return StatusCode(200, new NewLevelResponse<bool> { IsSuccess = result, Message = "Alterações salvas!" });
             }
             catch (Exception ex)
             {

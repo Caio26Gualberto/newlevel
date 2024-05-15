@@ -20,6 +20,8 @@ namespace NewLevel.Entities
         public bool IsFirstTimeLogin { get; private set; }
         [InverseProperty("User")]
         public List<Media> Medias { get; private set; }
+        [InverseProperty("User")]
+        public List<Photo> Photos { get; private set; }
 
         public void Update(bool? isFirstTimeLogin, string nickName, EActivityLocation activityLocation)
         {

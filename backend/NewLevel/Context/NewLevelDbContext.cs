@@ -11,6 +11,7 @@ namespace NewLevel.Context
         { }
 
         public DbSet<Media> Medias { get; set; }    
+        public DbSet<Photo> Photos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

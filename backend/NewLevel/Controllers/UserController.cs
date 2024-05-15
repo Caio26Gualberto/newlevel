@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NewLevel.Dtos.ApiResponse;
 using NewLevel.Dtos.User;
 using NewLevel.Interfaces.Services.User;

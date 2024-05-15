@@ -4,14 +4,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NewLevel.Context;
 using NewLevel.Entities;
-using NewLevel.Interfaces.Email;
 using NewLevel.Interfaces.Services.Authenticate;
 using NewLevel.Interfaces.Services.Common;
+using NewLevel.Interfaces.Services.Email;
 using NewLevel.Interfaces.Services.Media;
+using NewLevel.Interfaces.Services.Photo;
 using NewLevel.Interfaces.Services.User;
 using NewLevel.Services.Authenticate;
 using NewLevel.Services.Common;
 using NewLevel.Services.Media;
+using NewLevel.Services.Photo;
 using NewLevel.Services.UserService;
 using System.Text;
 
@@ -67,6 +69,7 @@ namespace NewLevel
             services.AddScoped<ICommonService, CommonService>();
             services.AddScoped<IMediaService, MediaService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IPhotoService, PhotoService>();
 
             return services;
         }

@@ -6,6 +6,7 @@ package.json
 src/apis/AuthenticateApi.ts
 src/apis/CommonApi.ts
 src/apis/MediaApi.ts
+src/apis/PhotoApi.ts
 src/apis/UserApi.ts
 src/apis/index.ts
 src/index.ts

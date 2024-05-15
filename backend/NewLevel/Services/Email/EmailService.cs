@@ -1,10 +1,10 @@
 ﻿using System.Net.Mail;
 using System.Net;
-using NewLevel.Interfaces.Email;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using Newtonsoft.Json.Linq;
 using System.Web;
+using NewLevel.Interfaces.Services.Email;
 
 public class EmailService : IEmailService
 {
