@@ -16,16 +16,27 @@
 import * as runtime from '../runtime';
 import type {
   BooleanNewLevelResponse,
+  Pagination,
+  PhotoResponseDtoGenericListNewLevelResponse,
 } from '../models/index';
 import {
     BooleanNewLevelResponseFromJSON,
     BooleanNewLevelResponseToJSON,
+    PaginationFromJSON,
+    PaginationToJSON,
+    PhotoResponseDtoGenericListNewLevelResponseFromJSON,
+    PhotoResponseDtoGenericListNewLevelResponseToJSON,
 } from '../models/index';
+
+export interface ApiPhotoGetAllPhotosPostRequest {
+    pagination?: Pagination;
+}
 
 export interface ApiPhotoUploadPhotoPostRequest {
     title?: string;
     subtitle?: string;
     description?: string;
+    takeAt?: string;
     file?: Blob;
 }
 
@@ -33,6 +44,41 @@ export interface ApiPhotoUploadPhotoPostRequest {
  * 
  */
 export class PhotoApi extends runtime.BaseAPI {
+
+    /**
+     */
+    async apiPhotoGetAllPhotosPostRaw(requestParameters: ApiPhotoGetAllPhotosPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PhotoResponseDtoGenericListNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/Photo/GetAllPhotos`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: PaginationToJSON(requestParameters['pagination']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PhotoResponseDtoGenericListNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiPhotoGetAllPhotosPost(requestParameters: ApiPhotoGetAllPhotosPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PhotoResponseDtoGenericListNewLevelResponse> {
+        const response = await this.apiPhotoGetAllPhotosPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      */
@@ -75,6 +121,10 @@ export class PhotoApi extends runtime.BaseAPI {
 
         if (requestParameters['description'] != null) {
             formParams.append('Description', requestParameters['description'] as any);
+        }
+
+        if (requestParameters['takeAt'] != null) {
+            formParams.append('TakeAt', requestParameters['takeAt'] as any);
         }
 
         if (requestParameters['file'] != null) {

@@ -1,10 +1,29 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CardPhoto from "./components/CardPhoto";
-import { Box, Button, Grid } from "@mui/material";
+import { Box, Button, Grid, TablePagination } from "@mui/material";
 import AddNewPhotoModal from "./components/modal/AddNewPhotoModal";
+import { PhotoApi, PhotoResponseDtoGenericList } from "../../gen/api/src";
+import ApiConfiguration from "../../apiConfig";
+import * as toastr from 'toastr';
 
 const Photos = () => {
+  const photoService = new PhotoApi(ApiConfiguration);
   const [openModal, setOpenModal] = useState<boolean>(false);
+  const [photos, setPhotos] = useState<PhotoResponseDtoGenericList>({ items: [], totalCount: 0 });
+  const [pagination, setPagination] = useState({ page: 1, pageSize: 12, pageCount: 0, search: '' });
+
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+    setPagination(prev => ({ ...prev, page: newPage }));
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const newPageSize = parseInt(event.target.value, 10);
+    setPagination(prev => ({
+      ...prev,
+      pageSize: newPageSize,
+      page: 0
+    }));
+  };
 
   const handleOpenModal = () => {
     setOpenModal(true);
@@ -14,41 +33,56 @@ const Photos = () => {
     setOpenModal(false);
   };
 
+  const getPhotos = async () => {
+    const result = await photoService.apiPhotoGetAllPhotosPost({
+      pagination: {
+        page: pagination.page + 1,
+        pageSize: pagination.pageSize,
+        pageCount: pagination.pageCount,
+        search: pagination.search
+      }
+    });
+    if (result.isSuccess) {
+      setPhotos(result.data!);
+    } else {
+      toastr.error(result.message!, 'Erro!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
+    }
+  };
+
+  useEffect(() => {
+    getPhotos();
+  }, [pagination.page, pagination.pageSize])
+
   return (
     <>
       <AddNewPhotoModal open={openModal} onClose={handleCloseModal} />
-      <Box>
-        <Box m={1} display="flex" justifyContent="flex-end">
-          <Button className="btn btn-primary" onClick={handleOpenModal}>
+      <Box bgcolor="#F3F3F3">
+        <Box display="flex" justifyContent="flex-end">
+          <Button sx={{ marginTop: "16px" }} className="btn btn-primary" onClick={handleOpenModal}>
             Adicionar foto
           </Button>
         </Box>
         <Box m={2}>
           <Grid container spacing={2}>
-            <Grid item xs={2}>
-              <CardPhoto key={1} title="Metal" subtitle="asasasasasasas" srcPhotoS3="" date={new Date()} description="sadfaaaaaaaaaaaaaaaaaaaaaaaaaasfesadgewgwebg" />
-            </Grid>
-            <Grid item xs={2}>
-              <CardPhoto key={2} title="Metal" subtitle="Metal em 1986" srcPhotoS3="" date={new Date()} description="sadfaaaaaaaaaaaaaaaaaaaaaaaaaasfesadgewgwebg" />
-            </Grid>
-            <Grid item xs={2}>
-              <CardPhoto key={3} title="Metal" subtitle="Metal em 1986" srcPhotoS3="" date={new Date()} description="sadfaaaaaaaaaaaaaaaaaaaaaaaaaasfesadgewgwebg" />
-            </Grid>
-            <Grid item xs={2}>
-              <CardPhoto key={4} title="Metal" subtitle="Metal em 1986" srcPhotoS3="" date={new Date()} description="sadfaaaaaaaaaaaaaaaaaaaaaaaaaasfesadgewgwebg" />
-            </Grid>
-            <Grid item xs={2}>
-              <CardPhoto key={5} title="Metal" subtitle="Metal em 1986" srcPhotoS3="" date={new Date()} description="sadfaaaaaaaaaaaaaaaaaaaaaaaaaasfesadgewgwebg" />
-            </Grid>
-            <Grid item xs={2}>
-              <CardPhoto key={6} title="Metal" subtitle="Metal em 1986" srcPhotoS3="" date={new Date()} description="sadfaaaaaaaaaaaaaaaaaaaaaaaaaasfesadgewgwebg" />
-            </Grid>
-            <Grid item xs={2}>
-              <CardPhoto key={7} title="Metal" subtitle="Metal em 1986" srcPhotoS3="" date={new Date()} description="Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of de Finibus Bonorum et Malorum (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, Lorem ipsum dolor sit amet.., comes from a line in section 1.10.32." />
-            </Grid>
+            {photos.items?.map((photo, index) => (
+              <Grid item xs={2}>
+                <CardPhoto key={index} title={photo.title!} subtitle={photo.subtitle!} srcPhotoS3={photo.src!} date={photo.captureDate!} description={photo.description} srcUserPhotoProfile={photo.avatarSrc} />
+              </Grid>
+            ))}
           </Grid>
         </Box>
       </Box>
+      <TablePagination
+        sx={{ display: 'flex', justifyContent: 'center' }}
+        rowsPerPageOptions={[12, 24, 48]}
+        component="div"
+        count={photos.totalCount!}
+        labelRowsPerPage="Fotos por página"
+        rowsPerPage={pagination.pageSize}
+        page={pagination.page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
     </>
   )
 }

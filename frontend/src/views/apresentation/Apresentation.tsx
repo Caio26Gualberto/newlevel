@@ -1,7 +1,17 @@
 import { Box, Button, Typography } from '@mui/material'
 import CelticFrost from '../../assets/Celtif_Frost.jpg'
+import { UserApi } from '../../gen/api/src';
+import ApiConfiguration from '../../apiConfig';
+import { useNavigate } from 'react-router-dom';
 
 const Apresentation = () => {
+    const userService = new UserApi(ApiConfiguration);
+    const navigate = useNavigate();
+    const skipApresentation = async () => { 
+        const result = await userService.apiUserSkipIntroductionGet();
+        navigate('/videos');
+    }
+
     return (<>
         <Box component="img" position="fixed" width="100%" height="100%" sx={{ opacity: "1" }} src={CelticFrost} alt="Celtic Frost" />
         <Box position="absolute" top="60%" left="50%" color="white" textAlign="center" sx={{ transform: "translate(-50%, -50%)" }}>
@@ -15,7 +25,7 @@ const Apresentation = () => {
                 Explore nossas páginas e embarque em uma jornada pela essência do metal. Seja revivendo as lendárias batalhas de mosh pit, relembrando as letras que ecoavam pelas ruas do ABC, ou simplesmente compartilhando suas próprias histórias, New Level é o lugar onde a comunidade headbanger se encontra para celebrar o passado e construir novas conexões no presente.
             </Typography>
             <Box p="3rem">
-                <Button sx={{ backgroundColor: "#3a100b", color: "white" }}>Começar</Button>
+                <Button onClick={skipApresentation} sx={{ backgroundColor: "#3a100b", color: "white" }}>Começar</Button>
             </Box>
         </Box>
     </>

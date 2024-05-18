@@ -91,5 +91,27 @@ namespace NewLevel.Controllers
                 });
             }
         }
+
+        [HttpPost("UploadAvatarImage")]
+        public async Task<ActionResult<NewLevelResponse<string>>> UploadAvatarImage(UploadAvatarImageInput input)
+        {
+            try
+            {
+                await _userService.UploadAvatarImage(input);
+                return Ok(new NewLevelResponse<string>
+                {
+                    IsSuccess = true,
+                    Message = "Avatar atualizado com sucesso"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<string>
+                {
+                    Message = ex.Message,
+                    IsSuccess = false
+                });
+            }
+        }
     }
 }

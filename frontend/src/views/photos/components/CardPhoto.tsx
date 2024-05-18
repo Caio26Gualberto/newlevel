@@ -47,6 +47,10 @@ const CardPhoto: React.FC<CardPhotoProps> = ({ title, srcPhotoS3, srcUserPhotoPr
     setExpanded(!expanded);
   };
 
+  const openImage = () => {
+    window.open(srcPhotoS3, '_blank');
+  };
+
   return (
     <Card sx={{ maxWidth: 345, minHeight: "100%" }}>
       <CardHeader
@@ -61,11 +65,13 @@ const CardPhoto: React.FC<CardPhotoProps> = ({ title, srcPhotoS3, srcUserPhotoPr
           </IconButton>
         }
         title={<Typography fontWeight="bold">{title}</Typography>}
-        subheader={date.toDateString()}
+        subheader={date.toLocaleDateString()}
       />
       <CardMedia
+        onClick={openImage}
+        sx={{ cursor: "pointer" }}
         component="img"
-        height="194"
+        height="250"
         src={srcPhotoS3}
       />
       <CardContent sx={{height: "109px"}}>

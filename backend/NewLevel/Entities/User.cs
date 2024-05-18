@@ -11,11 +11,12 @@ namespace NewLevel.Entities
         {
                 
         }
-        public User(bool isFirstTimeLogin, string nickName, EActivityLocation activityLocation)
+        public User(bool isFirstTimeLogin, string nickName, string? avatar, EActivityLocation activityLocation)
         {
-            ValidateDomainEntity(isFirstTimeLogin, nickName, activityLocation);
+            ValidateDomainEntity(isFirstTimeLogin, nickName, avatar, activityLocation);
         }
         public string Nickname { get; private set; }
+        public string? Avatar { get; private set; }
         public EActivityLocation ActivityLocation { get; private set; }
         public bool IsFirstTimeLogin { get; private set; }
         [InverseProperty("User")]
@@ -23,12 +24,12 @@ namespace NewLevel.Entities
         [InverseProperty("User")]
         public List<Photo> Photos { get; private set; }
 
-        public void Update(bool? isFirstTimeLogin, string nickName, EActivityLocation activityLocation)
+        public void Update(bool? isFirstTimeLogin, string nickName, string? avatar, EActivityLocation activityLocation)
         {
-            ValidateDomainEntity(isFirstTimeLogin, nickName, activityLocation);
+            ValidateDomainEntity(isFirstTimeLogin, nickName, avatar, activityLocation);
         }
 
-        private void ValidateDomainEntity(bool? isFirstTimeLogin, string nickName, EActivityLocation activityLocation)
+        private void ValidateDomainEntity(bool? isFirstTimeLogin, string nickName, string? avatar, EActivityLocation activityLocation)
         {
             DomainExceptionValidation.When(string.IsNullOrWhiteSpace(nickName), "Apelido inválido. Apelido é necessário!");  
 
@@ -37,6 +38,7 @@ namespace NewLevel.Entities
 
             Nickname = nickName;
             ActivityLocation = activityLocation;
+            Avatar = avatar;
         }
     }
 }

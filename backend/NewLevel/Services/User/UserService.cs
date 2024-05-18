@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using NewLevel.Context;
 using NewLevel.Dtos.User;
 using NewLevel.Entities;
 using NewLevel.Interfaces.Services.Email;
 using NewLevel.Interfaces.Services.User;
+using NewLevel.Services.AmazonS3;
 
 namespace NewLevel.Services.UserService
 {
@@ -11,11 +13,13 @@ namespace NewLevel.Services.UserService
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<User> _userManager;
         private readonly IEmailService _emailService;
-        public UserService(IHttpContextAccessor httpContextAccessor, UserManager<User> userManager, IEmailService emailService)
+        private readonly NewLevelDbContext _newLevelDbContext;
+        public UserService(IHttpContextAccessor httpContextAccessor, UserManager<User> userManager, IEmailService emailService, NewLevelDbContext newLevelDbContext)
         {
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
             _emailService = emailService;
+            _newLevelDbContext = newLevelDbContext;
         }
 
         public async Task GenerateTokenToResetPasswordByEmail(string email)
@@ -100,7 +104,7 @@ namespace NewLevel.Services.UserService
                     throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
                 }
 
-                user.Update(isFirstTimeLogin: false, nickName: user.Nickname, activityLocation: user.ActivityLocation);
+                user.Update(isFirstTimeLogin: false, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatar: null);
                 await _userManager.UpdateAsync(user);
             }
             catch (Exception e)
@@ -130,6 +134,37 @@ namespace NewLevel.Services.UserService
             var (body, subject) = EmailService.MakeResetPasswordTemplate(token);
 
             await _emailService.SendEmail(user.Email!, subject, body);
+        }
+
+        public async Task<bool> UploadAvatarImage(UploadAvatarImageInput input)
+        {
+            var userId = _httpContextAccessor.HttpContext!.Items["userId"];
+
+            if (userId == null)
+            {
+                throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
+            }
+            var user = await _userManager.FindByIdAsync(userId.ToString()!);
+
+            if (user == null)
+            {
+                throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
+            }
+
+            AmazonS3Service s3 = new AmazonS3Service();
+            string key = $"avatars/{user.Id}";
+            var result = await s3.UploadFilesAsync("newlevel-images", key, input.File);
+
+            if (!result)
+            {
+                throw new Exception("Erro ao adicionar imagem a nuvem, caso o problema persista entre em contato com o desenvolvedor");
+            }
+
+            user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatar: key);
+            await _userManager.UpdateAsync(user);
+            await _newLevelDbContext.SaveChangesAsync();
+
+            return true;
         }
     }
 }

@@ -24,6 +24,9 @@ src/models/MediaDto.ts
 src/models/MediaDtoGenericList.ts
 src/models/MediaDtoGenericListNewLevelResponse.ts
 src/models/Pagination.ts
+src/models/PhotoResponseDto.ts
+src/models/PhotoResponseDtoGenericList.ts
+src/models/PhotoResponseDtoGenericListNewLevelResponse.ts
 src/models/RegisterInputDto.ts
 src/models/RegisterResponseDto.ts
 src/models/RegisterResponseDtoNewLevelResponse.ts

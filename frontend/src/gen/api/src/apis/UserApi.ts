@@ -29,6 +29,10 @@ export interface ApiUserGenerateTokenToResetPasswordByEmailPostRequest {
     email?: string;
 }
 
+export interface ApiUserUploadAvatarImagePostRequest {
+    file?: Blob;
+}
+
 /**
  * 
  */
@@ -199,6 +203,59 @@ export class UserApi extends runtime.BaseAPI {
      */
     async apiUserSkipIntroductionGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.apiUserSkipIntroductionGetRaw(initOverrides);
+    }
+
+    /**
+     */
+    async apiUserUploadAvatarImagePostRaw(requestParameters: ApiUserUploadAvatarImagePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<StringNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['file'] != null) {
+            formParams.append('File', requestParameters['file'] as any);
+        }
+
+        const response = await this.request({
+            path: `/api/User/UploadAvatarImage`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => StringNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiUserUploadAvatarImagePost(requestParameters: ApiUserUploadAvatarImagePostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<StringNewLevelResponse> {
+        const response = await this.apiUserUploadAvatarImagePostRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

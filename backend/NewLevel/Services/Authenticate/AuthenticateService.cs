@@ -58,7 +58,7 @@ namespace NewLevel.Services.Authenticate
                 var user = await _signInManager.UserManager.FindByEmailAsync(email);
                 var tokenString = GenerateJwtToken(user);
 
-                user.Update(isFirstTimeLogin: null, nickName: user.Nickname, activityLocation: user.ActivityLocation);
+                user.Update(isFirstTimeLogin: null, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatar: null);
                 var refreshToken = await _userManager.GenerateUserTokenAsync(user, tokenProvider: "local", purpose: "email");
                 await _userManager.SetAuthenticationTokenAsync(user, loginProvider: "email", tokenName: "refresh_token", tokenValue: refreshToken);
 
@@ -84,7 +84,7 @@ namespace NewLevel.Services.Authenticate
                 { "PasswordRequiresUpper", "Senha requer letra maiúscula" }
             };
 
-            var user = new User(isFirstTimeLogin: true, nickName: input.Nickname, activityLocation: input.ActivityLocation);
+            var user = new User(isFirstTimeLogin: true, nickName: input.Nickname, activityLocation: input.ActivityLocation, avatar: null);
             user.UserName = input.Email;
             user.Email = input.Email;
 

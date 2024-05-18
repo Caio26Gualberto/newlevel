@@ -9,5 +9,6 @@ namespace NewLevel.Interfaces.Services.User
         public Task<UserInfoResponseDto> GetUserInfo();
         public Task GenerateTokenToResetPassword();
         public Task GenerateTokenToResetPasswordByEmail(string email);
+        public Task<bool> UploadAvatarImage(UploadAvatarImageInput input);
     }
 }

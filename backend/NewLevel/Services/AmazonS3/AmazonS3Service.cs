@@ -1,5 +1,6 @@
 ﻿using Amazon.Runtime;
 using Amazon.S3;
+using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 
 namespace NewLevel.Services.AmazonS3
@@ -40,6 +41,20 @@ namespace NewLevel.Services.AmazonS3
             });
 
             return true;
+        }
+
+        public async Task<string> CreateTempURLS3(string bucket, string key)
+        {
+            var request = new GetPreSignedUrlRequest
+            {
+                BucketName = bucket,
+                Key = key,
+                Expires = DateTime.Now.AddDays(2).AddHours(-3),
+            };
+
+            var url = _s3Client.GetPreSignedURL(request);
+
+            return url;
         }
     }
 }

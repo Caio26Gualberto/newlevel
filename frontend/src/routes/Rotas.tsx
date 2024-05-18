@@ -10,6 +10,7 @@ import AboutMe from '../views/aboutMe/AboutMe';
 import MyVideos from '../views/myVideos/MyVideos';
 import MyProfile from '../views/myProfile/MyProfile';
 import ResetPassword from '../views/resetPassword/ResetPassword';
+import ChooseUserAvatar from '../views/chooseUserAvatar/ChooseUserAvatar';
 
 const Rotas = () => {
   return (
@@ -26,6 +27,7 @@ const Rotas = () => {
         <Route path="/myVideos" element={<MyVideos />} />
         <Route path="/myProfile" element={<MyProfile />} />
         <Route path="/security/resetPassword" element={<ResetPassword />} />
+        <Route path="/newAvatar" element={<ChooseUserAvatar />} />
       </Switch>
     </Router>
   )

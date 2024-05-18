@@ -51,7 +51,9 @@ const Login = () => {
         window.localStorage.setItem('refreshToken', result.data?.tokens?.refreshToken!)
         toastr.success('Login efetuado com sucesso', 'Sucesso!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
         if (!result.data?.tokens?.skipIntroduction) {
-          navigate('/welcome')
+          navigate('/newAvatar')
+        } else {
+          navigate('/videos')
         }
       } else {
         toastr.error(result.message!, 'Erro!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
