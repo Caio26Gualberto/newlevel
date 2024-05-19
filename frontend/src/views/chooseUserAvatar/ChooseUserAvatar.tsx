@@ -7,10 +7,12 @@ import { useNavigate } from "react-router-dom";
 import { UserApi } from "../../gen/api/src";
 import ApiConfiguration from "../../apiConfig";
 import * as toastr from 'toastr';
+import NewLevelLoading from "../../components/NewLevelLoading";
 
 
 const ChooseUserAvatar = () => {
     const userService = new UserApi(ApiConfiguration);
+    const [loading, setLoading] = useState<boolean>(false);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [imageSrc, setImageSrc] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -31,6 +33,7 @@ const ChooseUserAvatar = () => {
     };
 
     const redirectToNextPageAndSaveAvatar = async () => {
+        setLoading(true)
         if (selectedImage) {
             const result = await userService.apiUserUploadAvatarImagePost(
                 {
@@ -44,6 +47,7 @@ const ChooseUserAvatar = () => {
                 toastr.error(result.message!, 'Erro!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
             }
         }
+        setLoading(false)
         navigate('/welcome');
     }
 
@@ -71,50 +75,53 @@ const ChooseUserAvatar = () => {
     const randomColor = getRandomColor();
 
     return (
-        <Box display="flex" bgcolor="#F3F3F3" height="100vh" justifyContent="flex-start" flexDirection="column" alignItems="center">
-            <Box mt={5} display="flex" justifyContent="center" alignItems="center" flexDirection="column">
-                <Typography variant="h3">Escolha seu avatar</Typography>
-                <Typography variant="h6">* Você poderá utilizar uma foto depois caso não queira selecionar uma agora &#129345;</Typography>
-            </Box>
-            <Box
-                onClick={handleButtonClick}
-                mt={5}
-                sx={{
-                    cursor: "pointer",
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center'
-                }}
-            >
-                <Avatar
-                    src={imageSrc || undefined}
+        <>
+        <NewLevelLoading isLoading={loading} />
+            <Box display="flex" bgcolor="#F3F3F3" height="100vh" justifyContent="flex-start" flexDirection="column" alignItems="center">
+                <Box mt={5} display="flex" justifyContent="center" alignItems="center" flexDirection="column">
+                    <Typography variant="h3">Escolha seu avatar</Typography>
+                    <Typography variant="h6">* Você poderá utilizar uma foto depois caso não queira selecionar uma agora &#129345;</Typography>
+                </Box>
+                <Box
+                    onClick={handleButtonClick}
+                    mt={5}
                     sx={{
-                        width: "300px",
-                        height: "300px",
-                        bgcolor: imageSrc ? 'transparent' : randomColor,
-                        '&:hover': {
-                            border: '2px dashed #000',
-                            opacity: 0.7,
-                        },
-                        cursor: 'pointer'
+                        cursor: "pointer",
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center'
                     }}
                 >
-                    {!imageSrc && 'C'}
-                </Avatar>
-                <input
-                    type="file"
-                    id="imagem"
-                    accept="image/*"
-                    ref={fileInputRef}
-                    style={{ display: 'none' }}
-                    onChange={handleImageChange}
-                />
+                    <Avatar
+                        src={imageSrc || undefined}
+                        sx={{
+                            width: "300px",
+                            height: "300px",
+                            bgcolor: imageSrc ? 'transparent' : randomColor,
+                            '&:hover': {
+                                border: '2px dashed #000',
+                                opacity: 0.7,
+                            },
+                            cursor: 'pointer'
+                        }}
+                    >
+                        {!imageSrc && 'C'}
+                    </Avatar>
+                    <input
+                        type="file"
+                        id="imagem"
+                        accept="image/*"
+                        ref={fileInputRef}
+                        style={{ display: 'none' }}
+                        onChange={handleImageChange}
+                    />
+                </Box>
+                <Box mt={6} width="100%" display="flex" justifyContent="center">
+                    <Box mr={2}><NewLevelButton onClick={handleRemoveImage} icon={CloseIcon} title="Remover foto" /></Box>
+                    <Box><NewLevelButton onClick={redirectToNextPageAndSaveAvatar} icon={ArrowForwardIcon} title="Próximo" /></Box>
+                </Box>
             </Box>
-            <Box mt={6} width="100%" display="flex" justifyContent="center">
-                <Box mr={2}><NewLevelButton onClick={handleRemoveImage} icon={CloseIcon} title="Remover foto" /></Box>
-                <Box><NewLevelButton onClick={redirectToNextPageAndSaveAvatar} icon={ArrowForwardIcon} title="Próximo" /></Box>
-            </Box>
-        </Box>
+        </>
     )
 }
 

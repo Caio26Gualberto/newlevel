@@ -27,11 +27,7 @@ namespace NewLevel.Services.UserService
 
         public async Task GenerateTokenToResetPasswordByEmail(string email)
         {
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
-            {
-                throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
-            }
+            var user = await _utils.GetUser();
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
@@ -42,18 +38,7 @@ namespace NewLevel.Services.UserService
 
         public async Task<UserInfoResponseDto> GetUserInfo()
         {
-            var userId = _httpContextAccessor.HttpContext.Items["userId"];
-
-            if (userId == null)
-            {
-                throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
-            }
-            var user = await _userManager.FindByIdAsync(userId.ToString()!);
-
-            if (user == null)
-            {
-                throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
-            }
+            var user = await _utils.GetUser();
 
             return new UserInfoResponseDto
             {
@@ -68,17 +53,7 @@ namespace NewLevel.Services.UserService
         {
             try
             {
-                var userId = _httpContextAccessor.HttpContext.Items["userId"];
-                if (userId == null)
-                {
-                    throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
-                }
-
-                var user = await _userManager.FindByIdAsync(userId.ToString());
-                if (user == null)
-                {
-                    throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
-                }
+                var user = await _utils.GetUser();
 
                 var result = await _userManager.DeleteAsync(user);
 
@@ -95,19 +70,9 @@ namespace NewLevel.Services.UserService
         {
             try
             {
-                var userId = _httpContextAccessor.HttpContext.Items["userId"];
-                if (userId == null)
-                {
-                    throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
-                }
+                var user = await _utils.GetUser();
 
-                var user = await _userManager.FindByIdAsync(userId.ToString());
-                if (user == null)
-                {
-                    throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
-                }
-
-                user.Update(isFirstTimeLogin: false, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatar: null, publicTimer: null, avatarUrl: null, email: null);
+                user.Update(isFirstTimeLogin: false, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatar: user.AvatarKey, publicTimer: user.PublicTimer, avatarUrl: user.AvatarUrl, email: user.Email);
                 await _userManager.UpdateAsync(user);
             }
             catch (Exception e)
@@ -119,18 +84,7 @@ namespace NewLevel.Services.UserService
 
         public async Task GenerateTokenToResetPassword()
         {
-            var userId = _httpContextAccessor.HttpContext!.Items["userId"];
-
-            if (userId == null)
-            {
-                throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
-            }
-            var user = await _userManager.FindByIdAsync(userId.ToString()!);
-
-            if (user == null)
-            {
-                throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
-            }
+            var user = await _utils.GetUser();
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
@@ -141,21 +95,10 @@ namespace NewLevel.Services.UserService
 
         public async Task<bool> UploadAvatarImage(UploadAvatarImageInput input)
         {
-            var userId = _httpContextAccessor.HttpContext!.Items["userId"];
-
-            if (userId == null)
-            {
-                throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
-            }
-            var user = await _userManager.FindByIdAsync(userId.ToString()!);
-
-            if (user == null)
-            {
-                throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
-            }
+            var user = await _utils.GetUser();
 
             AmazonS3Service s3 = new AmazonS3Service();
-            string key = $"avatars/{user.Id}";
+            string key = $"avatars/{user.Id}/{Guid.NewGuid()}";
             var result = await s3.UploadFilesAsync("newlevel-images", key, input.File);
             var url = await s3.CreateTempURLS3("newlevel-images", key);
 
@@ -165,7 +108,7 @@ namespace NewLevel.Services.UserService
             }
 
             user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatar: key, publicTimer: DateTime.Now.AddDays(2).AddHours(-3),
-                avatarUrl: url, email: null);
+                avatarUrl: url, email: user.Email);
             await _userManager.UpdateAsync(user);
             await _newLevelDbContext.SaveChangesAsync();
 
@@ -176,7 +119,7 @@ namespace NewLevel.Services.UserService
         {
             User user = await _utils.GetUser();
             AmazonS3Service s3 = new AmazonS3Service();
-            string key = $"avatars/{user.Id}";
+            string key = $"avatars/{user.Id}/{Guid.NewGuid()}";
 
             if (input.File != null)
             {

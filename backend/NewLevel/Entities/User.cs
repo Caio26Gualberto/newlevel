@@ -35,7 +35,7 @@ namespace NewLevel.Entities
             string avatarUrl, string? email)
         {
             DomainExceptionValidation.When(string.IsNullOrWhiteSpace(nickName), "Apelido inválido. Apelido é necessário!");  
-            DomainExceptionValidation.When(!email.Contains("@"), "Email inválido, valide o mesmo");
+            DomainExceptionValidation.When(email != null && !email.Contains("@"), "Email inválido, valide o mesmo");
 
             if (isFirstTimeLogin.HasValue)
                 IsFirstTimeLogin = isFirstTimeLogin.Value;

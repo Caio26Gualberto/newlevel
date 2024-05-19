@@ -15,6 +15,7 @@
 
 import * as runtime from '../runtime';
 import type {
+  BooleanNewLevelResponse,
   LoginInputDto,
   LoginResponseDtoNewLevelResponse,
   RegisterInputDto,
@@ -22,6 +23,8 @@ import type {
   TokensDto,
 } from '../models/index';
 import {
+    BooleanNewLevelResponseFromJSON,
+    BooleanNewLevelResponseToJSON,
     LoginInputDtoFromJSON,
     LoginInputDtoToJSON,
     LoginResponseDtoNewLevelResponseFromJSON,
@@ -88,7 +91,7 @@ export class AuthenticateApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiAuthenticateLogoutGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiAuthenticateLogoutGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -108,13 +111,14 @@ export class AuthenticateApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async apiAuthenticateLogoutGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiAuthenticateLogoutGetRaw(initOverrides);
+    async apiAuthenticateLogoutGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiAuthenticateLogoutGetRaw(initOverrides);
+        return await response.value();
     }
 
     /**

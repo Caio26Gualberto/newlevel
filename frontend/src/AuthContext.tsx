@@ -14,7 +14,6 @@ interface AuthContextType {
   token: string | null;
   isAdmin: () => boolean;
   setToken: (token: string) => void;
-  logout: () => void;
 }
 
 // Criar o contexto de autenticação
@@ -46,18 +45,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return false;
   };
 
-  const login = (newToken: string) => {
-    setToken(newToken);
-    localStorage.setItem('jwtToken', newToken);
-  };
-
-  const logout = () => {
-    setToken(null);
-    localStorage.removeItem('jwtToken');
-  };
-
   return (
-    <AuthContext.Provider value={{ token, isAdmin, setToken: login, logout }}>
+    <AuthContext.Provider value={{ token, isAdmin, setToken }}>
       {children}
     </AuthContext.Provider>
   );

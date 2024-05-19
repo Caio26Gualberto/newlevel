@@ -14,11 +14,13 @@ namespace NewLevel.Services.Media
         private readonly NewLevelDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<User> _userManager;
+        private readonly Utils.Utils _utils;
         public MediaService(NewLevelDbContext newLevelDb, IHttpContextAccessor httpContextAccessor, UserManager<User> userManager)
         {
             _context = newLevelDb;
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
+            _utils = new Utils.Utils(httpContextAccessor, userManager);
         }
 
         public async Task<bool> UpdateMediaById(UpdateMediaByIdInput input)
@@ -36,21 +38,17 @@ namespace NewLevel.Services.Media
 
         public async Task<GenericList<MediaByUserIdDto>> GetMediaByUserId(Pagination input)
         {
-            var userId = _httpContextAccessor.HttpContext.Items["userId"].ToString();
-            var user = await _userManager.FindByIdAsync(userId);
-
-            if (user == null)
-                throw new Exception("Usuário não encontrado");
+            var user = await _utils.GetUser();
 
             var totalMedias = await _context.Medias
-                .Where(media => media.UserId == userId)
+                .Where(media => media.UserId == user.Id)
                 .WhereIf(!string.IsNullOrEmpty(input.Search), media => media.Title.ToLower().Contains(input.Search.ToLower()) || media.Title.ToLower() == input.Search.ToLower())
                 .CountAsync();
 
             var skip = (input.Page - 1) * input.PageSize;
 
             var mediaList = await _context.Medias
-                .Where(media => media.UserId == userId)
+                .Where(media => media.UserId == user.Id)
                 .WhereIf(!string.IsNullOrEmpty(input.Search), media => media.Title.ToLower().Contains(input.Search.ToLower()) || media.Title.ToLower() == input.Search.ToLower())
                 .Skip(skip)
                 .Take(input.PageSize)
@@ -119,9 +117,8 @@ namespace NewLevel.Services.Media
         {
             try
             {
-                var userId = _httpContextAccessor.HttpContext.Items["userId"].ToString();
-                var user = await _userManager.FindByIdAsync(userId);
-                NewLevel.Entities.Media media = new NewLevel.Entities.Media(input.Src, input.Title, input.Description, isPublic: false, DateTime.UtcNow.AddHours(-3), userId);
+                var user = await _utils.GetUser();
+                NewLevel.Entities.Media media = new NewLevel.Entities.Media(input.Src, input.Title, input.Description, isPublic: false, DateTime.UtcNow.AddHours(-3), user.Id);
                 media.Src = media.Src.Replace("watch?v=", "embed/");
 
                 await _context.Medias.AddAsync(media);

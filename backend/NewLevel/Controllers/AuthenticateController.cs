@@ -58,9 +58,26 @@ namespace NewLevel.Controllers
 
         [Authorize]
         [HttpGet("Logout")]
-        public async Task<IActionResult> Logout()
+        public async Task<ActionResult<NewLevelResponse<bool>>> Logout()
         {
-            return Ok();
+            try
+            {
+                var result = await _authenticateService.Logout();
+
+                if (result)
+                    return Ok(new NewLevelResponse<bool>()
+                    {
+                        Data = result,
+                        IsSuccess = result,
+                        Message = "Deslogado com sucesso"
+                    });
+
+                return StatusCode(500, new NewLevelResponse<bool> { IsSuccess = false, Message = "Algo deu errado, tente novamente mais tarde" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<bool> { IsSuccess = false, Message = ex.Message });
+            }
         }
 
         [HttpGet("RenewToken")]

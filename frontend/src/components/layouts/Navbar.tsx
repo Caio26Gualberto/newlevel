@@ -3,7 +3,11 @@ import { useEffect, useState } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import Logo from "../../assets/128982_logo.png"
 import React from "react";
-import Photo from "../../assets/Celtif_Frost.jpg"
+import { useAuth } from "../../AuthContext";
+import { AuthenticateApi, UserApi } from "../../gen/api/src";
+import ApiConfiguration from "../../apiConfig";
+import * as toastr from 'toastr';
+import { profile } from "console";
 
 const StyledLink = styled(Link)`
   text-decoration: none;
@@ -15,15 +19,39 @@ const StyledLink = styled(Link)`
   }
 `;
 
+const StyledMenu = styled(MenuItem)`
+  text-decoration: none;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: red;
+  }
+`;
+
 const Navbar = () => {
+    const authService = new AuthenticateApi(ApiConfiguration)
+    const userService = new UserApi(ApiConfiguration)
     const navigate = useNavigate();
     const location = useLocation()
+    const { isAdmin } = useAuth()
     const [showNavbar, setShowNavbar] = useState<boolean>(false)
+    const [profileSrc, setProfileSrc] = useState({
+        profilePicture: "",
+        nickname: ""
+    })
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [anchorElAvatar, setAnchorElAvatar] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const openAvatar = Boolean(anchorElAvatar);
+
+    const notAllowedPaths = [
+        "/",
+        "/welcome",
+        "/register",
+        "/security/resetPassword"
+    ];
+
     const handleClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -39,11 +67,55 @@ const Navbar = () => {
         setAnchorElAvatar(event.currentTarget);
     };
 
+    const logout = async () => {
+        const result = await authService.apiAuthenticateLogoutGet()
+        if (result.isSuccess) {
+            window.localStorage.removeItem('accessToken');
+            window.localStorage.removeItem('refreshToken');
+            navigate('/')
+        } else {
+            toastr.error(result.message!, 'Erro!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
+        }
+    }
+
+    const getRandomColor = () => {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    };
+
+    const randomColor = getRandomColor();
+
+    const rederizeAvatar = () => {
+        if (profileSrc.profilePicture) {
+            return <Avatar component="a" sx={{ width: 50, height: 50 }} src={profileSrc.profilePicture} onClick={handleClickAvatar}></Avatar>
+        } else {
+            return <Avatar component="a" onClick={handleClickAvatar} sx={{ width: 50, height: 50, backgroundColor: randomColor }}>{(profileSrc as { nickname: string }).nickname.charAt(0)}</Avatar>
+        }
+    }
+
+    const getAvatarToNavbar = async () => {
+        const result = await userService.apiUserGetUserInfoGet()
+        if (result.isSuccess) {
+            setProfileSrc({ profilePicture: result.data!.profilePicture!, nickname: result.data!.nickname! })
+        } else {
+            toastr.error(result.message!, 'Erro!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
+        }
+    }
+
     useEffect(() => {
-        if (location.pathname === "/" || location.pathname === "/welcome" || location.pathname === "/register" || location.pathname === "/security/resetPassword") {
+        const currentPath = location.pathname;
+        if (notAllowedPaths.includes(currentPath)) {
             setShowNavbar(false)
         } else {
             setShowNavbar(true)
+        }
+
+        if (!notAllowedPaths.includes(currentPath)) {
+            getAvatarToNavbar();
         }
     }
         , [location])
@@ -82,12 +154,12 @@ const Navbar = () => {
                                 <StyledLink to="/aboutMe">Sobre mim</StyledLink>
                             </Grid>
                             <Grid display="flex" justifyContent="center" item xs={1}>
-                                
+
                             </Grid>
                         </Grid>
                     </Box>
                     <Box pr={2} pl={2} sx={{ cursor: "pointer" }}>
-                        <Avatar component="a" sx={{ width: 50, height: 50 }} src={Photo} onClick={handleClickAvatar} />
+                        {rederizeAvatar()}
                         <Menu
                             id="basic-menu"
                             anchorEl={anchorElAvatar}
@@ -99,7 +171,8 @@ const Navbar = () => {
                         >
                             <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myProfile"><MenuItem>Meu perfil</MenuItem></StyledLink>
                             <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myVideos"><MenuItem>Meus vídeos</MenuItem></StyledLink>
-                            <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/"><MenuItem>Sair</MenuItem></StyledLink>
+                            {isAdmin() && <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/acceptContent"><MenuItem>Pedidos</MenuItem></StyledLink>}
+                            <StyledMenu onClick={() => { handleCloseAvatar(); logout(); }}>Sair</StyledMenu>
                         </Menu>
                     </Box>
                 </Box>

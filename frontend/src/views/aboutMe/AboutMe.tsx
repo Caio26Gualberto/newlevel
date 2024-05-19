@@ -47,7 +47,7 @@ const AboutMe = () => {
             <Typography fontSize={17} fontWeight="bold" lineHeight={1.7}>
               Sejam todos bem-vindos! Meu nome é Caio, e se há algo que posso garantir é que música corre em minhas veias. Desde pequeno, fui imerso em um mundo de riffs de guitarra, batidas pesadas e letras que transcendem o comum.
 
-              Cresci ouvindo Metal. Bandas como Overkill, Slayer, Whiplash, Dark Angel, Exodus, Anthrax, e At War foram trilhas sonoras constantes da minha juventude. Mas, ao mesmo tempo, minha jornada musical foi enriquecida pelas influências do passado, graças ao meu avô. Paulo Sérgio, Vicente Celestino, Carlos Galhardo, Adoniran Barbosa, e muitos outros nomes ecoavam pelas paredes de nossa casa.
+              Cresci ouvindo Metal (Graças ao meu pai, Franco Gualberto). Bandas como Overkill, Slayer, Whiplash, Dark Angel, Exodus, Anthrax, e At War foram trilhas sonoras constantes da minha juventude. Mas, ao mesmo tempo, minha jornada musical foi enriquecida pelas influências do passado, graças ao meu avô. Paulo Sérgio, Vicente Celestino, Carlos Galhardo, Adoniran Barbosa, e muitos outros nomes ecoavam pelas paredes de nossa casa.
 
               Para mim, a música não é apenas uma paixão; é uma necessidade. Ela é a batida do meu coração e a energia que me impulsiona. E quando se trata de expressar essa paixão, nada supera o Metal e o bom e velho Rock. Desde jovem, tive a sorte de estar imerso na cena musical, frequentando estúdios e shows com meu pai e seus amigos. Cresci rodeado pela energia pulsante dos palcos, sempre acompanhado pelos veteranos da cena, como Fabrízio (Devastor) e Adriano (o Primo do Bode).
 
@@ -57,6 +57,7 @@ const AboutMe = () => {
 
               Sejam bem-vindos ao nosso mundo sonoro!
             </Typography>
+            <Typography mt={2}>Texto gerado pelo GPT &#128514; Porem baseado na minha história</Typography>
           </Box>
           <Box m={2}>
           </Box>

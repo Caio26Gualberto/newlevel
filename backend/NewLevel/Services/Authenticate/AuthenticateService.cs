@@ -16,6 +16,7 @@ namespace NewLevel.Services.Authenticate
         private readonly SignInManager<User> _signInManager;
         private readonly NewLevelDbContext _newLevelDbContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly Utils.Utils _utils;
 
         public AuthenticateService(UserManager<User> userManager, SignInManager<User> signInManager, NewLevelDbContext newLevelDbContext, IHttpContextAccessor httpContextAccessor)
         {
@@ -23,11 +24,11 @@ namespace NewLevel.Services.Authenticate
             _signInManager = signInManager;
             _newLevelDbContext = newLevelDbContext;
             _httpContextAccessor = httpContextAccessor;
+            _utils = new Utils.Utils(httpContextAccessor, userManager); 
         }
         public async Task<TokensDto> GenerateNewAccessToken(string accessToken)
         {
-            var userId = _httpContextAccessor.HttpContext.Items["userId"].ToString();
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _utils.GetUser();
 
             if (user == null)
             {
@@ -60,7 +61,7 @@ namespace NewLevel.Services.Authenticate
                 var roles = await _userManager.GetRolesAsync(user);
                 var tokenString = GenerateJwtToken(user, roles);
 
-                user.Update(isFirstTimeLogin: null, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatar: null, publicTimer:null, avatarUrl: null, email: null);
+                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatar: user.AvatarKey, publicTimer:user.PublicTimer, avatarUrl: user.AvatarUrl, email: user.Email);
                 var refreshToken = await _userManager.GenerateUserTokenAsync(user, tokenProvider: "local", purpose: "email");
                 await _userManager.SetAuthenticationTokenAsync(user, loginProvider: "email", tokenName: "refresh_token", tokenValue: refreshToken);
 
@@ -73,6 +74,13 @@ namespace NewLevel.Services.Authenticate
             }
 
             return new LoginResponseDto { IsSuccess = result.Succeeded, Message = "Usuário ou senha inválidos" };
+        }
+
+        public async Task<bool> Logout()
+        {
+            var user = _utils.GetUser();
+            await _signInManager.SignOutAsync();
+            return true;
         }
 
         public async Task<RegisterResponseDto> Register(RegisterInputDto input)
@@ -95,7 +103,7 @@ namespace NewLevel.Services.Authenticate
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                return new RegisterResponseDto { Result = true, Message = "Bem vindo!" };
+                return new RegisterResponseDto { Result = true, Message = "Conta criada!" };
             }
             else if (result.Errors.Any(e => errors.ContainsKey(e.Code)) && result.Errors.Count() == 1)
             {
@@ -116,8 +124,6 @@ namespace NewLevel.Services.Authenticate
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("jwtkey")!);
-
-            bool isAdmin = user.Email!.ToLower() == "caiogualbertodev@outlook.com";
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
