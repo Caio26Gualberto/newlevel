@@ -2,6 +2,7 @@
 {
     public class PhotoResponseDto
     {
+        public string UserId { get; set; }
         public string Src { get; set; }
         public string? AvatarSrc { get; set; }
         public string Title { get; set; }

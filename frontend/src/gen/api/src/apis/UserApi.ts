@@ -15,10 +15,16 @@
 
 import * as runtime from '../runtime';
 import type {
+  BooleanNewLevelResponse,
+  EActivityLocation,
   StringNewLevelResponse,
   UserInfoResponseDtoNewLevelResponse,
 } from '../models/index';
 import {
+    BooleanNewLevelResponseFromJSON,
+    BooleanNewLevelResponseToJSON,
+    EActivityLocationFromJSON,
+    EActivityLocationToJSON,
     StringNewLevelResponseFromJSON,
     StringNewLevelResponseToJSON,
     UserInfoResponseDtoNewLevelResponseFromJSON,
@@ -27,6 +33,13 @@ import {
 
 export interface ApiUserGenerateTokenToResetPasswordByEmailPostRequest {
     email?: string;
+}
+
+export interface ApiUserUpdateUserPostRequest {
+    email?: string;
+    nickname?: string;
+    activityLocation?: EActivityLocation;
+    file?: Blob;
 }
 
 export interface ApiUserUploadAvatarImagePostRequest {
@@ -203,6 +216,71 @@ export class UserApi extends runtime.BaseAPI {
      */
     async apiUserSkipIntroductionGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.apiUserSkipIntroductionGetRaw(initOverrides);
+    }
+
+    /**
+     */
+    async apiUserUpdateUserPostRaw(requestParameters: ApiUserUpdateUserPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['email'] != null) {
+            queryParameters['Email'] = requestParameters['email'];
+        }
+
+        if (requestParameters['nickname'] != null) {
+            queryParameters['Nickname'] = requestParameters['nickname'];
+        }
+
+        if (requestParameters['activityLocation'] != null) {
+            queryParameters['ActivityLocation'] = requestParameters['activityLocation'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['file'] != null) {
+            formParams.append('File', requestParameters['file'] as any);
+        }
+
+        const response = await this.request({
+            path: `/api/User/UpdateUser`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiUserUpdateUserPost(requestParameters: ApiUserUpdateUserPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiUserUpdateUserPostRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**

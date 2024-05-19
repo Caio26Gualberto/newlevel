@@ -1,6 +1,7 @@
 using Microsoft.OpenApi.Models;
 using NewLevel;
 using NewLevel.Api.Middleware;
+using NewLevel.Services.Admin;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,7 +68,24 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        string adminEmail = "Caiogualbertodev@outlook.com";
+        string adminPasword = "*";
+
+        await DataSeeder.SeedAdminUser(services, adminEmail, adminPasword);
+    }
+    catch (Exception)
+    {
+
+        throw;
+    }
+}
+
+    app.UseHttpsRedirection();
 app.UseCors();
 
 app.UseAuthentication();

@@ -51,12 +51,13 @@ namespace NewLevel.Services.Photo
                     response.Add(new PhotoResponseDto
                     {
                         Src = url,
-                        AvatarSrc = photo.User.Avatar,
+                        AvatarSrc = await GetOrGenerateAvatarPrivateUrl(photo),
                         Title = photo.Title,
                         Subtitle = photo.Subtitle,
                         CaptureDate = photo.CaptureDate,
                         Nickname = photo.User.Nickname,
                         Description = photo.Description,
+                        UserId = photo.UserId
                     });
 
                     photo.UpdateMedia(photo.KeyS3, photo.Title, photo.Subtitle, photo.Description, photo.IsPublic, url, DateTime.Now.AddDays(2).AddHours(-3), photo.CaptureDate);
@@ -67,12 +68,13 @@ namespace NewLevel.Services.Photo
                     response.Add(new PhotoResponseDto
                     {
                         Src = photo.PrivateURL,
-                        AvatarSrc = photo.User.Avatar,
+                        AvatarSrc = await GetOrGenerateAvatarPrivateUrl(photo),
                         Title = photo.Title,
                         Subtitle = photo.Subtitle,
                         CaptureDate = photo.CaptureDate,
                         Nickname = photo.User.Nickname,
                         Description = photo.Description,
+                        UserId = photo.UserId
                     });
                 }
             }
@@ -108,5 +110,21 @@ namespace NewLevel.Services.Photo
 
             return true;
         } 
+
+        private async Task<string> GetOrGenerateAvatarPrivateUrl(NewLevel.Entities.Photo photo)
+        {
+            if (photo.User.PublicTimer == null || photo.User.PublicTimer < DateTime.UtcNow.AddHours(-3))
+            {
+                var s3 = new AmazonS3Service();
+                var url = await s3.CreateTempURLS3("newlevel-images", photo.KeyS3);
+                photo.User.Update(photo.User.IsFirstTimeLogin, photo.User.Nickname, photo.User.AvatarUrl, photo.User.ActivityLocation, DateTime.Now.AddDays(2).AddHours(-3), url, email: null);
+                await _context.SaveChangesAsync();
+                return url;
+            }
+            else
+            {
+                return photo.User.AvatarUrl!;
+            }
+        }
     }
 }

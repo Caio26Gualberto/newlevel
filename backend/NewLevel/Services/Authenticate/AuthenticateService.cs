@@ -36,10 +36,11 @@ namespace NewLevel.Services.Authenticate
 
             var refreshToken = await _userManager.GetAuthenticationTokenAsync(user, loginProvider: "email", tokenName: "refresh_token");
             var result = await _userManager.VerifyUserTokenAsync(user, tokenProvider: "local", purpose: "email", refreshToken);
+            var roles = await _userManager.GetRolesAsync(user);
 
             if (result)
             {
-                var token = GenerateJwtToken(user);
+                var token = GenerateJwtToken(user, roles);
                 var newRefreshToken = await _userManager.GenerateUserTokenAsync(user, tokenProvider: "local", purpose: "email");
 
                 if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(newRefreshToken))
@@ -56,9 +57,10 @@ namespace NewLevel.Services.Authenticate
             if (result.Succeeded)
             {
                 var user = await _signInManager.UserManager.FindByEmailAsync(email);
-                var tokenString = GenerateJwtToken(user);
+                var roles = await _userManager.GetRolesAsync(user);
+                var tokenString = GenerateJwtToken(user, roles);
 
-                user.Update(isFirstTimeLogin: null, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatar: null);
+                user.Update(isFirstTimeLogin: null, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatar: null, publicTimer:null, avatarUrl: null, email: null);
                 var refreshToken = await _userManager.GenerateUserTokenAsync(user, tokenProvider: "local", purpose: "email");
                 await _userManager.SetAuthenticationTokenAsync(user, loginProvider: "email", tokenName: "refresh_token", tokenValue: refreshToken);
 
@@ -84,7 +86,7 @@ namespace NewLevel.Services.Authenticate
                 { "PasswordRequiresUpper", "Senha requer letra maiúscula" }
             };
 
-            var user = new User(isFirstTimeLogin: true, nickName: input.Nickname, activityLocation: input.ActivityLocation, avatar: null);
+            var user = new User(isFirstTimeLogin: true, nickName: input.Nickname, activityLocation: input.ActivityLocation, avatar: null, publicTimer: null, avatarUrl: null);
             user.UserName = input.Email;
             user.Email = input.Email;
 
@@ -110,23 +112,28 @@ namespace NewLevel.Services.Authenticate
             return new RegisterResponseDto { Result = false, Message = "Erro ao registrar usuário" };
         }
 
-        private string GenerateJwtToken(User user)
+        private string GenerateJwtToken(User user, IList<string> roles)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("jwtkey")!);
+
+            bool isAdmin = user.Email!.ToLower() == "caiogualbertodev@outlook.com";
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim("userId", user.Id)
+                    new Claim("userId", user.Id),
+                    roles.Contains("Admin") ? new Claim(ClaimTypes.Role, "Admin") : null
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(10),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            var tokenString = tokenHandler.WriteToken(token);
+
+            return tokenString;
         }
     }
 }

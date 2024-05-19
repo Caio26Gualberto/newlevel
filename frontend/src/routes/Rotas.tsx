@@ -11,25 +11,28 @@ import MyVideos from '../views/myVideos/MyVideos';
 import MyProfile from '../views/myProfile/MyProfile';
 import ResetPassword from '../views/resetPassword/ResetPassword';
 import ChooseUserAvatar from '../views/chooseUserAvatar/ChooseUserAvatar';
+import { AuthProvider } from '../AuthContext';
 
 const Rotas = () => {
   return (
-    <Router>
-      <Navbar />
-      <Switch>
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/welcome" element={<Apresentation />} />
-        <Route path="/videos" element={<Videos />} />
-        <Route path="/photos" element={<Photos />} />
-        <Route path="/podcasts" element={<Podcast />} />
-        <Route path="/aboutMe" element={<AboutMe />} />
-        <Route path="/myVideos" element={<MyVideos />} />
-        <Route path="/myProfile" element={<MyProfile />} />
-        <Route path="/security/resetPassword" element={<ResetPassword />} />
-        <Route path="/newAvatar" element={<ChooseUserAvatar />} />
-      </Switch>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Navbar />
+        <Switch>
+          <Route path="/" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/welcome" element={<Apresentation />} />
+          <Route path="/videos" element={<Videos />} />
+          <Route path="/photos" element={<Photos />} />
+          <Route path="/podcasts" element={<Podcast />} />
+          <Route path="/aboutMe" element={<AboutMe />} />
+          <Route path="/myVideos" element={<MyVideos />} />
+          <Route path="/myProfile" element={<MyProfile />} />
+          <Route path="/security/resetPassword" element={<ResetPassword />} />
+          <Route path="/newAvatar" element={<ChooseUserAvatar />} />
+        </Switch>
+      </Router>
+    </AuthProvider>
   )
 }
 

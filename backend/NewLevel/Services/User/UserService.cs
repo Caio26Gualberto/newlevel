@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
+using Microsoft.AspNetCore.Identity;
 using NewLevel.Context;
 using NewLevel.Dtos.User;
 using NewLevel.Entities;
@@ -14,12 +15,14 @@ namespace NewLevel.Services.UserService
         private readonly UserManager<User> _userManager;
         private readonly IEmailService _emailService;
         private readonly NewLevelDbContext _newLevelDbContext;
+        private readonly NewLevel.Utils.Utils _utils;
         public UserService(IHttpContextAccessor httpContextAccessor, UserManager<User> userManager, IEmailService emailService, NewLevelDbContext newLevelDbContext)
         {
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
             _emailService = emailService;
             _newLevelDbContext = newLevelDbContext;
+            _utils = new Utils.Utils(httpContextAccessor, userManager);
         }
 
         public async Task GenerateTokenToResetPasswordByEmail(string email)
@@ -58,7 +61,7 @@ namespace NewLevel.Services.UserService
                 ActivityLocation = user.ActivityLocation,
                 Email = user.Email,
                 Password = user.PasswordHash,
-                ProfilePicture = null,
+                ProfilePicture = user.AvatarUrl,
             };
         }
         public async Task<bool> Delete()
@@ -79,7 +82,7 @@ namespace NewLevel.Services.UserService
 
                 var result = await _userManager.DeleteAsync(user);
 
-                return result.Succeeded;    
+                return result.Succeeded;
             }
             catch (Exception e)
             {
@@ -104,14 +107,14 @@ namespace NewLevel.Services.UserService
                     throw new Exception("Usuário não encontrado, favor entrar em contato com o desenvolvedor.");
                 }
 
-                user.Update(isFirstTimeLogin: false, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatar: null);
+                user.Update(isFirstTimeLogin: false, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatar: null, publicTimer: null, avatarUrl: null, email: null);
                 await _userManager.UpdateAsync(user);
             }
             catch (Exception e)
             {
                 throw new Exception(e.Message);
             }
-            
+
         }
 
         public async Task GenerateTokenToResetPassword()
@@ -154,17 +157,55 @@ namespace NewLevel.Services.UserService
             AmazonS3Service s3 = new AmazonS3Service();
             string key = $"avatars/{user.Id}";
             var result = await s3.UploadFilesAsync("newlevel-images", key, input.File);
+            var url = await s3.CreateTempURLS3("newlevel-images", key);
 
             if (!result)
             {
                 throw new Exception("Erro ao adicionar imagem a nuvem, caso o problema persista entre em contato com o desenvolvedor");
             }
 
-            user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatar: key);
+            user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatar: key, publicTimer: DateTime.Now.AddDays(2).AddHours(-3),
+                avatarUrl: url, email: null);
             await _userManager.UpdateAsync(user);
             await _newLevelDbContext.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<bool> UpdateUser(UpdateUserInput input)
+        {
+            User user = await _utils.GetUser();
+            AmazonS3Service s3 = new AmazonS3Service();
+            string key = $"avatars/{user.Id}";
+
+            if (input.File != null)
+            {
+                var isUploaded = await s3.UploadFilesAsync("newlevel-images", key, input.File);
+
+                if (!isUploaded)
+                    throw new Exception("Erro ao adicionar imagem a nuvem, caso o problema persista entre em contato com o desenvolvedor");
+
+                if (!string.IsNullOrEmpty(user.AvatarKey))
+                {
+                    var fileDeleted = await s3.DeleteFileAsync("newlevel-images", user.AvatarKey);
+                    if (!fileDeleted)
+                        throw new Exception("Erro ao deletar imagem antiga, caso o problema persista entre em contato com o desenvolvedor");
+                }
+
+                var url = await s3.CreateTempURLS3("newlevel-images", key);
+                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: input.Nickname ?? user.Nickname, activityLocation: input.ActivityLocation ?? user.ActivityLocation, avatar: key, publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: url, email: input.Email);
+                await _userManager.UpdateAsync(user);
+                await _newLevelDbContext.SaveChangesAsync();
+            }
+            else
+            {
+                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: input.Nickname ?? user.Nickname, activityLocation: input.ActivityLocation ?? user.ActivityLocation, avatar: user.AvatarUrl, publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: user.AvatarUrl, email: input.Email);
+                await _userManager.UpdateAsync(user);
+                await _newLevelDbContext.SaveChangesAsync();
+            }
+
+            return true;
+
         }
     }
 }

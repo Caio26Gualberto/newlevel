@@ -113,5 +113,27 @@ namespace NewLevel.Controllers
                 });
             }
         }
+
+        [HttpPost("UpdateUser")]
+        public async Task<ActionResult<NewLevelResponse<bool>>> UpdateUser(UpdateUserInput input)
+        {
+            try
+            {
+                await _userService.UpdateUser(input);
+                return Ok(new NewLevelResponse<bool>
+                {
+                    IsSuccess = true,
+                    Message = "Perfil atualizado com sucesso"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<bool>
+                {
+                    Message = ex.Message,
+                    IsSuccess = false
+                });
+            }
+        }
     }
 }

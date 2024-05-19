@@ -2,6 +2,7 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using Azure.Core;
 
 namespace NewLevel.Services.AmazonS3
 {
@@ -41,6 +42,12 @@ namespace NewLevel.Services.AmazonS3
             });
 
             return true;
+        }
+
+        public async Task<bool> DeleteFileAsync(string bucket, string key)
+        {
+            var result = await _s3Client.DeleteObjectAsync(bucket, key);
+            return result.HttpStatusCode == System.Net.HttpStatusCode.OK;
         }
 
         public async Task<string> CreateTempURLS3(string bucket, string key)

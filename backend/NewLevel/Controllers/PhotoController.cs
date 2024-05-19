@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NewLevel.Dtos.ApiResponse;
 using NewLevel.Dtos.Photo;
 using NewLevel.Dtos.Utils;

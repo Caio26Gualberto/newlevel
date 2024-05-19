@@ -24,6 +24,12 @@ export interface PhotoResponseDto {
      * @type {string}
      * @memberof PhotoResponseDto
      */
+    userId?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PhotoResponseDto
+     */
     src?: string;
     /**
      * 
@@ -80,6 +86,7 @@ export function PhotoResponseDtoFromJSONTyped(json: any, ignoreDiscriminator: bo
     }
     return {
         
+        'userId': json['userId'] == null ? undefined : json['userId'],
         'src': json['src'] == null ? undefined : json['src'],
         'avatarSrc': json['avatarSrc'] == null ? undefined : json['avatarSrc'],
         'title': json['title'] == null ? undefined : json['title'],
@@ -96,6 +103,7 @@ export function PhotoResponseDtoToJSON(value?: PhotoResponseDto | null): any {
     }
     return {
         
+        'userId': value['userId'],
         'src': value['src'],
         'avatarSrc': value['avatarSrc'],
         'title': value['title'],

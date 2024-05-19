@@ -6,7 +6,7 @@ const ApiConfiguration = new Configuration({
     basePath: "https://localhost:7082",
 
     accessToken: async (name, scopes) => {
-        const accessToken = window.localStorage.getItem('accessToken');
+        var accessToken = window.localStorage.getItem('accessToken');
         if (!accessToken) {
             console.error("Token de acesso não encontrado no localStorage.");
             return '';

@@ -5,6 +5,7 @@ import ApiConfiguration from "../../apiConfig";
 import { Link, useNavigate } from "react-router-dom";
 import * as toastr from 'toastr';
 import ModalPassword from "./modalResetPassword/ModalPassword";
+import { useAuth } from "../../AuthContext";
 
 const style = {
   transform: 'translate(-50%, -50%)',
@@ -16,6 +17,7 @@ interface IFormLogin {
 }
 
 const Login = () => {
+  const { setToken } = useAuth();
   const [formLogin, setFormLogin] = useState<IFormLogin>({
     login: '',
     password: ''
@@ -49,6 +51,7 @@ const Login = () => {
       if (result.isSuccess) {
         window.localStorage.setItem('accessToken', result.data?.tokens?.token!)
         window.localStorage.setItem('refreshToken', result.data?.tokens?.refreshToken!)
+        setToken(result.data?.tokens?.token!)
         toastr.success('Login efetuado com sucesso', 'Sucesso!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
         if (!result.data?.tokens?.skipIntroduction) {
           navigate('/newAvatar')
