@@ -5,7 +5,7 @@ using System.Web;
 
 public class EmailService : IEmailService
 {
-    private readonly string _sendGridApiKey = "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";
+    private readonly string _sendGridApiKey = "";
 
     public async Task SendEmail(string recipient, string subject, string body, string templateId = "", object templateObj = null)
     {
