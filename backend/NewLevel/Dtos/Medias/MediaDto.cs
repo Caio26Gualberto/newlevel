@@ -2,6 +2,7 @@
 {
     public class MediaDto
     {
+        public int? Id { get; set; }
         public string Src { get; set; }
         public string Title { get; set; }
         public string Nickname { get; set; }

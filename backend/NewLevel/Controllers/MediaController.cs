@@ -23,7 +23,7 @@ namespace NewLevel.Controllers
         {
             try
             {
-                var media = await _mediaService.GetAllMedias(input);
+                var media = await _mediaService.GetAllMedias(input, false);
 
                 if (media != null)
                     return Ok(new NewLevelResponse<GenericList<MediaDto>> { Data = media, IsSuccess = true });
@@ -105,6 +105,34 @@ namespace NewLevel.Controllers
             catch (Exception ex)
             {
                 return StatusCode(400, new NewLevelResponse<bool> { IsSuccess = false, Message = "Não foi possível salvar as alterações" });
+            }
+        }
+
+        [HttpPost("GetMediaToApprove")]
+        public async Task<ActionResult<NewLevelResponse<GenericList<MediaDto>>>> GetMediaToApprove(Pagination input)
+        {
+            try
+            {
+                var result = await _mediaService.GetAllMedias(input, true);
+                return Ok(new NewLevelResponse<GenericList<MediaDto>> { Data = result, IsSuccess = true });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(400, new NewLevelResponse<GenericList<MediaDto>> { IsSuccess = false, Message = ex.Message });
+            }
+        }
+
+        [HttpGet("ApproveMedia")]
+        public async Task<ActionResult<NewLevelResponse<bool>>> ApproveMedia([FromQuery]int mediaId, bool isApprove)
+        {
+            try
+            {
+                var result = await _mediaService.ApproveMedia(mediaId, isApprove);
+                return Ok(new NewLevelResponse<bool> { Data = result, IsSuccess = true, Message = "Vídeo aprovado" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(400, new NewLevelResponse<bool> { IsSuccess = false, Message = ex.Message });
             }
         }
     }

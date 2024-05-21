@@ -1,21 +1,23 @@
-﻿using System.Net.Mail;
-using System.Net;
+﻿using NewLevel.Interfaces.Services.Email;
 using SendGrid;
 using SendGrid.Helpers.Mail;
-using Newtonsoft.Json.Linq;
 using System.Web;
-using NewLevel.Interfaces.Services.Email;
 
 public class EmailService : IEmailService
 {
-    private readonly string _sendGridApiKey = "W";
+    private readonly string _sendGridApiKey = "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";
 
-    public async Task SendEmail(string recipient, string subject, string body)
+    public async Task SendEmail(string recipient, string subject, string body, string templateId = "", object templateObj = null)
     {
         var client = new SendGridClient(_sendGridApiKey);
         var from = new EmailAddress("anewlevelmusic@gmail.com", "A New Level");
         var to = new EmailAddress(recipient);
         var msg = MailHelper.CreateSingleEmail(from, to, subject, body, body);
+        if (!string.IsNullOrEmpty(templateId))
+        {
+            msg.TemplateId = templateId;
+            msg.SetTemplateData(templateObj);
+        }
 
         try
         {

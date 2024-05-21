@@ -37,11 +37,20 @@ import {
     UpdateMediaByIdInputToJSON,
 } from '../models/index';
 
+export interface ApiMediaApproveMediaGetRequest {
+    mediaId?: number;
+    isApprove?: boolean;
+}
+
 export interface ApiMediaDeleteMediaByIdPostRequest {
     id?: number;
 }
 
 export interface ApiMediaGetMediaPostRequest {
+    pagination?: Pagination;
+}
+
+export interface ApiMediaGetMediaToApprovePostRequest {
     pagination?: Pagination;
 }
 
@@ -61,6 +70,46 @@ export interface ApiMediaUpdateMediaByIdPostRequest {
  * 
  */
 export class MediaApi extends runtime.BaseAPI {
+
+    /**
+     */
+    async apiMediaApproveMediaGetRaw(requestParameters: ApiMediaApproveMediaGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['mediaId'] != null) {
+            queryParameters['mediaId'] = requestParameters['mediaId'];
+        }
+
+        if (requestParameters['isApprove'] != null) {
+            queryParameters['isApprove'] = requestParameters['isApprove'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/Media/ApproveMedia`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiMediaApproveMediaGet(requestParameters: ApiMediaApproveMediaGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiMediaApproveMediaGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      */
@@ -130,6 +179,41 @@ export class MediaApi extends runtime.BaseAPI {
      */
     async apiMediaGetMediaPost(requestParameters: ApiMediaGetMediaPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MediaDtoGenericListNewLevelResponse> {
         const response = await this.apiMediaGetMediaPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiMediaGetMediaToApprovePostRaw(requestParameters: ApiMediaGetMediaToApprovePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MediaDtoGenericListNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/Media/GetMediaToApprove`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: PaginationToJSON(requestParameters['pagination']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MediaDtoGenericListNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiMediaGetMediaToApprovePost(requestParameters: ApiMediaGetMediaToApprovePostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MediaDtoGenericListNewLevelResponse> {
+        const response = await this.apiMediaGetMediaToApprovePostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

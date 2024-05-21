@@ -21,6 +21,12 @@ import { mapValues } from '../runtime';
 export interface MediaDto {
     /**
      * 
+     * @type {number}
+     * @memberof MediaDto
+     */
+    id?: number;
+    /**
+     * 
      * @type {string}
      * @memberof MediaDto
      */
@@ -68,6 +74,7 @@ export function MediaDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     }
     return {
         
+        'id': json['id'] == null ? undefined : json['id'],
         'src': json['src'] == null ? undefined : json['src'],
         'title': json['title'] == null ? undefined : json['title'],
         'nickname': json['nickname'] == null ? undefined : json['nickname'],
@@ -82,6 +89,7 @@ export function MediaDtoToJSON(value?: MediaDto | null): any {
     }
     return {
         
+        'id': value['id'],
         'src': value['src'],
         'title': value['title'],
         'nickname': value['nickname'],
