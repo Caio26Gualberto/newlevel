@@ -21,6 +21,12 @@ import { mapValues } from '../runtime';
 export interface PhotoResponseDto {
     /**
      * 
+     * @type {number}
+     * @memberof PhotoResponseDto
+     */
+    id?: number;
+    /**
+     * 
      * @type {string}
      * @memberof PhotoResponseDto
      */
@@ -86,6 +92,7 @@ export function PhotoResponseDtoFromJSONTyped(json: any, ignoreDiscriminator: bo
     }
     return {
         
+        'id': json['id'] == null ? undefined : json['id'],
         'userId': json['userId'] == null ? undefined : json['userId'],
         'src': json['src'] == null ? undefined : json['src'],
         'avatarSrc': json['avatarSrc'] == null ? undefined : json['avatarSrc'],
@@ -103,6 +110,7 @@ export function PhotoResponseDtoToJSON(value?: PhotoResponseDto | null): any {
     }
     return {
         
+        'id': value['id'],
         'userId': value['userId'],
         'src': value['src'],
         'avatarSrc': value['avatarSrc'],

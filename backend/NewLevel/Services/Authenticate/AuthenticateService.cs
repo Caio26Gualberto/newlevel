@@ -61,7 +61,7 @@ namespace NewLevel.Services.Authenticate
                 var roles = await _userManager.GetRolesAsync(user);
                 var tokenString = GenerateJwtToken(user, roles);
 
-                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatar: user.AvatarKey, publicTimer:user.PublicTimer, avatarUrl: user.AvatarUrl, email: user.Email);
+                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatarKey: user.AvatarKey, publicTimer:user.PublicTimer, avatarUrl: user.AvatarUrl, email: user.Email);
                 var refreshToken = await _userManager.GenerateUserTokenAsync(user, tokenProvider: "local", purpose: "email");
                 await _userManager.SetAuthenticationTokenAsync(user, loginProvider: "email", tokenName: "refresh_token", tokenValue: refreshToken);
 

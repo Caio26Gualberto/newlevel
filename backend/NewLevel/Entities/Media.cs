@@ -1,5 +1,4 @@
-﻿using NewLevel.Enums;
-using NewLevel.Validation;
+﻿using NewLevel.Validation;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NewLevel.Entities
@@ -16,6 +15,10 @@ namespace NewLevel.Entities
         public string Description { get; set; }
         public bool IsPublic { get; set; }
         public DateTime CreationTime { get; set; }
+
+
+
+
         public string UserId { get; set; }
         [ForeignKey("UserId")]
         public User User { get; set; }

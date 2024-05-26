@@ -1,8 +1,6 @@
-﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NewLevel.Context;
-using NewLevel.Dtos.Medias;
 using NewLevel.Dtos.Photo;
 using NewLevel.Dtos.Utils;
 using NewLevel.Entities;
@@ -24,16 +22,35 @@ namespace NewLevel.Services.Photo
             _context = newLevelDbContext;
         }
 
-        public async Task<GenericList<PhotoResponseDto>> GetAllPhotos(Pagination input)
+        public async Task<bool> ApprovePhoto(int photoId, bool isApprove)
         {
-            var allPhotos = await _context.Photos.Where(x => x.IsPublic).ToListAsync();
+            var photo = await _context.Photos.FirstOrDefaultAsync(x => x.Id == photoId);
+            if (photo == null)
+            {
+                throw new Exception("Foto não encontrada");
+            }
+
+            photo.UpdateMedia(photo.KeyS3, photo.Title, photo.Subtitle, photo.Description, isApprove, photo.PrivateURL!, (DateTime)photo.PublicTimer!, photo.CaptureDate);
+            _context.Update(photo);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<GenericList<PhotoResponseDto>> GetAllPhotos(Pagination input, bool isForApprove)
+        {
+            var allPhotos = await _context.Photos
+                .WhereIf(isForApprove, x => x.IsPublic == false)
+                .WhereIf(!isForApprove, x => x.IsPublic)
+                .ToListAsync();
             int totalPhotos = allPhotos.Count;
 
             var skip = (input.Page - 1) * input.PageSize;
 
             var photos = await _context.Photos
                 .Include(x => x.User)
-                .Where(x => x.IsPublic)
+                .WhereIf(isForApprove, x => x.IsPublic == false)
+                .WhereIf(!isForApprove, x => x.IsPublic)
                 .WhereIf(!string.IsNullOrEmpty(input.Search), photo => photo.Title.ToLower().Contains(input.Search.ToLower()) || photo.Title.ToLower() == input.Search.ToLower())
                 .OrderByDescending(photo => photo.CreationTime)
                 .Skip(skip)
@@ -50,6 +67,7 @@ namespace NewLevel.Services.Photo
                     var url = await s3.CreateTempURLS3("newlevel-images", photo.KeyS3);
                     response.Add(new PhotoResponseDto
                     {
+                        Id = photo.Id,
                         Src = url,
                         AvatarSrc = await GetOrGenerateAvatarPrivateUrl(photo),
                         Title = photo.Title,
@@ -67,6 +85,7 @@ namespace NewLevel.Services.Photo
                 {
                     response.Add(new PhotoResponseDto
                     {
+                        Id = photo.Id,
                         Src = photo.PrivateURL,
                         AvatarSrc = await GetOrGenerateAvatarPrivateUrl(photo),
                         Title = photo.Title,

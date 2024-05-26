@@ -6,6 +6,7 @@ namespace NewLevel.Interfaces.Services.Photo
     public interface IPhotoService
     {
         Task<bool> UploadPhoto(PhotoArchiveInput file);
-        Task<GenericList<PhotoResponseDto>> GetAllPhotos(Pagination input);
+        Task<bool> ApprovePhoto(int photoId, bool isApprove);
+        Task<GenericList<PhotoResponseDto>> GetAllPhotos(Pagination input, bool isForApprove);
     }
 }

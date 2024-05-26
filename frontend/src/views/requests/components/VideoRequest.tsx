@@ -13,7 +13,7 @@ const styles = {
     maxHeight: '200px', // Ajuste a altura máxima conforme necessário
     overflow: 'auto',
     cursor: 'default', // Define o cursor padrão para o campo
-    '& .MuiInputBase-input': {
+    '& .MuiInputBaseInput': {
       cursor: 'default', // Define o cursor padrão para o conteúdo do campo
     },
   },
@@ -39,7 +39,7 @@ const VideoRequest = () => {
   const [expanded, setExpanded] = useState<string | false>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [videosToApprove, setVideosToApprove] = useState<MediaDtoGenericList>({ items: [], totalCount: 0 });
-  const [pagination, setPagination] = useState({ page: 0, pageSize: 10, pageCount: 0, search: "" });
+  const [pagination, setPagination] = useState({ page: 0, pageSize: 12, pageCount: 0, search: "" });
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPagination(prev => ({ ...prev, page: newPage }));
@@ -140,31 +140,22 @@ const VideoRequest = () => {
                 </Box>
               </Box>
             </AccordionDetails>
-            <TablePagination
-              sx={{ display: 'flex', justifyContent: 'center' }}
-              rowsPerPageOptions={[12, 24, 48]}
-              component="div"
-              labelRowsPerPage="Vídeos por página"
-              count={videosToApprove.totalCount!!}
-              rowsPerPage={pagination.pageSize}
-              page={pagination.page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
           </Accordion>
         ))}
         {videosToApprove.items!.length === 0 && !loading && <Typography variant="h6" textAlign="center">Nenhum vídeo para aprovar</Typography>}
-        <TablePagination
-          sx={{ display: 'flex', justifyContent: 'center' }}
-          rowsPerPageOptions={[12, 24, 48]}
-          component="div"
-          labelRowsPerPage="Vídeos por página"
-          count={videosToApprove.totalCount!}
-          rowsPerPage={pagination.pageSize}
-          page={pagination.page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+        {videosToApprove.items!.length > 0 &&
+          <TablePagination
+            sx={{ display: 'flex', justifyContent: 'center' }}
+            rowsPerPageOptions={[12, 24, 48]}
+            component="div"
+            labelRowsPerPage="Vídeos por página"
+            count={videosToApprove.totalCount!}
+            rowsPerPage={pagination.pageSize}
+            page={pagination.page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        }
       </Box>
     </>
   )

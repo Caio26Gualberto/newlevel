@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NewLevel.Entities;
+using System.Reflection.Emit;
 
 namespace NewLevel.Context
 {
@@ -10,14 +11,16 @@ namespace NewLevel.Context
         public NewLevelDbContext(DbContextOptions<NewLevelDbContext> options) : base(options)
         { }
 
-        public DbSet<Media> Medias { get; set; }    
+        public DbSet<Media> Medias { get; set; }
         public DbSet<Photo> Photos { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
             builder.ApplyConfigurationsFromAssembly(typeof(NewLevelDbContext).Assembly);
 
+            // Configurações para o Identity
             builder.Entity<User>(entity =>
             {
                 entity.ToTable(name: "Users");

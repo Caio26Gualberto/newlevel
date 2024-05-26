@@ -19,6 +19,9 @@ namespace NewLevel.Entities
         public DateTime CaptureDate { get; private set; }
         public DateTime? PublicTimer { get; private set; }
         public bool IsPublic { get; private set; }
+
+
+
         public string UserId { get; set; }
         [ForeignKey("UserId")]
         public User User { get; set; }

@@ -28,7 +28,16 @@ import {
     PhotoResponseDtoGenericListNewLevelResponseToJSON,
 } from '../models/index';
 
+export interface ApiPhotoApprovePhotoGetRequest {
+    photoId?: number;
+    isApprove?: boolean;
+}
+
 export interface ApiPhotoGetAllPhotosPostRequest {
+    pagination?: Pagination;
+}
+
+export interface ApiPhotoGetPhotoToApprovePostRequest {
     pagination?: Pagination;
 }
 
@@ -44,6 +53,46 @@ export interface ApiPhotoUploadPhotoPostRequest {
  * 
  */
 export class PhotoApi extends runtime.BaseAPI {
+
+    /**
+     */
+    async apiPhotoApprovePhotoGetRaw(requestParameters: ApiPhotoApprovePhotoGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['photoId'] != null) {
+            queryParameters['photoId'] = requestParameters['photoId'];
+        }
+
+        if (requestParameters['isApprove'] != null) {
+            queryParameters['isApprove'] = requestParameters['isApprove'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/Photo/ApprovePhoto`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiPhotoApprovePhotoGet(requestParameters: ApiPhotoApprovePhotoGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiPhotoApprovePhotoGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      */
@@ -77,6 +126,41 @@ export class PhotoApi extends runtime.BaseAPI {
      */
     async apiPhotoGetAllPhotosPost(requestParameters: ApiPhotoGetAllPhotosPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PhotoResponseDtoGenericListNewLevelResponse> {
         const response = await this.apiPhotoGetAllPhotosPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiPhotoGetPhotoToApprovePostRaw(requestParameters: ApiPhotoGetPhotoToApprovePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PhotoResponseDtoGenericListNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/Photo/GetPhotoToApprove`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: PaginationToJSON(requestParameters['pagination']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PhotoResponseDtoGenericListNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiPhotoGetPhotoToApprovePost(requestParameters: ApiPhotoGetPhotoToApprovePostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PhotoResponseDtoGenericListNewLevelResponse> {
+        const response = await this.apiPhotoGetPhotoToApprovePostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

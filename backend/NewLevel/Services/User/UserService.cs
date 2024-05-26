@@ -1,9 +1,11 @@
 ﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using NewLevel.Context;
 using NewLevel.Dtos.User;
 using NewLevel.Entities;
 using NewLevel.Interfaces.Services.Email;
+using NewLevel.Interfaces.Services.Photo;
 using NewLevel.Interfaces.Services.User;
 using NewLevel.Services.AmazonS3;
 
@@ -46,8 +48,21 @@ namespace NewLevel.Services.UserService
                 ActivityLocation = user.ActivityLocation,
                 Email = user.Email,
                 Password = user.PasswordHash,
-                ProfilePicture = user.AvatarUrl,
+                ProfilePicture = await GetOrSetAvatarURL(user)
             };
+        }
+
+        private async Task<string> GetOrSetAvatarURL(User user)
+        {
+            if (user.PublicTimer == null || user.PublicTimer < DateTime.UtcNow.AddHours(-3))
+            {
+                AmazonS3Service s3 = new AmazonS3Service();
+                string key = user.AvatarKey!;
+                var url = await s3.CreateTempURLS3("newlevel-images", key);
+                return url;
+            }
+
+            return user.AvatarUrl!;
         }
         public async Task<bool> Delete()
         {
@@ -72,7 +87,7 @@ namespace NewLevel.Services.UserService
             {
                 var user = await _utils.GetUser();
 
-                user.Update(isFirstTimeLogin: false, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatar: user.AvatarKey, publicTimer: user.PublicTimer, avatarUrl: user.AvatarUrl, email: user.Email);
+                user.Update(isFirstTimeLogin: false, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatarKey: user.AvatarKey, publicTimer: user.PublicTimer, avatarUrl: user.AvatarUrl, email: user.Email);
                 await _userManager.UpdateAsync(user);
             }
             catch (Exception e)
@@ -107,7 +122,7 @@ namespace NewLevel.Services.UserService
                 throw new Exception("Erro ao adicionar imagem a nuvem, caso o problema persista entre em contato com o desenvolvedor");
             }
 
-            user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatar: key, publicTimer: DateTime.Now.AddDays(2).AddHours(-3),
+            user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatarKey: key, publicTimer: DateTime.Now.AddDays(2).AddHours(-3),
                 avatarUrl: url, email: user.Email);
             await _userManager.UpdateAsync(user);
             await _newLevelDbContext.SaveChangesAsync();
@@ -136,13 +151,13 @@ namespace NewLevel.Services.UserService
                 }
 
                 var url = await s3.CreateTempURLS3("newlevel-images", key);
-                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: input.Nickname ?? user.Nickname, activityLocation: input.ActivityLocation ?? user.ActivityLocation, avatar: key, publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: url, email: input.Email);
+                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: input.Nickname ?? user.Nickname, activityLocation: input.ActivityLocation ?? user.ActivityLocation, avatarKey: key, publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: url, email: input.Email);
                 await _userManager.UpdateAsync(user);
                 await _newLevelDbContext.SaveChangesAsync();
             }
             else
             {
-                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: input.Nickname ?? user.Nickname, activityLocation: input.ActivityLocation ?? user.ActivityLocation, avatar: user.AvatarUrl, publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: user.AvatarUrl, email: input.Email);
+                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: input.Nickname ?? user.Nickname, activityLocation: input.ActivityLocation ?? user.ActivityLocation, avatarKey: user.AvatarUrl, publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: user.AvatarUrl, email: input.Email);
                 await _userManager.UpdateAsync(user);
                 await _newLevelDbContext.SaveChangesAsync();
             }

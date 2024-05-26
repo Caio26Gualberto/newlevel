@@ -44,7 +44,7 @@ const Request: React.FC = () => {
     };
 
     return (
-        <Box height="100vh" bgcolor="#F3F3F3">
+        <Box height="92.5vh" bgcolor="#F3F3F3">
             <Box display="flex" pt={10} justifyContent="center" alignItems="center">
                 <Box flex={1} maxWidth="1200px">
                     <Paper elevation={3}>

@@ -9,7 +9,7 @@ public class EmailService : IEmailService
 
     public async Task SendEmail(string recipient, string subject, string body, string templateId = "", object templateObj = null)
     {
-        var client = new SendGridClient(_sendGridApiKey);
+        var client = new SendGridClient("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");
         var from = new EmailAddress("anewlevelmusic@gmail.com", "A New Level");
         var to = new EmailAddress(recipient);
         var msg = MailHelper.CreateSingleEmail(from, to, subject, body, body);
