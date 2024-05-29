@@ -54,6 +54,26 @@ namespace NewLevel.Context
             {
                 entity.ToTable("UserTokens");
             });
+
+            builder.Entity<User>()
+                        .HasMany(u => u.Comments)
+                        .WithOne(c => c.User)
+                        .HasForeignKey(c => c.UserId)
+                        .OnDelete(DeleteBehavior.Restrict);
+
+            // Configuração da entidade Media
+            builder.Entity<Media>()
+                .HasMany(m => m.Comments)
+                .WithOne(c => c.Media)
+                .HasForeignKey(c => c.MediaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configuração da entidade Photo
+            builder.Entity<Photo>()
+                .HasMany(p => p.Comments)
+                .WithOne(c => c.Photo)
+                .HasForeignKey(c => c.PhotoId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

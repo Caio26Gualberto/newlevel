@@ -80,9 +80,9 @@ const Photos = () => {
         <Box m={2}>
           <Grid container spacing={2}>
             {photos.items?.map((photo, index) => (
-              <Grid item xs={2}>
+              <Grid key={index} item xs={2}>
                 <CardPhoto key={index} title={photo.title!} subtitle={photo.subtitle!} srcPhotoS3={photo.src!} date={photo.captureDate!}
-                  description={photo.description} srcUserPhotoProfile={photo.avatarSrc} userId={photo.userId!} nickname={photo.nickname!} />
+                  description={photo.description} srcUserPhotoProfile={photo.avatarSrc} userId={photo.userId!} nickname={photo.nickname!} photoId={photo.id!} />
               </Grid>
             ))}
           </Grid>

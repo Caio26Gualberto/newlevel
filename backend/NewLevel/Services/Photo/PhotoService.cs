@@ -136,7 +136,7 @@ namespace NewLevel.Services.Photo
             {
                 var s3 = new AmazonS3Service();
                 var url = await s3.CreateTempURLS3("newlevel-images", photo.KeyS3);
-                photo.User.Update(photo.User.IsFirstTimeLogin, photo.User.Nickname, photo.User.AvatarUrl, photo.User.ActivityLocation, DateTime.Now.AddDays(2).AddHours(-3), url, email: null);
+                photo.User.Update(photo.User.IsFirstTimeLogin, photo.User.Nickname, photo.User.AvatarUrl, photo.User.ActivityLocation, DateTime.Now.AddDays(2).AddHours(-3), url, email: photo.User.Email);
                 await _context.SaveChangesAsync();
                 return url;
             }

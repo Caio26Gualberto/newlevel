@@ -4,6 +4,7 @@
 README.md
 package.json
 src/apis/AuthenticateApi.ts
+src/apis/CommentApi.ts
 src/apis/CommonApi.ts
 src/apis/MediaApi.ts
 src/apis/PhotoApi.ts
@@ -11,6 +12,9 @@ src/apis/UserApi.ts
 src/apis/index.ts
 src/index.ts
 src/models/BooleanNewLevelResponse.ts
+src/models/CommentsListDto.ts
+src/models/CommentsPhotoResponseDto.ts
+src/models/CommentsPhotoResponseDtoNewLevelResponse.ts
 src/models/DisplayActivityLocationDto.ts
 src/models/DisplayActivityLocationDtoListNewLevelResponse.ts
 src/models/EActivityLocation.ts
@@ -27,6 +31,7 @@ src/models/Pagination.ts
 src/models/PhotoResponseDto.ts
 src/models/PhotoResponseDtoGenericList.ts
 src/models/PhotoResponseDtoGenericListNewLevelResponse.ts
+src/models/ReceiveCommentDto.ts
 src/models/RegisterInputDto.ts
 src/models/RegisterResponseDto.ts
 src/models/RegisterResponseDtoNewLevelResponse.ts

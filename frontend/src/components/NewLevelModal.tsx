@@ -21,7 +21,7 @@ const NewLevelModal: React.FC<NewModalProps> = ({ width, height, ...props }) => 
                 height: height,
                 bgcolor: 'white',
                 boxShadow: "0 8px 18px rgba(0,0,0,.18), 0 6px 6px rgba(0,0,0,.23)",
-                borderRadius: "4px"
+                borderRadius: "4px",
             }}>
                 {props.children}
             </Box>

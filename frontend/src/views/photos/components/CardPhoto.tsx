@@ -15,12 +15,14 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ForumIcon from '@mui/icons-material/Forum';
 import { Box } from '@mui/material';
 import PictureProfileModal from './modal/PictureProfileModal';
+import CommentsModal from './modal/CommentsModal';
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
 }
 
 interface CardPhotoProps {
+  photoId: number;
   userId: string;
   title: string;
   srcPhotoS3: string;
@@ -42,13 +44,22 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
   }),
 }));
 
-const CardPhoto: React.FC<CardPhotoProps> = ({ title, srcPhotoS3, srcUserPhotoProfile, date, subtitle, description, userId, nickname }) => {
+const CardPhoto: React.FC<CardPhotoProps> = ({ title, srcPhotoS3, srcUserPhotoProfile, date, subtitle, description, userId, nickname, photoId }) => {
   const haveDescription = description ? true : false;
   const [expanded, setExpanded] = React.useState(false);
   const [openAvatar, setOpenAvatar] = React.useState(false);
+  const [openComments, setOpenComments] = React.useState(false);
 
   const handleClickOpenAvatar = () => {
     setOpenAvatar(true);
+  }
+
+  const handleOpenComments = () => { 
+    setOpenComments(true);
+  }
+
+  const handleCloseComments = () => { 
+    setOpenComments(false);
   }
 
   const handleCloseAvatar = () => { 
@@ -77,17 +88,18 @@ const CardPhoto: React.FC<CardPhotoProps> = ({ title, srcPhotoS3, srcUserPhotoPr
 
   return (
     <>
+      {openComments && <CommentsModal open={true} onClose={handleCloseComments} photoId={photoId}/>}
       <PictureProfileModal onClose={handleCloseAvatar} open={openAvatar} avatarUrl={srcUserPhotoProfile!} nickname={nickname!}/>
       <Card sx={{ maxWidth: 345, minHeight: "100%" }}>
         <CardHeader
           avatar={
             renderizeAvatar()
           }
-          action={
-            <IconButton aria-label="settings">
-              <MoreVertIcon />
-            </IconButton>
-          }
+          // action={
+          //   <IconButton aria-label="settings">
+          //     <MoreVertIcon />
+          //   </IconButton>
+          // }
           title={<Typography fontWeight="bold">{title}</Typography>}
           subheader={date.toLocaleDateString()}
         />
@@ -105,7 +117,7 @@ const CardPhoto: React.FC<CardPhotoProps> = ({ title, srcPhotoS3, srcUserPhotoPr
         </CardContent>
         <Box display="flex" flexDirection="column" justifyContent="end">
           <CardActions sx={{ display: "flex", justifyContent: "end" }} disableSpacing>
-            <IconButton aria-label="add to favorites">
+            <IconButton onClick={handleOpenComments} aria-label="add to favorites">
               <ForumIcon />
             </IconButton>
             {haveDescription && <ExpandMore

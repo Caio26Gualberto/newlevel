@@ -169,8 +169,9 @@ const Navbar = () => {
                                 'aria-labelledby': 'basic-button',
                             }}
                         >
-                            <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myProfile"><MenuItem>Meu perfil</MenuItem></StyledLink>
-                            <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myVideos"><MenuItem>Meus vídeos</MenuItem></StyledLink>
+                            <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myProfile"><MenuItem>Meu Perfil</MenuItem></StyledLink>
+                            <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myVideos"><MenuItem>Meus Vídeos</MenuItem></StyledLink>
+                            <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myPhotos"><MenuItem>Minhas Fotos</MenuItem></StyledLink>
                             {isAdmin() && <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/acceptContent"><MenuItem>Pedidos</MenuItem></StyledLink>}
                             <StyledMenu onClick={() => { handleCloseAvatar(); logout(); }}>Sair</StyledMenu>
                         </Menu>

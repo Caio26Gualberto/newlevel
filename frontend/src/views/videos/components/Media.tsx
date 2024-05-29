@@ -1,8 +1,11 @@
-import { Box, Button, Skeleton, Typography } from "@mui/material"
+import { Box, Button, IconButton, Skeleton, Typography } from "@mui/material"
 import { useState } from "react"
 import SimpleDialog from "./SimpleDialog"
+import ForumIcon from '@mui/icons-material/Forum';
+import CommentsModal from "../../../views/photos/components/modal/CommentsModal";
 
 interface MediaProps {
+    id: number
     src: string
     title: string
     createdAt: Date
@@ -11,16 +14,28 @@ interface MediaProps {
     loading: boolean
 }
 
-const Media = ({ src, title, description, nickname, createdAt, loading }: MediaProps) => {
+const Media = ({ id, src, title, description, nickname, createdAt, loading }: MediaProps) => {
     const [showDescription, setShowDescription] = useState(false);
+    const [showComments, setShowComments] = useState(false);
+
     const handleClickOpen = () => {
         setShowDescription(true);
     };
     const handleClose = () => {
         setShowDescription(false);
     };
+
+    const handleOpenComments = () => {
+        setShowComments(true);
+    }
+
+    const handleCloseComments = () => {
+        setShowComments(false);
+    }
+    
     return (
         <Box sx={{ width: 460, marginRight: 1, my: 2 }}>
+            {showComments && <CommentsModal open={true} onClose={handleCloseComments} mediaId={id}/>}
             {!loading ? (
                 <iframe width="460" height="300" src={src} title={title}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -34,12 +49,17 @@ const Media = ({ src, title, description, nickname, createdAt, loading }: MediaP
                         {title}
                     </Typography>
                     <Typography>
-                        <Button
-                            variant="outlined"
-                            color="primary"
-                            size="small"
-                            onClick={handleClickOpen}
-                            sx={{ mb: 1, color: "white", backgroundColor: "red", border: "none", "&:hover": { backgroundColor: "#F3F3F3", color: "black", border: "none" } }}>Ver descrição</Button>
+                        <Box display="flex" justifyContent="space-between">
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                size="small"
+                                onClick={handleClickOpen}
+                                sx={{ mb: 1, color: "white", backgroundColor: "red", border: "none", "&:hover": { backgroundColor: "#F3F3F3", color: "black", border: "none" } }}>Ver descrição</Button>
+                            <IconButton onClick={handleOpenComments} aria-label="add to favorites">
+                                <ForumIcon color="error"/>
+                            </IconButton>
+                        </Box>
                         <SimpleDialog
                             open={showDescription}
                             onClose={handleClose}

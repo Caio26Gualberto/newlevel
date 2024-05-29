@@ -13,6 +13,7 @@ import ResetPassword from '../views/resetPassword/ResetPassword';
 import ChooseUserAvatar from '../views/chooseUserAvatar/ChooseUserAvatar';
 import { AuthProvider } from '../AuthContext';
 import Request from '../views/requests/Request';
+import MyPhotos from '../views/myPhotos/MyPhotos';
 
 const Rotas = () => {
   return (
@@ -28,6 +29,7 @@ const Rotas = () => {
           <Route path="/podcasts" element={<Podcast />} />
           <Route path="/aboutMe" element={<AboutMe />} />
           <Route path="/myVideos" element={<MyVideos />} />
+          <Route path="/myPhotos" element={<MyPhotos />} />
           <Route path="/myProfile" element={<MyProfile />} />
           <Route path="/security/resetPassword" element={<ResetPassword />} />
           <Route path="/newAvatar" element={<ChooseUserAvatar />} />

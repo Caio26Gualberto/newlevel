@@ -29,6 +29,7 @@ namespace NewLevel.Entities
 
         [InverseProperty("User")]
         public List<Photo> Photos { get; private set; }
+        public List<Comment> Comments { get; set; } 
 
         public void Update(bool? isFirstTimeLogin, string nickName, string? avatarKey, EActivityLocation activityLocation, DateTime? publicTimer, string avatarUrl, string? email)
         {

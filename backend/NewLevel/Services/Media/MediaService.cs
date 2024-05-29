@@ -104,7 +104,7 @@ namespace NewLevel.Services.Media
                 .Take(input.PageSize)
                 .Select(media => new MediaDto
                 {
-                    Id = isForApprove ? media.Id : null,
+                    Id = media.Id,
                     Src = media.Src,
                     Title = media.Title,
                     CreationTime = media.CreationTime,

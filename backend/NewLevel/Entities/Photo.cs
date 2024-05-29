@@ -25,6 +25,7 @@ namespace NewLevel.Entities
         public string UserId { get; set; }
         [ForeignKey("UserId")]
         public User User { get; set; }
+        public List<Comment> Comments { get; set; }
 
         public void UpdateMedia(string keyS3, string title, string subtitle, string description, bool isPublic, string privateUrl, DateTime publicTimer, DateTime captureDate)
         {

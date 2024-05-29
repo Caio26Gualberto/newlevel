@@ -12,8 +12,8 @@ using NewLevel.Context;
 namespace NewLevel.Migrations
 {
     [DbContext(typeof(NewLevelDbContext))]
-    [Migration("20240526030530_AddCommentsTableAndAssociations")]
-    partial class AddCommentsTableAndAssociations
+    [Migration("20240526064421_AddCommenTableAndAssociations")]
+    partial class AddCommenTableAndAssociations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -191,7 +191,7 @@ namespace NewLevel.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comment");
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("NewLevel.Entities.Media", b =>
@@ -419,19 +419,19 @@ namespace NewLevel.Migrations
             modelBuilder.Entity("NewLevel.Entities.Comment", b =>
                 {
                     b.HasOne("NewLevel.Entities.Media", "Media")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("MediaId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("NewLevel.Entities.Photo", "Photo")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("PhotoId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("NewLevel.Entities.User", "User")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Media");
@@ -463,8 +463,20 @@ namespace NewLevel.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("NewLevel.Entities.Media", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("NewLevel.Entities.Photo", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
             modelBuilder.Entity("NewLevel.Entities.User", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("Medias");
 
                     b.Navigation("Photos");

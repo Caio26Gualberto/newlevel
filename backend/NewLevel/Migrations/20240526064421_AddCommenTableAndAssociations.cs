@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace NewLevel.Migrations
 {
     /// <inheritdoc />
-    public partial class AddCommentsTableAndAssociations : Migration
+    public partial class AddCommenTableAndAssociations : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Comment",
+                name: "Comments",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -20,45 +20,45 @@ namespace NewLevel.Migrations
                     Text = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    PhotoId = table.Column<int>(type: "int", nullable: true),
-                    MediaId = table.Column<int>(type: "int", nullable: true)
+                    MediaId = table.Column<int>(type: "int", nullable: true),
+                    PhotoId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Comment", x => x.Id);
+                    table.PrimaryKey("PK_Comments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Comment_Medias_MediaId",
+                        name: "FK_Comments_Medias_MediaId",
                         column: x => x.MediaId,
                         principalTable: "Medias",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Comment_Photos_PhotoId",
+                        name: "FK_Comments_Photos_PhotoId",
                         column: x => x.PhotoId,
                         principalTable: "Photos",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Comment_Users_UserId",
+                        name: "FK_Comments_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comment_MediaId",
-                table: "Comment",
+                name: "IX_Comments_MediaId",
+                table: "Comments",
                 column: "MediaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comment_PhotoId",
-                table: "Comment",
+                name: "IX_Comments_PhotoId",
+                table: "Comments",
                 column: "PhotoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comment_UserId",
-                table: "Comment",
+                name: "IX_Comments_UserId",
+                table: "Comments",
                 column: "UserId");
         }
 
@@ -66,7 +66,7 @@ namespace NewLevel.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Comment");
+                name: "Comments");
         }
     }
 }

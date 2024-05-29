@@ -107,7 +107,7 @@ const Videos = () => {
         </Box>
         <Grid container pl={3.4}>
           {data.data?.items!.map((item, index) => (
-            <Media key={index} src={item.src!} title={item.title!} description={item.description!} nickname={item.nickname!} createdAt={new Date(item.creationTime!)} loading={loading} />
+            <Media key={index} id={item.id!} src={item.src!} title={item.title!} description={item.description!} nickname={item.nickname!} createdAt={new Date(item.creationTime!)} loading={loading} />
           ))}
         </Grid>
         <TablePagination

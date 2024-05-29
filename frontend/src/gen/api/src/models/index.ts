@@ -1,6 +1,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './BooleanNewLevelResponse';
+export * from './CommentsListDto';
+export * from './CommentsPhotoResponseDto';
+export * from './CommentsPhotoResponseDtoNewLevelResponse';
 export * from './DisplayActivityLocationDto';
 export * from './DisplayActivityLocationDtoListNewLevelResponse';
 export * from './EActivityLocation';
@@ -17,6 +20,7 @@ export * from './Pagination';
 export * from './PhotoResponseDto';
 export * from './PhotoResponseDtoGenericList';
 export * from './PhotoResponseDtoGenericListNewLevelResponse';
+export * from './ReceiveCommentDto';
 export * from './RegisterInputDto';
 export * from './RegisterResponseDto';
 export * from './RegisterResponseDtoNewLevelResponse';
