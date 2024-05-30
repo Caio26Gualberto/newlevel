@@ -50,7 +50,7 @@ namespace NewLevel.Entities
             AvatarKey = avatarKey;
             PublicTimer = publicTimer;
             AvatarUrl = avatarUrl;
-            Email = email
+            Email = email;
         }
     }
 }
