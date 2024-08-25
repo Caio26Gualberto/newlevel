@@ -26,7 +26,7 @@ namespace NewLevel
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<NewLevelDbContext>(options =>
-            options.UseSqlServer(Environment.GetEnvironmentVariable("MainDb"), p => p.MigrationsAssembly(typeof(NewLevelDbContext).Assembly.FullName)));
+            options.UseSqlServer(configuration.GetConnectionString("MainDb"), p => p.MigrationsAssembly(typeof(NewLevelDbContext).Assembly.FullName)));
 
             services.Configure<DataProtectionTokenProviderOptions>(options =>
             {
@@ -45,7 +45,7 @@ namespace NewLevel
             .AddDefaultTokenProviders()
             .AddTokenProvider<DataProtectorTokenProvider<User>>("local");
 
-            var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("jwtkey")!);
+            var key = Encoding.ASCII.GetBytes(configuration["jwtkey"]!);
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

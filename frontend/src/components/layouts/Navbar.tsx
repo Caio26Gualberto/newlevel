@@ -1,4 +1,4 @@
-import { Avatar, Box, Grid, Menu, MenuItem, styled } from "@mui/material"
+import { Avatar, Box, Drawer, Grid, IconButton, List, ListItem, Menu, MenuItem, styled, useMediaQuery, useTheme } from "@mui/material"
 import { useEffect, useState } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import Logo from "../../assets/128982_logo.png"
@@ -8,6 +8,7 @@ import { AuthenticateApi, UserApi } from "../../gen/api/src";
 import ApiConfiguration from "../../apiConfig";
 import * as toastr from 'toastr';
 import { profile } from "console";
+import MenuIcon from '@mui/icons-material/Menu';
 
 const StyledLink = styled(Link)`
   text-decoration: none;
@@ -44,12 +45,23 @@ const Navbar = () => {
     const [anchorElAvatar, setAnchorElAvatar] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const openAvatar = Boolean(anchorElAvatar);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [drawerOpen, setDrawerOpen] = React.useState(false);
+
+    const toggleDrawer = (open: any) => (event: any) => {
+        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+            return;
+        }
+        setDrawerOpen(open);
+    };
 
     const notAllowedPaths = [
         "/",
         "/welcome",
         "/register",
-        "/security/resetPassword"
+        "/security/resetPassword",
+        "/newAvatar"
     ];
 
     const handleClick = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -123,60 +135,125 @@ const Navbar = () => {
     return (
         <>{showNavbar &&
             <>
-                <Box display="flex" justifyContent="space-evenly" alignItems="center" bgcolor="black" zIndex={2} position="fixed" width="100%" height="70px">
-                    <Box component="img" onClick={async () => {
-                        navigate('/welcome')
-                    }} src={Logo} height="50%" pl={2} sx={{ cursor: "pointer" }}>
-                    </Box>
-                    <Box display="flex" width="95%" pr={2} pl={2}>
-                        <Grid container>
-                            <Grid display="flex" justifyContent="center" item xs={1}>
-                                <Menu
-                                    id="basic-menu"
-                                    anchorEl={anchorEl}
-                                    open={open}
-                                    onClose={handleClose}
-                                    MenuListProps={{
-                                        'aria-labelledby': 'basic-button',
-                                    }}
-                                >
-                                    <StyledLink sx={{ color: "black" }} onClick={handleClose} to="/videos"><MenuItem>Vídeos</MenuItem></StyledLink>
-                                    <StyledLink sx={{ color: "black" }} onClick={handleClose} to="/photos"><MenuItem>Fotos</MenuItem></StyledLink>
-                                </Menu>
-                                <a onClick={handleClick} onMouseEnter={(e) => (e.target as HTMLAnchorElement).style.color = "red"}
-                                    onMouseLeave={(e) => (e.target as HTMLAnchorElement).style.color = "white"}
-                                    style={{ textDecoration: "none", color: "white", transition: "color 0.3s ease", cursor: "pointer" }}>Álbuns</a>
-                            </Grid>
-                            <Grid display="flex" justifyContent="center" item xs={1}>
-                                <StyledLink to="/podcasts">Podcasts</StyledLink>
-                            </Grid>
-                            <Grid display="flex" justifyContent="center" item xs={1}>
-                                <StyledLink to="/aboutMe">Sobre mim</StyledLink>
-                            </Grid>
-                            <Grid display="flex" justifyContent="center" item xs={1}>
-
-                            </Grid>
-                        </Grid>
-                    </Box>
-                    <Box pr={2} pl={2} sx={{ cursor: "pointer" }}>
-                        {rederizeAvatar()}
-                        <Menu
-                            id="basic-menu"
-                            anchorEl={anchorElAvatar}
-                            open={openAvatar}
-                            onClose={handleCloseAvatar}
-                            MenuListProps={{
-                                'aria-labelledby': 'basic-button',
-                            }}
+                {isMobile ? (
+                    <>
+                        <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            alignItems="center"
+                            bgcolor="black"
+                            zIndex={2}
+                            position="fixed"
+                            width="100%"
+                            height="70px"
+                            p={2}
                         >
-                            <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myProfile"><MenuItem>Meu Perfil</MenuItem></StyledLink>
-                            <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myVideos"><MenuItem>Meus Vídeos</MenuItem></StyledLink>
-                            <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myPhotos"><MenuItem>Minhas Fotos</MenuItem></StyledLink>
-                            {isAdmin() && <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/acceptContent"><MenuItem>Pedidos</MenuItem></StyledLink>}
-                            <StyledMenu onClick={() => { handleCloseAvatar(); logout(); }}>Sair</StyledMenu>
-                        </Menu>
+                            <Box
+                                component="img"
+                                onClick={() => navigate('/welcome')}
+                                src={Logo}
+                                height="40px"
+                                sx={{ cursor: "pointer" }}
+                            />
+                            <IconButton
+                                edge="start"
+                                color="inherit"
+                                aria-label="menu"
+                                onClick={toggleDrawer(true)}
+                            >
+                                <MenuIcon color="primary"/>
+                            </IconButton>
+                        </Box>
+                        <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
+                            <Box
+                                sx={{ width: 250 }}
+                                role="presentation"
+                                onClick={toggleDrawer(false)}
+                                onKeyDown={toggleDrawer(false)}
+                                bgcolor="black"
+                            >
+                                <List>
+                                    <StyledLink to="/videos"><ListItem button>Vídeos</ListItem></StyledLink>
+                                    <StyledLink to="/photos"><ListItem button>Fotos</ListItem></StyledLink>
+                                    <StyledLink to="/podcasts"><ListItem button>Podcasts</ListItem></StyledLink>
+                                    <StyledLink to="/aboutMe"><ListItem button>Sobre mim</ListItem></StyledLink>
+                                    <StyledLink to="/myProfile"><ListItem>Meu Perfil</ListItem></StyledLink>
+                                </List>
+                            </Box>
+                        </Drawer>
+                    </>
+                ) : (
+                    // Layout para telas maiores
+                    <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        bgcolor="black"
+                        zIndex={2}
+                        position="fixed"
+                        width="100%"
+                        height="70px"
+                        p={2}
+                    >
+                        <Box
+                            component="img"
+                            onClick={() => navigate('/welcome')}
+                            src={Logo}
+                            height="50%"
+                            sx={{ cursor: "pointer" }}
+                        />
+                        <Box display="flex" width="95%" pr={2} pl={2}>
+                            <Grid container>
+                                <Grid display="flex" justifyContent="center" item xs={1}>
+                                    <Menu
+                                        id="basic-menu"
+                                        anchorEl={anchorEl}
+                                        open={open}
+                                        onClose={handleClose}
+                                        MenuListProps={{
+                                            'aria-labelledby': 'basic-button',
+                                        }}
+                                    >
+                                        <StyledLink sx={{ color: "black" }} onClick={handleClose} to="/videos"><MenuItem>Vídeos</MenuItem></StyledLink>
+                                        <StyledLink sx={{ color: "black" }} onClick={handleClose} to="/photos"><MenuItem>Fotos</MenuItem></StyledLink>
+                                    </Menu>
+                                    <a
+                                        onClick={handleClick}
+                                        onMouseEnter={(e) => (e.target as HTMLAnchorElement).style.color = "red"}
+                                        onMouseLeave={(e) => (e.target as HTMLAnchorElement).style.color = "white"}
+                                        style={{ textDecoration: "none", color: "white", transition: "color 0.3s ease", cursor: "pointer" }}
+                                    >
+                                        Álbuns
+                                    </a>
+                                </Grid>
+                                <Grid display="flex" justifyContent="center" item xs={1}>
+                                    <StyledLink to="/podcasts">Podcasts</StyledLink>
+                                </Grid>
+                                <Grid display="flex" justifyContent="center" item xs={1}>
+                                    <StyledLink to="/aboutMe">Sobre mim</StyledLink>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                        <Box pr={2} pl={2} sx={{ cursor: "pointer" }}>
+                            {rederizeAvatar()}
+                            <Menu
+                                id="basic-menu"
+                                anchorEl={anchorElAvatar}
+                                open={openAvatar}
+                                onClose={handleCloseAvatar}
+                                MenuListProps={{
+                                    'aria-labelledby': 'basic-button',
+                                }}
+                            >
+                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myProfile"><MenuItem>Meu Perfil</MenuItem></StyledLink>
+                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myVideos"><MenuItem>Meus Vídeos</MenuItem></StyledLink>
+                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myPhotos"><MenuItem>Minhas Fotos</MenuItem></StyledLink>
+                                {isAdmin() && <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/acceptContent"><MenuItem>Pedidos</MenuItem></StyledLink>}
+                                <StyledMenu onClick={() => { handleCloseAvatar(); logout(); }}>Sair</StyledMenu>
+                            </Menu>
+                        </Box>
                     </Box>
-                </Box>
+                )}
                 <Box height="70px" />
             </>
         }

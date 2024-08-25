@@ -41,6 +41,9 @@ namespace NewLevel.Services.UserService
         public async Task<UserInfoResponseDto> GetUserInfo()
         {
             var user = await _utils.GetUser();
+            //Todo tratar esse nulo depois no front
+            if (user.IsFirstTimeLogin)
+                return null;
 
             return new UserInfoResponseDto
             {

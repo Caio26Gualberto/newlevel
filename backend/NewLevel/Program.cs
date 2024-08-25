@@ -73,7 +73,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-        string adminEmail = "Caiogualbertodev@outlook.com";
+        string adminEmail = "Caiogualberto@outlook.com";
         string adminPasword = "*";
 
         await DataSeeder.SeedAdminUser(services, adminEmail, adminPasword);

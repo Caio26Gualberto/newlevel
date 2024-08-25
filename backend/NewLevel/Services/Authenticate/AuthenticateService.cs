@@ -17,13 +17,15 @@ namespace NewLevel.Services.Authenticate
         private readonly NewLevelDbContext _newLevelDbContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly Utils.Utils _utils;
+        private readonly IConfiguration _configuration;
 
-        public AuthenticateService(UserManager<User> userManager, SignInManager<User> signInManager, NewLevelDbContext newLevelDbContext, IHttpContextAccessor httpContextAccessor)
+        public AuthenticateService(UserManager<User> userManager, SignInManager<User> signInManager, NewLevelDbContext newLevelDbContext, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _newLevelDbContext = newLevelDbContext;
             _httpContextAccessor = httpContextAccessor;
+            _configuration = configuration;
             _utils = new Utils.Utils(httpContextAccessor, userManager); 
         }
         public async Task<TokensDto> GenerateNewAccessToken(string accessToken)
@@ -123,7 +125,7 @@ namespace NewLevel.Services.Authenticate
         private string GenerateJwtToken(User user, IList<string> roles)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("jwtkey")!);
+            var key = Encoding.ASCII.GetBytes(_configuration["jwtkey"]!);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
