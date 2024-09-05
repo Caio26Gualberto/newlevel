@@ -135,5 +135,27 @@ namespace NewLevel.Controllers
                 });
             }
         }
+
+        [HttpPost("ResetPassword")]
+        public async Task<ActionResult<NewLevelResponse<bool>>> ResetPassword(ResetPasswordInput input)
+        {
+            try
+            {
+                await _userService.ResetPassword(input);
+                return Ok(new NewLevelResponse<bool>
+                {
+                    IsSuccess = true,
+                    Message = "Senha alterada com sucesso!"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<bool>
+                {
+                    Message = ex.Message,
+                    IsSuccess = false
+                });
+            }
+        }
     }
 }

@@ -178,6 +178,7 @@ const Navbar = () => {
                                     <StyledLink to="/podcasts"><ListItem button>Podcasts</ListItem></StyledLink>
                                     <StyledLink to="/aboutMe"><ListItem button>Sobre mim</ListItem></StyledLink>
                                     <StyledLink to="/myProfile"><ListItem>Meu Perfil</ListItem></StyledLink>
+                                    <StyledLink to="/partnerStore"><ListItem>Loja Parceira</ListItem></StyledLink>
                                 </List>
                             </Box>
                         </Drawer>
@@ -228,6 +229,9 @@ const Navbar = () => {
                                 </Grid>
                                 <Grid display="flex" justifyContent="center" item xs={1}>
                                     <StyledLink to="/podcasts">Podcasts</StyledLink>
+                                </Grid>
+                                <Grid display="flex" justifyContent="center" item xs={1}>
+                                    <StyledLink to="/partnerStore">Loja Parceira</StyledLink>
                                 </Grid>
                                 <Grid display="flex" justifyContent="center" item xs={1}>
                                     <StyledLink to="/aboutMe">Sobre mim</StyledLink>

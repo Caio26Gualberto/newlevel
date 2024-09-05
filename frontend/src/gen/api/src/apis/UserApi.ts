@@ -17,6 +17,7 @@ import * as runtime from '../runtime';
 import type {
   BooleanNewLevelResponse,
   EActivityLocation,
+  ResetPasswordInput,
   StringNewLevelResponse,
   UserInfoResponseDtoNewLevelResponse,
 } from '../models/index';
@@ -25,6 +26,8 @@ import {
     BooleanNewLevelResponseToJSON,
     EActivityLocationFromJSON,
     EActivityLocationToJSON,
+    ResetPasswordInputFromJSON,
+    ResetPasswordInputToJSON,
     StringNewLevelResponseFromJSON,
     StringNewLevelResponseToJSON,
     UserInfoResponseDtoNewLevelResponseFromJSON,
@@ -33,6 +36,10 @@ import {
 
 export interface ApiUserGenerateTokenToResetPasswordByEmailPostRequest {
     email?: string;
+}
+
+export interface ApiUserResetPasswordPostRequest {
+    resetPasswordInput?: ResetPasswordInput;
 }
 
 export interface ApiUserUpdateUserPostRequest {
@@ -184,6 +191,41 @@ export class UserApi extends runtime.BaseAPI {
      */
     async apiUserGetUserInfoGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserInfoResponseDtoNewLevelResponse> {
         const response = await this.apiUserGetUserInfoGetRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiUserResetPasswordPostRaw(requestParameters: ApiUserResetPasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/User/ResetPassword`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ResetPasswordInputToJSON(requestParameters['resetPasswordInput']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiUserResetPasswordPost(requestParameters: ApiUserResetPasswordPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiUserResetPasswordPostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

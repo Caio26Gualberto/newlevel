@@ -9,7 +9,7 @@ public class EmailService : IEmailService
 
     public async Task SendEmail(string recipient, string subject, string body, string templateId = "", object templateObj = null)
     {
-        var client = new SendGridClient("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");
+        var client = new SendGridClient("");
         var from = new EmailAddress("anewlevelmusic@gmail.com", "A New Level");
         var to = new EmailAddress(recipient);
         var msg = MailHelper.CreateSingleEmail(from, to, subject, body, body);
@@ -34,9 +34,9 @@ public class EmailService : IEmailService
         }
     }
 
-    public static (string body, string subject) MakeResetPasswordTemplate(string token)
+    public static (string body, string subject) MakeResetPasswordTemplate(string token, string userId)
     {
-        var resetUrl = "http://localhost:3000/security/resetPassword?token=" + HttpUtility.UrlEncode(token);
+        var resetUrl = "http://localhost:3000/security/resetPassword?token=" + HttpUtility.UrlEncode(token) + "&userId=" + HttpUtility.UrlEncode(userId);
 
         var subject = "Redefinição de Senha";
         var body = $"<p>Para redefinir sua senha, clique <a href=\"{resetUrl}\">aqui</a>.</p>";

@@ -29,11 +29,11 @@ namespace NewLevel.Services.UserService
 
         public async Task GenerateTokenToResetPasswordByEmail(string email)
         {
-            var user = await _utils.GetUser();
+            var user = await _userManager.FindByEmailAsync(email);
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            var (body, subject) = EmailService.MakeResetPasswordTemplate(token);
+            var (body, subject) = EmailService.MakeResetPasswordTemplate(token, user.Id);
 
             await _emailService.SendEmail(user.Email!, subject, body);
         }
@@ -106,7 +106,7 @@ namespace NewLevel.Services.UserService
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            var (body, subject) = EmailService.MakeResetPasswordTemplate(token);
+            var (body, subject) = EmailService.MakeResetPasswordTemplate(token, user.Id);
 
             await _emailService.SendEmail(user.Email!, subject, body);
         }
@@ -168,5 +168,25 @@ namespace NewLevel.Services.UserService
             return true;
 
         }
+
+        public async Task<bool> ResetPassword(ResetPasswordInput input)
+        {
+            var user = await _userManager.FindByIdAsync(input.UserId);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            var result = await _userManager.ResetPasswordAsync(user, input.Token, input.Password);
+
+            if (result.Succeeded)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
     }
 }

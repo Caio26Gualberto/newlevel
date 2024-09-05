@@ -14,6 +14,7 @@ import ChooseUserAvatar from '../views/chooseUserAvatar/ChooseUserAvatar';
 import { AuthProvider } from '../AuthContext';
 import Request from '../views/requests/Request';
 import MyPhotos from '../views/myPhotos/MyPhotos';
+import PartnerStore from '../views/partnerStore/PartnerStore';
 
 const Rotas = () => {
   return (
@@ -34,6 +35,7 @@ const Rotas = () => {
           <Route path="/security/resetPassword" element={<ResetPassword />} />
           <Route path="/newAvatar" element={<ChooseUserAvatar />} />
           <Route path="/acceptContent" element={<Request />} />
+          <Route path="/partnerStore" element={<PartnerStore />} />
         </Switch>
       </Router>
     </AuthProvider>

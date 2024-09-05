@@ -56,8 +56,6 @@ const Register = () => {
                 }
             })
 
-            debugger
-
             if (result.isSuccess) {
                 toastr.success(result.message!, 'Sucesso!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
                 navigate('/')

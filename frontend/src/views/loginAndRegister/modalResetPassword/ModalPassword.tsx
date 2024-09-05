@@ -16,7 +16,6 @@ const ModalPassword: React.FC<ResetPasswordProps> = ({ open, onClose }) => {
     const [email, setEmail] = useState<string>("")
 
     const sendEmail = async () => {
-        debugger
         const sendEmail = await userService.apiUserGenerateTokenToResetPasswordByEmailPost({
             email: email
         })

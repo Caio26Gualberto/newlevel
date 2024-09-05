@@ -25,6 +25,7 @@ export * from './RegisterInputDto';
 export * from './RegisterResponseDto';
 export * from './RegisterResponseDtoNewLevelResponse';
 export * from './RequestMediaDto';
+export * from './ResetPasswordInput';
 export * from './StringNewLevelResponse';
 export * from './TokensDto';
 export * from './UpdateMediaByIdInput';
