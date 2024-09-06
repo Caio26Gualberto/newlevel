@@ -3,6 +3,7 @@ import { useState } from "react"
 import SimpleDialog from "./SimpleDialog"
 import ForumIcon from '@mui/icons-material/Forum';
 import CommentsModal from "../../../views/photos/components/modal/CommentsModal";
+import { useMobile } from "../../../MobileContext";
 
 interface MediaProps {
     id: number
@@ -17,6 +18,7 @@ interface MediaProps {
 const Media = ({ id, src, title, description, nickname, createdAt, loading }: MediaProps) => {
     const [showDescription, setShowDescription] = useState(false);
     const [showComments, setShowComments] = useState(false);
+    const { isMobile } = useMobile()
 
     const handleClickOpen = () => {
         setShowDescription(true);
@@ -32,17 +34,37 @@ const Media = ({ id, src, title, description, nickname, createdAt, loading }: Me
     const handleCloseComments = () => {
         setShowComments(false);
     }
-    
+
     return (
-        <Box sx={{ width: 460, marginRight: 1, my: 2 }}>
-            {showComments && <CommentsModal open={true} onClose={handleCloseComments} mediaId={id}/>}
-            {!loading ? (
-                <iframe width="460" height="300" src={src} title={title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerPolicy="strict-origin-when-cross-origin" allowFullScreen style={{ border: "0px", borderRadius: "10px" }}></iframe>
-            ) : (
-                <Skeleton variant="rectangular" width={460} height={300} />
+        <Box
+            sx={{
+                width: isMobile ? '100%' : 460,
+                marginRight: isMobile ? 0 : 1, 
+                my: 2,
+            }}
+        >
+            {showComments && (
+                <CommentsModal open={true} onClose={handleCloseComments} mediaId={id} />
             )}
+
+            {!loading ? (
+                <iframe
+                    width={isMobile ? '100%' : 460}
+                    height={isMobile ? 200 : 300}  
+                    src={src}
+                    title={title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                    style={{
+                        border: '0px',
+                        borderRadius: '10px',
+                    }}
+                ></iframe>
+            ) : (
+                <Skeleton variant="rectangular" width={isMobile ? '100%' : 460} height={isMobile ? 200 : 300} />
+            )}
+
             {!loading ? (
                 <Box sx={{ pr: 2 }}>
                     <Typography gutterBottom fontWeight="bold" variant="body2">
@@ -55,9 +77,22 @@ const Media = ({ id, src, title, description, nickname, createdAt, loading }: Me
                                 color="primary"
                                 size="small"
                                 onClick={handleClickOpen}
-                                sx={{ mb: 1, color: "white", backgroundColor: "red", border: "none", "&:hover": { backgroundColor: "#F3F3F3", color: "black", border: "none" } }}>Ver descrição</Button>
+                                sx={{
+                                    mb: 1,
+                                    color: 'white',
+                                    backgroundColor: 'red',
+                                    border: 'none',
+                                    '&:hover': {
+                                        backgroundColor: '#F3F3F3',
+                                        color: 'black',
+                                        border: 'none',
+                                    },
+                                }}
+                            >
+                                Ver descrição
+                            </Button>
                             <IconButton onClick={handleOpenComments} aria-label="add to favorites">
-                                <ForumIcon color="error"/>
+                                <ForumIcon color="error" />
                             </IconButton>
                         </Box>
                         <SimpleDialog
@@ -78,7 +113,7 @@ const Media = ({ id, src, title, description, nickname, createdAt, loading }: Me
                 </Box>
             )}
         </Box>
-    )
+    );
 }
 
 function formatCreationTime(creationTime: Date): string {

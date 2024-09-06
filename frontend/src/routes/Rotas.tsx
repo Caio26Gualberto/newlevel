@@ -15,29 +15,32 @@ import { AuthProvider } from '../AuthContext';
 import Request from '../views/requests/Request';
 import MyPhotos from '../views/myPhotos/MyPhotos';
 import PartnerStore from '../views/partnerStore/PartnerStore';
+import { MobileProvider } from '../MobileContext';
 
 const Rotas = () => {
   return (
     <AuthProvider>
-      <Router>
-        <Navbar />
-        <Switch>
-          <Route path="/" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/welcome" element={<Apresentation />} />
-          <Route path="/videos" element={<Videos />} />
-          <Route path="/photos" element={<Photos />} />
-          <Route path="/podcasts" element={<Podcast />} />
-          <Route path="/aboutMe" element={<AboutMe />} />
-          <Route path="/myVideos" element={<MyVideos />} />
-          <Route path="/myPhotos" element={<MyPhotos />} />
-          <Route path="/myProfile" element={<MyProfile />} />
-          <Route path="/security/resetPassword" element={<ResetPassword />} />
-          <Route path="/newAvatar" element={<ChooseUserAvatar />} />
-          <Route path="/acceptContent" element={<Request />} />
-          <Route path="/partnerStore" element={<PartnerStore />} />
-        </Switch>
-      </Router>
+      <MobileProvider>
+        <Router>
+          <Navbar />
+          <Switch>
+            <Route path="/" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/welcome" element={<Apresentation />} />
+            <Route path="/videos" element={<Videos />} />
+            <Route path="/photos" element={<Photos />} />
+            <Route path="/podcasts" element={<Podcast />} />
+            <Route path="/aboutMe" element={<AboutMe />} />
+            <Route path="/myVideos" element={<MyVideos />} />
+            <Route path="/myPhotos" element={<MyPhotos />} />
+            <Route path="/myProfile" element={<MyProfile />} />
+            <Route path="/security/resetPassword" element={<ResetPassword />} />
+            <Route path="/newAvatar" element={<ChooseUserAvatar />} />
+            <Route path="/acceptContent" element={<Request />} />
+            <Route path="/partnerStore" element={<PartnerStore />} />
+          </Switch>
+        </Router>
+      </MobileProvider>
     </AuthProvider>
   )
 }

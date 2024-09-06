@@ -5,6 +5,7 @@ import { ChangeEvent, useState } from "react";
 import { MediaApi } from "../../../../gen/api/src";
 import * as toastr from 'toastr';
 import ApiConfiguration from "../../../../apiConfig";
+import { useMobile } from "../../../../MobileContext";
 
 interface AddVideoModalProps {
     open: boolean;
@@ -13,6 +14,7 @@ interface AddVideoModalProps {
 
 const AddVideoModal: React.FC<AddVideoModalProps> = ({ open, onClose }) => {
     const mediaService = new MediaApi(ApiConfiguration);
+    const { isMobile } = useMobile()
     const [tituloVideo, setTituloVideo] = useState<string>('');
     const [urlVideo, setUrlVideo] = useState<string>('');
     const [descricaoVideo, setDescricaoVideo] = useState<string>('');
@@ -39,9 +41,9 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({ open, onClose }) => {
         })
 
         if (result.isSuccess) {
-            toastr.success(result.message!, 'Sucesso', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
-        } else { 
-            toastr.error(result.message!, 'Erro', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});    
+            toastr.success(result.message!, 'Sucesso', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
+        } else {
+            toastr.error(result.message!, 'Erro', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
         }
         setTituloVideo('');
         setUrlVideo('');
@@ -50,44 +52,66 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({ open, onClose }) => {
     };
 
     return (
-        <NewLevelModal width={900} height="40%" open={open} onClose={onClose}>
+        <NewLevelModal
+            width={isMobile ? '100%' : 900}  // Full width em mobile, 900px em telas maiores
+            height={isMobile ? '100%' : '40%'} // Full height em mobile, 40% em telas maiores
+            open={open}
+            onClose={onClose}
+        >
             <>
                 <NewLevelModalHeader closeModal={onClose} title="Adicione um vídeo" />
                 <Box>
                     <Box width="100%">
-                        <DialogContent sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                        <DialogContent
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'space-between',
+                                padding: isMobile ? 2 : 3, // Padding menor para mobile
+                            }}
+                        >
                             <TextField
                                 autoFocus
                                 margin="dense"
-                                id="name"
+                                id="titulo"
                                 label="Título do vídeo"
                                 type="text"
                                 fullWidth
                                 value={tituloVideo}
                                 onChange={handleTituloChange}
-                            ></TextField>
+                            />
                             <TextField
-                                autoFocus
                                 margin="dense"
-                                id="name"
+                                id="url"
                                 label="URL do vídeo"
                                 type="text"
                                 fullWidth
                                 value={urlVideo}
                                 onChange={handleUrlChange}
-                            ></TextField>
+                            />
                             <TextField
-                                autoFocus
                                 margin="dense"
-                                id="name"
+                                id="descricao"
                                 label="Descrição do vídeo"
                                 type="text"
                                 fullWidth
                                 value={descricaoVideo}
                                 onChange={handleDescricaoChange}
-                            ></TextField>
+                            />
                             <Box mt={1} width="100%">
-                                <Button fullWidth sx={{ backgroundColor: "#b81414", "&:hover": { backgroundColor: "white" }, color: "black" }} onClick={() => handleSubmit()}>Enviar</Button>
+                                <Button
+                                    fullWidth
+                                    sx={{
+                                        backgroundColor: '#b81414',
+                                        '&:hover': {
+                                            backgroundColor: 'white',
+                                        },
+                                        color: 'black',
+                                    }}
+                                    onClick={handleSubmit}
+                                >
+                                    Enviar
+                                </Button>
                             </Box>
                         </DialogContent>
                     </Box>

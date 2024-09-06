@@ -8,6 +8,7 @@ import NewLevelButton from "../../../../components/NewLevelButton";
 import * as toastr from 'toastr';
 import { PhotoApi } from "../../../../gen/api/src/apis/PhotoApi";
 import NewLevelLoading from "../../../../components/NewLevelLoading";
+import { useMobile } from "../../../../MobileContext";
 
 interface AddNewPhotoModalProps {
     open: boolean;
@@ -16,6 +17,7 @@ interface AddNewPhotoModalProps {
 
 const AddNewPhotoModal: React.FC<AddNewPhotoModalProps> = ({ open, onClose }) => {
     const photoService = new PhotoApi(ApiConfiguration);
+    const { isMobile } = useMobile()
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [form, setForm] = useState({
@@ -98,12 +100,24 @@ const AddNewPhotoModal: React.FC<AddNewPhotoModalProps> = ({ open, onClose }) =>
         }
     };
     return (
-        <NewLevelModal height="auto" open={open} width={1000}>
+        <NewLevelModal
+            open={open}
+            onClose={onClose}
+            width={isMobile ? '90%' : 1000} // Ajusta a largura para dispositivos móveis
+            height="auto"
+        >
             <>
-            <NewLevelLoading isLoading={loading} />
+                <NewLevelLoading isLoading={loading} />
                 <NewLevelModalHeader closeModal={() => { setSelectedImage(null); onClose() }} title="Requisitar Nova Foto" />
-                <Box width="100%" overflow="auto" maxHeight="600px">
-                    <DialogContent sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                <Box width="100%" overflow="auto" maxHeight={isMobile ? '60vh' : '600px'} p={isMobile ? 1 : 3}>
+                    <DialogContent
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "space-between",
+                            gap: isMobile ? 1 : 2 // Adiciona espaçamento entre os elementos
+                        }}
+                    >
                         <TextField
                             autoFocus
                             margin="dense"
@@ -113,7 +127,7 @@ const AddNewPhotoModal: React.FC<AddNewPhotoModalProps> = ({ open, onClose }) =>
                             fullWidth
                             value={form.title}
                             onChange={(e) => setForm({ ...form, title: e.target.value })}
-                        ></TextField>
+                        />
                         <TextField
                             autoFocus
                             margin="dense"
@@ -123,33 +137,31 @@ const AddNewPhotoModal: React.FC<AddNewPhotoModalProps> = ({ open, onClose }) =>
                             fullWidth
                             value={form.subtitle}
                             onChange={(e) => setForm({ ...form, subtitle: e.target.value })}
-                        ></TextField>
+                        />
                         <TextField
                             placeholder="Descrição da foto"
                             margin="dense"
                             autoFocus
                             fullWidth
                             multiline
-                            rows={6}
+                            rows={isMobile ? 4 : 6} // Ajusta a altura para dispositivos móveis
                             value={form.description}
                             onChange={(e) => setForm({ ...form, description: e.target.value })}
-                        ></TextField>
+                        />
                         <Box display="flex" justifyContent="center" alignItems="center">
                             <TextField
                                 margin="dense"
                                 id="date"
                                 label="Data da foto (Aproximadamente)"
                                 type="text"
-                                sx={{ width: "30%" }}
+                                sx={{ width: isMobile ? '100%' : '30%' }} // Ajusta a largura para dispositivos móveis
                                 value={form.date}
                                 onChange={handleDateChange}
                             />
                         </Box>
-                        <Box display="flex" justifyContent="center">
-                            <Box mb={2} mt={2}>
-                                <Box display="flex" justifyContent="center" mb={2}>
-                                    <h2>Upload de Imagem</h2>
-                                </Box>
+                        <Box display="flex" flexDirection="column" alignItems="center">
+                            <Box mb={2}>
+                                <Typography variant="h6" textAlign="center">Upload de Imagem</Typography>
                                 <input
                                     type="file"
                                     id="fileInput"
@@ -157,22 +169,20 @@ const AddNewPhotoModal: React.FC<AddNewPhotoModalProps> = ({ open, onClose }) =>
                                     style={{ display: 'none' }}
                                     onChange={handleImageChange}
                                 />
-                                <Box display="flex" ml={2.5}>
-                                    <Button onClick={handleButtonClick}>Selecionar imagem</Button>
-                                    {<Typography fontWeight="bold" mt={0.5}>{selectedImage?.name}</Typography>}
-                                </Box>
+                                <Button onClick={handleButtonClick} sx={{ mt: 1 }}>
+                                    Selecionar imagem
+                                </Button>
+                                <Typography fontWeight="bold" mt={1}>{selectedImage?.name}</Typography>
                             </Box>
                         </Box>
                         <Box mt={1} width="100%">
                             <NewLevelButton title="Enviar" onClick={handleUploadImage} maxWidth />
                         </Box>
                     </DialogContent>
-
                 </Box>
-
             </>
         </NewLevelModal>
-    )
+    );
 }
 
 export default AddNewPhotoModal

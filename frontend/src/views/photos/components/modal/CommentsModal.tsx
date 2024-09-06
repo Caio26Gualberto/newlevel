@@ -5,6 +5,7 @@ import React, { useEffect } from "react";
 import { CommentApi, CommentsPhotoResponseDto, ReceiveCommentDto } from "../../../../gen/api/src";
 import ApiConfiguration from "../../../../apiConfig";
 import * as toastr from 'toastr';
+import { useMobile } from "../../../../MobileContext";
 
 interface ICommentsModal {
     open: boolean;
@@ -15,6 +16,7 @@ interface ICommentsModal {
 
 const CommentsModal: React.FC<ICommentsModal> = ({ open, photoId, mediaId, onClose }) => {
     const commentService = new CommentApi(ApiConfiguration)
+    const { isMobile } = useMobile()
     const [loading, setLoading] = React.useState(false)
     const [comments, setComments] = React.useState<CommentsPhotoResponseDto>({ comments: [], title: "" })
     const [comment, setComment] = React.useState("")
@@ -102,11 +104,22 @@ const CommentsModal: React.FC<ICommentsModal> = ({ open, photoId, mediaId, onClo
 
 
     return (
-        <NewLevelModal height="800px" open={open} width={900}>
+        <NewLevelModal
+            height={isMobile ? '100%' : '800px'}
+            open={open}
+            width={isMobile ? '100%' : 900} 
+        >
             <Box display="flex" flexDirection="column" height="100%">
                 <NewLevelModalHeader title="Comentários" closeModal={onClose} />
                 <Divider />
-                <div style={{ flex: 1, overflowY: "auto", padding: 14 }} className="App">
+                <div
+                    style={{
+                        flex: 1,
+                        overflowY: 'auto',
+                        padding: isMobile ? 10 : 14,
+                    }}
+                    className="App"
+                >
                     <h2>{comments.title}</h2>
                     {loading ? (
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90%' }}>
@@ -115,17 +128,22 @@ const CommentsModal: React.FC<ICommentsModal> = ({ open, photoId, mediaId, onClo
                     ) : (
                         comments.comments!.length > 0 ? (
                             comments.comments!.map((comment, index) => (
-                                <Paper elevation={6} key={index} style={{ padding: "40px 20px", marginTop: 20 }}>
+                                <Paper
+                                    elevation={6}
+                                    key={index}
+                                    style={{
+                                        padding: isMobile ? '20px 10px' : '40px 20px',
+                                        marginTop: 20,
+                                    }}
+                                >
                                     <Grid container wrap="nowrap" spacing={2}>
                                         <Grid item>
                                             <Avatar src={comment.userAvatarSrc} alt="User Avatar" />
                                         </Grid>
                                         <Grid justifyContent="left" item xs zeroMinWidth>
-                                            <h4 style={{ marginBottom: 8, textAlign: "left" }}>{comment.userName}</h4>
-                                            <p style={{ textAlign: "left" }}>
-                                                {comment.comment}
-                                            </p>
-                                            <p style={{ textAlign: "left", color: "gray", marginTop: "24px" }}>
+                                            <h4 style={{ marginBottom: 8, textAlign: 'left' }}>{comment.userName}</h4>
+                                            <p style={{ textAlign: 'left' }}>{comment.comment}</p>
+                                            <p style={{ textAlign: 'left', color: 'gray', marginTop: '24px' }}>
                                                 {comment.dateOfComment!.toLocaleDateString()}
                                             </p>
                                         </Grid>
@@ -133,33 +151,48 @@ const CommentsModal: React.FC<ICommentsModal> = ({ open, photoId, mediaId, onClo
                                 </Paper>
                             ))
                         ) : (
-                            <p style={{ textAlign: "center", color: "gray", marginTop: "24px" }}>
+                            <p style={{ textAlign: 'center', color: 'gray', marginTop: '24px' }}>
                                 Nenhum comentário disponível.
                             </p>
                         )
                     )}
                 </div>
                 <Divider />
-                <Box p={2} display="flex" alignItems="center">
+                <Box
+                    p={isMobile ? 1 : 2}
+                    display="flex"
+                    alignItems="center"
+                    flexDirection={isMobile ? 'column' : 'row'} 
+                >
                     <TextField
                         id="outlined-multiline-static"
                         label="Comentar"
                         multiline
-                        rows={2}
+                        rows={isMobile ? 3 : 2} 
                         defaultValue=""
                         variant="outlined"
                         disabled={loading}
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
-                        sx={{ flexGrow: 1, marginRight: 2 }}
+                        sx={{
+                            flexGrow: 1,
+                            marginBottom: isMobile ? 2 : 0,
+                            marginRight: isMobile ? 0 : 2,
+                        }}
                     />
-                    <Button onClick={addComment} disabled={loading} variant="contained" color="primary">
+                    <Button
+                        onClick={addComment}
+                        disabled={loading}
+                        variant="contained"
+                        color="primary"
+                        sx={{ width: isMobile ? '100%' : 'auto' }}
+                    >
                         Publicar
                     </Button>
                 </Box>
             </Box>
         </NewLevelModal>
-    )
+    );
 }
 
 export default CommentsModal

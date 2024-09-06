@@ -16,6 +16,7 @@ import ForumIcon from '@mui/icons-material/Forum';
 import { Box } from '@mui/material';
 import PictureProfileModal from './modal/PictureProfileModal';
 import CommentsModal from './modal/CommentsModal';
+import { useMobile } from '../../../MobileContext';
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -46,6 +47,7 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 
 const CardPhoto: React.FC<CardPhotoProps> = ({ title, srcPhotoS3, srcUserPhotoProfile, date, subtitle, description, userId, nickname, photoId }) => {
   const haveDescription = description ? true : false;
+  const { isMobile } = useMobile()
   const [expanded, setExpanded] = React.useState(false);
   const [openAvatar, setOpenAvatar] = React.useState(false);
   const [openComments, setOpenComments] = React.useState(false);
@@ -54,15 +56,15 @@ const CardPhoto: React.FC<CardPhotoProps> = ({ title, srcPhotoS3, srcUserPhotoPr
     setOpenAvatar(true);
   }
 
-  const handleOpenComments = () => { 
+  const handleOpenComments = () => {
     setOpenComments(true);
   }
 
-  const handleCloseComments = () => { 
+  const handleCloseComments = () => {
     setOpenComments(false);
   }
 
-  const handleCloseAvatar = () => { 
+  const handleCloseAvatar = () => {
     setOpenAvatar(false);
   }
 
@@ -74,9 +76,9 @@ const CardPhoto: React.FC<CardPhotoProps> = ({ title, srcPhotoS3, srcUserPhotoPr
     window.open(srcPhotoS3, '_blank');
   };
 
-  const renderizeAvatar = () => { 
+  const renderizeAvatar = () => {
     if (srcUserPhotoProfile) {
-      return <Avatar  src={srcUserPhotoProfile} onClick={handleClickOpenAvatar} sx={{ cursor: "pointer" }} aria-label="recipe">
+      return <Avatar src={srcUserPhotoProfile} onClick={handleClickOpenAvatar} sx={{ cursor: "pointer" }} aria-label="recipe">
         R
       </Avatar>
     } else {
@@ -88,46 +90,67 @@ const CardPhoto: React.FC<CardPhotoProps> = ({ title, srcPhotoS3, srcUserPhotoPr
 
   return (
     <>
-      {openComments && <CommentsModal open={true} onClose={handleCloseComments} photoId={photoId}/>}
-      <PictureProfileModal onClose={handleCloseAvatar} open={openAvatar} avatarUrl={srcUserPhotoProfile!} nickname={nickname!}/>
-      <Card sx={{ maxWidth: 345, minHeight: "100%" }}>
+      {openComments && <CommentsModal open={true} onClose={handleCloseComments} photoId={photoId} />}
+      <PictureProfileModal onClose={handleCloseAvatar} open={openAvatar} avatarUrl={srcUserPhotoProfile!} nickname={nickname!} />
+      <Card
+        sx={{
+          maxWidth: isMobile ? '100%' : 345,  // Full width em mobile
+          minHeight: '100%',
+          margin: isMobile ? '0 auto' : 'initial', // Centraliza o cartão em mobile
+          padding: isMobile ? 1 : 2,  // Menor padding em mobile
+        }}
+      >
         <CardHeader
-          avatar={
-            renderizeAvatar()
-          }
-          // action={
-          //   <IconButton aria-label="settings">
-          //     <MoreVertIcon />
-          //   </IconButton>
-          // }
+          avatar={renderizeAvatar()}
           title={<Typography fontWeight="bold">{title}</Typography>}
           subheader={date.toLocaleDateString()}
         />
         <CardMedia
           onClick={openImage}
-          sx={{ cursor: "pointer" }}
+          sx={{
+            cursor: 'pointer',
+            height: isMobile ? '200px' : '250px', // Altura menor em mobile
+            objectFit: 'cover',  // Garante que a imagem cubra a área sem distorção
+          }}
           component="img"
-          height="250"
           src={srcPhotoS3}
         />
-        <CardContent sx={{ height: "109px" }}>
+        <CardContent
+          sx={{
+            height: isMobile ? 'auto' : '109px', // Ajusta a altura para mobile
+            overflow: 'hidden', // Esconde o excesso de texto se a altura for menor
+          }}
+        >
           <Typography paragraph style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }} variant="body2" color="text.secondary">
             {subtitle}
           </Typography>
         </CardContent>
-        <Box display="flex" flexDirection="column" justifyContent="end">
-          <CardActions sx={{ display: "flex", justifyContent: "end" }} disableSpacing>
+        <Box
+          display="flex"
+          flexDirection="column"
+          justifyContent="end"
+        >
+          <CardActions
+            sx={{
+              display: 'flex',
+              justifyContent: isMobile ? 'space-between' : 'end', // Ajusta a justificativa para mobile
+              padding: isMobile ? 1 : 2,  // Menor padding em mobile
+            }}
+            disableSpacing
+          >
             <IconButton onClick={handleOpenComments} aria-label="add to favorites">
               <ForumIcon />
             </IconButton>
-            {haveDescription && <ExpandMore
-              expand={expanded}
-              onClick={handleExpandClick}
-              aria-expanded={expanded}
-              aria-label="show more"
-            >
-              <ExpandMoreIcon />
-            </ExpandMore>}
+            {haveDescription && (
+              <ExpandMore
+                expand={expanded}
+                onClick={handleExpandClick}
+                aria-expanded={expanded}
+                aria-label="show more"
+              >
+                <ExpandMoreIcon />
+              </ExpandMore>
+            )}
           </CardActions>
         </Box>
         <Collapse in={expanded} timeout="auto" unmountOnExit>

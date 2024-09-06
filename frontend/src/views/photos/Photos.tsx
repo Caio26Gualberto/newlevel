@@ -6,9 +6,11 @@ import { PhotoApi, PhotoResponseDtoGenericList } from "../../gen/api/src";
 import ApiConfiguration from "../../apiConfig";
 import * as toastr from 'toastr';
 import SearchIcon from '@mui/icons-material/Search';
+import { useMobile } from "../../MobileContext";
 
 const Photos = () => {
   const photoService = new PhotoApi(ApiConfiguration);
+  const { isMobile } = useMobile()
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [photos, setPhotos] = useState<PhotoResponseDtoGenericList>({ items: [], totalCount: 0 });
   const [pagination, setPagination] = useState({ page: 0, pageSize: 12, pageCount: 0, search: '' });
@@ -62,27 +64,64 @@ const Photos = () => {
     <>
       <AddNewPhotoModal open={openModal} onClose={handleCloseModal} />
       <Box bgcolor="#F3F3F3">
-        <Box display="flex" justifyContent="space-between">
-          <Box ml={2} width="100%" display="flex" alignItems="center" justifyContent="space-between">
-            <Box>
-              <Input value={pagination.search} placeholder="Pesquisa por título" size="small" sx={{ marginTop: "16px", width: "400px" }} onChange={(e) => setPagination({ ...pagination, search: e.target.value })} />
-              <Button className="btn btn-primary" onClick={search}>
-                <SearchIcon fontSize="medium" />
-              </Button>
-            </Box>
-            <Box>
-              <Button sx={{ marginTop: "16px" }} className="btn btn-primary" onClick={handleOpenModal}>
-                Adicionar foto
-              </Button>
-            </Box>
+        <Box
+          display="flex"
+          flexDirection={isMobile ? 'column' : 'row'}
+          alignItems="center"
+          justifyContent="space-between"
+          padding={isMobile ? 2 : 3} 
+        >
+          <Box
+            width={isMobile ? '100%' : 'auto'}
+            display="flex"
+            alignItems="center"
+            justifyContent={isMobile ? 'space-between' : 'flex-start'}
+            mb={isMobile ? 2 : 0}
+          >
+            <Input
+              value={pagination.search}
+              placeholder="Pesquisa por título"
+              size="small"
+              sx={{
+                width: isMobile ? '100%' : '400px',
+                marginTop: isMobile ? 1 : 2,
+              }}
+              onChange={(e) => setPagination({ ...pagination, search: e.target.value })}
+            />
+            <Button
+              className="btn btn-primary"
+              onClick={search}
+              sx={{ ml: isMobile ? 0 : 1, mt: isMobile ? 1 : 0 }}
+            >
+              <SearchIcon fontSize="medium" />
+            </Button>
           </Box>
+          <Button
+            sx={{
+              width: isMobile ? '100%' : 'auto',
+              mt: isMobile ? 1 : 2,
+            }}
+            className="btn btn-primary"
+            onClick={handleOpenModal}
+          >
+            Adicionar foto
+          </Button>
         </Box>
-        <Box m={2}>
-          <Grid container spacing={2}>
+        <Box m={isMobile ? 1 : 2}>
+          <Grid container spacing={isMobile ? 1 : 2}>
             {photos.items?.map((photo, index) => (
-              <Grid key={index} item xs={2}>
-                <CardPhoto key={index} title={photo.title!} subtitle={photo.subtitle!} srcPhotoS3={photo.src!} date={photo.captureDate!}
-                  description={photo.description} srcUserPhotoProfile={photo.avatarSrc} userId={photo.userId!} nickname={photo.nickname!} photoId={photo.id!} />
+              <Grid key={index} item xs={12}>
+                <CardPhoto
+                  title={photo.title!}
+                  subtitle={photo.subtitle!}
+                  srcPhotoS3={photo.src!}
+                  date={photo.captureDate!}
+                  description={photo.description}
+                  srcUserPhotoProfile={photo.avatarSrc}
+                  userId={photo.userId!}
+                  nickname={photo.nickname!}
+                  photoId={photo.id!}
+                />
               </Grid>
             ))}
           </Grid>
@@ -100,7 +139,7 @@ const Photos = () => {
         />
       </Box>
     </>
-  )
+  );
 }
 
 export default Photos

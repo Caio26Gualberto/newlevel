@@ -5,6 +5,7 @@ import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField
 import Swal from "sweetalert2";
 import * as toastr from 'toastr';
 import { useNavigate } from "react-router-dom";
+import { useMobile } from "../../MobileContext";
 
 
 interface IFormRegister {
@@ -17,6 +18,7 @@ interface IFormRegister {
 
 const Register = () => {
     const navigate = useNavigate();
+    const { isMobile } = useMobile()
     const authenticateService = new AuthenticateApi(ApiConfiguration)
     const commonService = new CommonApi(ApiConfiguration)
     const [cities, setCities] = useState<DisplayActivityLocationDto[]>([])
@@ -30,21 +32,21 @@ const Register = () => {
     });
 
     const registerAction = async () => {
-        try {    
+        try {
             if (formRegister.email === '' || formRegister.nickname === '' || formRegister.password === '' || formRegister.confirmPassword === '' || selectedCity.value === -1) {
-                toastr.warning('Preencha todos os campos', 'Atenção!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
+                toastr.warning('Preencha todos os campos', 'Atenção!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
                 return
             }
             if (formRegister.password.length < 6) {
-                toastr.warning('A senha deve ter no minímo 6 caracteres', 'Atenção!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
+                toastr.warning('A senha deve ter no minímo 6 caracteres', 'Atenção!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
                 return
             }
             if (formRegister.password !== formRegister.confirmPassword) {
-                toastr.warning('As duas senhas estão diferentes', 'Atenção!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
+                toastr.warning('As duas senhas estão diferentes', 'Atenção!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
                 return
             }
             if (!formRegister.email.includes('@')) {
-                toastr.warning('Email inválido', 'Atenção!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
+                toastr.warning('Email inválido', 'Atenção!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
                 return
             }
             const result = await authenticateService.apiAuthenticateRegisterPost({
@@ -57,14 +59,14 @@ const Register = () => {
             })
 
             if (result.isSuccess) {
-                toastr.success(result.message!, 'Sucesso!', { timeOut: 3000 , progressBar: true, positionClass: "toast-bottom-right"});
+                toastr.success(result.message!, 'Sucesso!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
                 navigate('/')
             } else {
                 Swal.fire({
                     title: 'Erro',
                     text: (result as any).message!,
                     icon: 'error'
-                })               
+                })
             }
         } catch (error) {
 
@@ -94,15 +96,52 @@ const Register = () => {
     }, [])
 
     return (
-        <Box display="flex" alignItems="center" justifyContent="center" width="100%" bgcolor="#4F4F4F">
-            <Box display="flex" flex={1} height="100vh">
-                <Grid container m={10} bgcolor="white" borderRadius={2}>
-                    <Grid item xs={8} overflow="hidden">
-                        <img src={require('../../assets/slayer.gif')} alt="loading..." style={{ height: "100%" }} />
+        <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            width="100%"
+            bgcolor="#4F4F4F"
+            p={isMobile ? 2 : 4} // Ajusta o padding para dispositivos móveis
+        >
+            <Box display="flex" flexDirection={isMobile ? "column" : "row"} height="100vh">
+                <Grid
+                    container
+                    m={isMobile ? 0 : 10}
+                    bgcolor="white"
+                    borderRadius={2}
+                    spacing={2}
+                >
+                    <Grid
+                        item
+                        xs={12}
+                        md={8}
+                        display="flex"
+                        justifyContent="center"
+                        alignItems="center"
+                        overflow="hidden"
+                        p={isMobile ? 1 : 0}
+                    >
+                        <img
+                            src={require('../../assets/slayer.gif')}
+                            alt="loading..."
+                            style={{
+                                width: isMobile ? "100%" : "auto",
+                                height: isMobile ? "auto" : "105%",
+                            }}
+                        />
                     </Grid>
-                    <Grid pr={2} item xs={4} display="flex" flexDirection="column" justifyContent="space-evenly">
-                        <Box alignSelf="center" display="flex" justifyContent="center" flexDirection="column">
-                            <Typography overflow="hidden" variant="h3">Registre-se</Typography>
+                    <Grid
+                        item
+                        xs={12}
+                        md={4}
+                        display="flex"
+                        flexDirection="column"
+                        justifyContent="space-evenly"
+                        p={isMobile ? 1 : 2}
+                    >
+                        <Box display="flex" justifyContent="center">
+                            <Typography variant={isMobile ? "h5" : "h3"}>Registre-se</Typography>
                         </Box>
                         <Box>
                             <Typography>*Alguma dúvida sobre o preenchimento?</Typography>
@@ -112,21 +151,40 @@ const Register = () => {
                             <Tooltip TransitionComponent={Zoom} title={<Typography>Seu email será usado como forma de login, posteriormente será utilizado para entrar no site</Typography>}>
                                 <InputLabel variant="standard"><Typography fontWeight="bold">Email:</Typography></InputLabel>
                             </Tooltip>
-                            <TextField fullWidth type="email" placeholder="Email" onChange={(event) => setFormRegister({ ...formRegister, email: event.target.value })}></TextField>
+                            <TextField
+                                fullWidth
+                                type="email"
+                                placeholder="Email"
+                                onChange={(event) => setFormRegister({ ...formRegister, email: event.target.value })}
+                            />
                         </Box>
                         <Box>
                             <Tooltip TransitionComponent={Zoom} title={<Typography>Seu apelido como era conhecido na época, seja punk, cabeludo ou qualquer outra coisa</Typography>}>
                                 <InputLabel variant="standard"><Typography fontWeight="bold">Apelido:</Typography></InputLabel>
                             </Tooltip>
-                            <TextField fullWidth placeholder="Apelido" onChange={(event) => setFormRegister({ ...formRegister, nickname: event.target.value })}></TextField>
+                            <TextField
+                                fullWidth
+                                placeholder="Apelido"
+                                onChange={(event) => setFormRegister({ ...formRegister, nickname: event.target.value })}
+                            />
                         </Box>
                         <Box>
                             <InputLabel variant="standard"><Typography fontWeight="bold">Senha:</Typography></InputLabel>
-                            <TextField fullWidth type="password" placeholder="Senha" onChange={(event) => setFormRegister({ ...formRegister, password: event.target.value })}></TextField>
+                            <TextField
+                                fullWidth
+                                type="password"
+                                placeholder="Senha"
+                                onChange={(event) => setFormRegister({ ...formRegister, password: event.target.value })}
+                            />
                         </Box>
                         <Box>
                             <InputLabel variant="standard"><Typography fontWeight="bold">Confirme a senha:</Typography></InputLabel>
-                            <TextField fullWidth type="password" placeholder="Confirme a senha" onChange={(event) => setFormRegister({ ...formRegister, confirmPassword: event.target.value })}></TextField>
+                            <TextField
+                                fullWidth
+                                type="password"
+                                placeholder="Confirme a senha"
+                                onChange={(event) => setFormRegister({ ...formRegister, confirmPassword: event.target.value })}
+                            />
                         </Box>
                         <Box>
                             <Tooltip TransitionComponent={Zoom} title={<Typography>De onde era, ou cidade que costumava ser reconhecido</Typography>}>
@@ -139,18 +197,23 @@ const Register = () => {
                                     value={selectedCity.value}
                                     onChange={handleCityChange}
                                 >
-                                    {cities.map((city) => {
-                                        return <MenuItem key={city.value} value={city.value}>{city.name}</MenuItem>
-                                    })}
+                                    {cities.map((city) => (
+                                        <MenuItem key={city.value} value={city.value}>{city.name}</MenuItem>
+                                    ))}
                                 </Select>
                             </FormControl>
                         </Box>
-                        <Button onClick={registerAction} sx={{ backgroundColor: "#b81414", "&:hover": { backgroundColor: "white" }, color: "black" }}><Typography fontWeight="bold" variant="overline">Cadastrar</Typography></Button>
+                        <Button
+                            onClick={registerAction}
+                            sx={{ backgroundColor: "#b81414", "&:hover": { backgroundColor: "white" }, color: "black", marginTop: isMobile ? 1 : 0 }}
+                        >
+                            <Typography fontWeight="bold" variant="overline">Cadastrar</Typography>
+                        </Button>
                     </Grid>
                 </Grid>
             </Box>
         </Box>
-    )
+    );
 }
 
 export default Register

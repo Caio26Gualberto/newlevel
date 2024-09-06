@@ -3,7 +3,7 @@ import React from 'react'
 
 
 interface AdditionalModalProps {
-    width: number;
+    width: number | string;
     height: string;
 }
 

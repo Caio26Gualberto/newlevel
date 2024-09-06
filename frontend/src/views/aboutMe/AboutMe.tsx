@@ -3,10 +3,10 @@ import CaioImg from "../../assets/Perfil.jpg"
 import InstagramIcon from '@mui/icons-material/Instagram';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import { useMobile } from "../../MobileContext";
 
 const AboutMe = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { isMobile } = useMobile()
 
   return (
     <>

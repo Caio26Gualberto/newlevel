@@ -7,12 +7,12 @@ import ApiConfiguration from "../../apiConfig";
 import { UserInfoResponseDto } from "../../gen/api/src/models/UserInfoResponseDto";
 import Swal from "sweetalert2";
 import NewLevelLoading from "../../components/NewLevelLoading";
+import { useMobile } from "../../MobileContext";
 
 const MyProfile = () => {
     const userService = new UserApi(ApiConfiguration);
     const commonService = new CommonApi(ApiConfiguration);
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const { isMobile } = useMobile()
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [file, setFile] = useState<File | null>(null);
     const [isHovered, setIsHovered] = useState<boolean>(false);

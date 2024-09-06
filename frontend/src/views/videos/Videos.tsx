@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Input, TablePagination } from "@mui/material"
+import { Box, Button, Grid, Input, TablePagination, useMediaQuery, useTheme } from "@mui/material"
 import Media from "./components/Media";
 import { useEffect, useState } from "react";
 import SearchIcon from '@mui/icons-material/Search';
@@ -7,6 +7,7 @@ import { MediaApi, MediaDtoGenericListNewLevelResponse } from "../../gen/api/src
 import ApiConfiguration from "../../apiConfig";
 import Swal from "sweetalert2";
 import NewLevelLoading from "../../components/NewLevelLoading";
+import { useMobile } from "../../MobileContext";
 
 const Videos = () => {
   const mediaService = new MediaApi(ApiConfiguration);
@@ -16,6 +17,7 @@ const Videos = () => {
   const [data, setData] = useState<MediaDtoGenericListNewLevelResponse>({ data: { items: [], totalCount: 0 }, isSuccess: false, message: "" });
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(12);
+  const { isMobile } = useMobile()
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
@@ -85,29 +87,42 @@ const Videos = () => {
   return (
     <>
       <NewLevelLoading isLoading={loading} />
-      <AddVideoModal
-        open={openModal}
-        onClose={handleCloseModal}
-      />
-      <Box height="100%" flex={1} bgcolor="#F3F3F3">
-        <Box display="flex" pl={3.4} pt={2}>
-          <Box width="100%" display="flex" alignItems="center" justifyContent="space-between" mr={1}>
-            <Box>
-              <Input value={searchTerm} placeholder="Pesquisa por título" sx={{ width: 460 }} onChange={handleInputChange} />
-              <Button className="btn btn-primary" onClick={search}>
-                <SearchIcon fontSize="medium" />
-              </Button>
-            </Box>
-            <Box>
-              <Button className="btn btn-primary" onClick={handleOpenModal}>
-                Adicionar vídeo
-              </Button>
-            </Box>
+      <AddVideoModal open={openModal} onClose={handleCloseModal} />
+      <Box height="100%" flex={1} bgcolor="#F3F3F3" p={isMobile ? 1 : 3}>
+        <Box display="flex" flexDirection={isMobile ? 'column' : 'row'} justifyContent="space-between" alignItems={isMobile ? 'flex-start' : 'center'} mb={isMobile ? 2 : 0}>
+          <Box display="flex" flexDirection={'row'} alignItems={'center'}>
+            <Input
+              value={searchTerm}
+              placeholder="Pesquisa por título"
+              sx={{ width: isMobile ? '100%' : 460, mb: isMobile ? 1 : 0 }}
+              onChange={handleInputChange}
+            />
+            <Button
+              className="btn btn-primary"
+              onClick={search}
+              sx={{ mt: isMobile ? 1 : 0, ml: isMobile ? 4 : 1 }}
+            >
+              <SearchIcon fontSize="medium" />
+            </Button>
+          </Box>
+          <Box>
+            <Button className="btn btn-primary" onClick={handleOpenModal} sx={{ mt: isMobile ? 1 : 0 }}>
+              Adicionar vídeo
+            </Button>
           </Box>
         </Box>
-        <Grid container pl={3.4}>
+        <Grid container spacing={isMobile ? 1 : 3}>
           {data.data?.items!.map((item, index) => (
-            <Media key={index} id={item.id!} src={item.src!} title={item.title!} description={item.description!} nickname={item.nickname!} createdAt={new Date(item.creationTime!)} loading={loading} />
+            <Media
+              key={index}
+              id={item.id!}
+              src={item.src!}
+              title={item.title!}
+              description={item.description!}
+              nickname={item.nickname!}
+              createdAt={new Date(item.creationTime!)}
+              loading={loading}
+            />
           ))}
         </Grid>
         <TablePagination
@@ -123,7 +138,7 @@ const Videos = () => {
         />
       </Box>
     </>
-  )
+  );
 }
 
 export default Videos
