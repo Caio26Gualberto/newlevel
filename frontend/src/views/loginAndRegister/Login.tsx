@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import * as toastr from 'toastr';
 import ModalPassword from "./modalResetPassword/ModalPassword";
 import { useAuth } from "../../AuthContext";
+import { useMobile } from "../../MobileContext";
 
 const style = {
   transform: 'translate(-50%, -50%)',
@@ -17,6 +18,7 @@ interface IFormLogin {
 }
 
 const Login = () => {
+  const { isMobile } = useMobile()
   const { setToken } = useAuth();
   const [formLogin, setFormLogin] = useState<IFormLogin>({
     login: '',
@@ -54,6 +56,9 @@ const Login = () => {
         setToken(result.data?.tokens?.token!)
         toastr.success('Login efetuado com sucesso', 'Sucesso!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
         if (!result.data?.tokens?.skipIntroduction) {
+          if (isMobile) {
+            navigate('/welcome')
+          }
           navigate('/newAvatar')
         } else {
           navigate('/videos')

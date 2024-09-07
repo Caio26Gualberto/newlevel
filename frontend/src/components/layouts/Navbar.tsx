@@ -21,6 +21,16 @@ const StyledLink = styled(Link)`
   }
 `;
 
+const StyledLinkForAdmin = styled(Link)`
+  text-decoration: none;
+  color: pink;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: pink;
+  }
+`;
+
 const StyledMenu = styled(MenuItem)`
   text-decoration: none;
   transition: color 0.3s ease;
@@ -47,7 +57,7 @@ const Navbar = () => {
     const [anchorElAvatar, setAnchorElAvatar] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const openAvatar = Boolean(anchorElAvatar);
-    
+
     const [drawerOpen, setDrawerOpen] = React.useState(false);
 
     const toggleDrawer = (open: any) => (event: any) => {
@@ -162,7 +172,7 @@ const Navbar = () => {
                                 aria-label="menu"
                                 onClick={toggleDrawer(true)}
                             >
-                                <MenuIcon color="primary"/>
+                                <MenuIcon color="primary" />
                             </IconButton>
                         </Box>
                         <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
@@ -180,7 +190,8 @@ const Navbar = () => {
                                     <StyledLink to="/aboutMe"><ListItem button>Sobre mim</ListItem></StyledLink>
                                     <StyledLink to="/myProfile"><ListItem>Meu Perfil</ListItem></StyledLink>
                                     <StyledLink to="/partnerStore"><ListItem>Loja Parceira</ListItem></StyledLink>
-                                    <StyledLink to="/partnerStore" onClick={() => { handleCloseAvatar(); logout(); }}><ListItem>Sair</ListItem></StyledLink>
+                                    {isAdmin() && <StyledLinkForAdmin sx={{ color: "white" }} onClick={handleCloseAvatar} to="/acceptContent"><MenuItem>Pedidos (Admin)</MenuItem></StyledLinkForAdmin>}
+                                    <StyledLink to="/" onClick={() => { handleCloseAvatar(); logout(); }}><ListItem>Sair</ListItem></StyledLink>
                                 </List>
                             </Box>
                         </Drawer>
@@ -254,7 +265,8 @@ const Navbar = () => {
                                 <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myProfile"><MenuItem>Meu Perfil</MenuItem></StyledLink>
                                 <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myVideos"><MenuItem>Meus Vídeos</MenuItem></StyledLink>
                                 <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myPhotos"><MenuItem>Minhas Fotos</MenuItem></StyledLink>
-                                {isAdmin() && <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/acceptContent"><MenuItem>Pedidos</MenuItem></StyledLink>}
+                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/issueReport"><MenuItem>Reportar um Bug</MenuItem></StyledLink>
+                                {isAdmin() && <StyledLinkForAdmin sx={{ color: "pink" }} onClick={handleCloseAvatar} to="/acceptContent"><MenuItem>Pedidos (Admin)</MenuItem></StyledLinkForAdmin>}
                                 <StyledMenu onClick={() => { handleCloseAvatar(); logout(); }}>Sair</StyledMenu>
                             </Menu>
                         </Box>

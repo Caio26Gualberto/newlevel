@@ -6,5 +6,6 @@ namespace NewLevel.Interfaces.Services.Common
     public interface ICommonService
     {
         public List<DisplayActivityLocationDto> GetDisplayActivityLocation();
+        public List<SelectOptionDto> GetDisplayGitLabels();
     }
 }

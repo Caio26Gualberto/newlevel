@@ -8,12 +8,14 @@ using NewLevel.Interfaces.Services.Authenticate;
 using NewLevel.Interfaces.Services.Comment;
 using NewLevel.Interfaces.Services.Common;
 using NewLevel.Interfaces.Services.Email;
+using NewLevel.Interfaces.Services.Github;
 using NewLevel.Interfaces.Services.Media;
 using NewLevel.Interfaces.Services.Photo;
 using NewLevel.Interfaces.Services.User;
 using NewLevel.Services.Authenticate;
 using NewLevel.Services.Comment;
 using NewLevel.Services.Common;
+using NewLevel.Services.Github;
 using NewLevel.Services.Media;
 using NewLevel.Services.Photo;
 using NewLevel.Services.UserService;
@@ -73,6 +75,7 @@ namespace NewLevel
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<ICommentService, CommentService>();
+            services.AddScoped<IGithubService, GithubService>();
 
             return services;
         }

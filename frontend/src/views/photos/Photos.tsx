@@ -69,7 +69,7 @@ const Photos = () => {
           flexDirection={isMobile ? 'column' : 'row'}
           alignItems="center"
           justifyContent="space-between"
-          padding={isMobile ? 2 : 3} 
+          padding={isMobile ? 2 : 3}
         >
           <Box
             width={isMobile ? '100%' : 'auto'}
@@ -110,7 +110,14 @@ const Photos = () => {
         <Box m={isMobile ? 1 : 2}>
           <Grid container spacing={isMobile ? 1 : 2}>
             {photos.items?.map((photo, index) => (
-              <Grid key={index} item xs={12}>
+              <Grid
+                key={index}
+                item
+                xs={12}
+                sm={6} 
+                md={4} 
+                lg={2} 
+              >
                 <CardPhoto
                   title={photo.title!}
                   subtitle={photo.subtitle!}
@@ -140,6 +147,7 @@ const Photos = () => {
       </Box>
     </>
   );
+
 }
 
 export default Photos

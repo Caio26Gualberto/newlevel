@@ -15,17 +15,65 @@
 
 import * as runtime from '../runtime';
 import type {
+  CreateGitIssueInput,
   DisplayActivityLocationDtoListNewLevelResponse,
+  SelectOptionDtoListNewLevelResponse,
+  StringNewLevelResponse,
 } from '../models/index';
 import {
+    CreateGitIssueInputFromJSON,
+    CreateGitIssueInputToJSON,
     DisplayActivityLocationDtoListNewLevelResponseFromJSON,
     DisplayActivityLocationDtoListNewLevelResponseToJSON,
+    SelectOptionDtoListNewLevelResponseFromJSON,
+    SelectOptionDtoListNewLevelResponseToJSON,
+    StringNewLevelResponseFromJSON,
+    StringNewLevelResponseToJSON,
 } from '../models/index';
+
+export interface ApiCommonCreateIssuePostRequest {
+    createGitIssueInput?: CreateGitIssueInput;
+}
 
 /**
  * 
  */
 export class CommonApi extends runtime.BaseAPI {
+
+    /**
+     */
+    async apiCommonCreateIssuePostRaw(requestParameters: ApiCommonCreateIssuePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<StringNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/Common/CreateIssue`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: CreateGitIssueInputToJSON(requestParameters['createGitIssueInput']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => StringNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiCommonCreateIssuePost(requestParameters: ApiCommonCreateIssuePostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<StringNewLevelResponse> {
+        const response = await this.apiCommonCreateIssuePostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      */
@@ -56,6 +104,38 @@ export class CommonApi extends runtime.BaseAPI {
      */
     async apiCommonGetDisplayCitiesGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DisplayActivityLocationDtoListNewLevelResponse> {
         const response = await this.apiCommonGetDisplayCitiesGetRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiCommonGetDisplayGitLabelsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SelectOptionDtoListNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/Common/GetDisplayGitLabels`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SelectOptionDtoListNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiCommonGetDisplayGitLabelsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SelectOptionDtoListNewLevelResponse> {
+        const response = await this.apiCommonGetDisplayGitLabelsGetRaw(initOverrides);
         return await response.value();
     }
 

@@ -16,6 +16,7 @@ import Request from '../views/requests/Request';
 import MyPhotos from '../views/myPhotos/MyPhotos';
 import PartnerStore from '../views/partnerStore/PartnerStore';
 import { MobileProvider } from '../MobileContext';
+import IssueReport from '../views/issueReport/IssueReport';
 
 const Rotas = () => {
   return (
@@ -38,6 +39,7 @@ const Rotas = () => {
             <Route path="/newAvatar" element={<ChooseUserAvatar />} />
             <Route path="/acceptContent" element={<Request />} />
             <Route path="/partnerStore" element={<PartnerStore />} />
+            <Route path="/issueReport" element={<IssueReport />} />
           </Switch>
         </Router>
       </MobileProvider>

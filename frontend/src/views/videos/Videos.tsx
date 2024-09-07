@@ -111,7 +111,7 @@ const Videos = () => {
             </Button>
           </Box>
         </Box>
-        <Grid container spacing={isMobile ? 1 : 3}>
+        <Grid mt={isMobile ? 0 : 3} ml={0} container spacing={isMobile ? 1 : 3}>
           {data.data?.items!.map((item, index) => (
             <Media
               key={index}

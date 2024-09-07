@@ -6,7 +6,7 @@ interface ButtonProps {
     maxWidth?: boolean
     width?: string
     icon?: SvgIconComponent
-    onClick?: () => void;
+    onClick?: (e?: any) => void;
 }
 
 const NewLevelButton: React.FC<ButtonProps> = ({ title, maxWidth, width, icon: Icon, onClick }) => {

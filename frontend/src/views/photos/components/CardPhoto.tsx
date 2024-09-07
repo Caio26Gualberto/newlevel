@@ -94,10 +94,10 @@ const CardPhoto: React.FC<CardPhotoProps> = ({ title, srcPhotoS3, srcUserPhotoPr
       <PictureProfileModal onClose={handleCloseAvatar} open={openAvatar} avatarUrl={srcUserPhotoProfile!} nickname={nickname!} />
       <Card
         sx={{
-          maxWidth: isMobile ? '100%' : 345,  // Full width em mobile
+          maxWidth: isMobile ? '100%' : 345, 
           minHeight: '100%',
-          margin: isMobile ? '0 auto' : 'initial', // Centraliza o cartão em mobile
-          padding: isMobile ? 1 : 2,  // Menor padding em mobile
+          margin: isMobile ? '0 auto' : 'initial', 
+          padding: isMobile ? 1 : 2, 
         }}
       >
         <CardHeader
