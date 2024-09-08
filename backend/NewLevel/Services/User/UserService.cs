@@ -40,7 +40,7 @@ namespace NewLevel.Services.UserService
 
         public async Task<UserInfoResponseDto> GetUserInfo()
         {
-            var user = await _utils.GetUser();
+            var user = await _utils.GetUserAsync();
             //Todo tratar esse nulo depois no front
             if (user.IsFirstTimeLogin)
                 return null;
@@ -71,7 +71,7 @@ namespace NewLevel.Services.UserService
         {
             try
             {
-                var user = await _utils.GetUser();
+                var user = await _utils.GetUserAsync();
 
                 var result = await _userManager.DeleteAsync(user);
 
@@ -88,9 +88,11 @@ namespace NewLevel.Services.UserService
         {
             try
             {
-                var user = await _utils.GetUser();
+                var user = await _utils.GetUserAsync();
 
-                user.Update(isFirstTimeLogin: false, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatarKey: user.AvatarKey, publicTimer: user.PublicTimer, avatarUrl: user.AvatarUrl, email: user.Email);
+                user.Update(isFirstTimeLogin: false, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatarKey: user.AvatarKey, publicTimer: user.PublicTimer,
+                    avatarUrl: user.AvatarUrl, email: user.Email);
+
                 await _userManager.UpdateAsync(user);
             }
             catch (Exception e)
@@ -102,7 +104,7 @@ namespace NewLevel.Services.UserService
 
         public async Task GenerateTokenToResetPassword()
         {
-            var user = await _utils.GetUser();
+            var user = await _utils.GetUserAsync();
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
@@ -113,7 +115,7 @@ namespace NewLevel.Services.UserService
 
         public async Task<bool> UploadAvatarImage(UploadAvatarImageInput input)
         {
-            var user = await _utils.GetUser();
+            var user = await _utils.GetUserAsync();
 
             AmazonS3Service s3 = new AmazonS3Service();
             string key = $"avatars/{user.Id}/{Guid.NewGuid()}";
@@ -125,8 +127,9 @@ namespace NewLevel.Services.UserService
                 throw new Exception("Erro ao adicionar imagem a nuvem, caso o problema persista entre em contato com o desenvolvedor");
             }
 
-            user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatarKey: key, publicTimer: DateTime.Now.AddDays(2).AddHours(-3),
-                avatarUrl: url, email: user.Email);
+            user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatarKey: key, 
+                publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: url, email: user.Email);
+
             await _userManager.UpdateAsync(user);
             await _newLevelDbContext.SaveChangesAsync();
 
@@ -135,7 +138,7 @@ namespace NewLevel.Services.UserService
 
         public async Task<bool> UpdateUser(UpdateUserInput input)
         {
-            User user = await _utils.GetUser();
+            User user = await _utils.GetUserAsync();
             AmazonS3Service s3 = new AmazonS3Service();
             string key = $"avatars/{user.Id}/{Guid.NewGuid()}";
 
@@ -154,13 +157,17 @@ namespace NewLevel.Services.UserService
                 }
 
                 var url = await s3.CreateTempURLS3("newlevel-images", key);
-                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: input.Nickname ?? user.Nickname, activityLocation: input.ActivityLocation ?? user.ActivityLocation, avatarKey: key, publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: url, email: input.Email);
+                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: input.Nickname ?? user.Nickname, activityLocation: input.ActivityLocation ?? user.ActivityLocation,
+                    avatarKey: key, publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: url, email: input.Email);
+
                 await _userManager.UpdateAsync(user);
                 await _newLevelDbContext.SaveChangesAsync();
             }
             else
             {
-                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: input.Nickname ?? user.Nickname, activityLocation: input.ActivityLocation ?? user.ActivityLocation, avatarKey: user.AvatarUrl, publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: user.AvatarUrl, email: input.Email);
+                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: input.Nickname ?? user.Nickname, activityLocation: input.ActivityLocation ?? user.ActivityLocation,
+                    avatarKey: user.AvatarUrl, publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: user.AvatarUrl, email: input.Email);
+
                 await _userManager.UpdateAsync(user);
                 await _newLevelDbContext.SaveChangesAsync();
             }

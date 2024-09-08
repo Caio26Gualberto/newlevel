@@ -42,7 +42,7 @@ namespace NewLevel.Services.Media
 
         public async Task<GenericList<MediaByUserIdDto>> GetMediaByUserId(Pagination input)
         {
-            var user = await _utils.GetUser();
+            var user = await _utils.GetUserAsync();
 
             var totalMedias = await _context.Medias
                 .Where(media => media.UserId == user.Id)
@@ -124,7 +124,7 @@ namespace NewLevel.Services.Media
         {
             try
             {
-                var user = await _utils.GetUser();
+                var user = await _utils.GetUserAsync();
                 NewLevel.Entities.Media media = new NewLevel.Entities.Media(input.Src, input.Title, input.Description, isPublic: false, DateTime.UtcNow.AddHours(-3), user.Id);
                 media.Src = media.Src.Replace("watch?v=", "embed/");
 

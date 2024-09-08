@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewLevel.Context;
 
@@ -11,9 +12,11 @@ using NewLevel.Context;
 namespace NewLevel.Migrations
 {
     [DbContext(typeof(NewLevelDbContext))]
-    partial class NewLevelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240908050843_CriandoArtistHerdandoUser2")]
+    partial class CriandoArtistHerdandoUser2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -299,6 +302,11 @@ namespace NewLevel.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -365,7 +373,9 @@ namespace NewLevel.Migrations
 
                     b.ToTable("Users", (string)null);
 
-                    b.UseTptMappingStrategy();
+                    b.HasDiscriminator<string>("Discriminator").HasValue("User");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("NewLevel.Entities.Artist", b =>
@@ -394,15 +404,7 @@ namespace NewLevel.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
-
-                    b.ToTable("Artists", (string)null);
+                    b.HasDiscriminator().HasValue("Artist");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -501,21 +503,6 @@ namespace NewLevel.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("NewLevel.Entities.Artist", b =>
-                {
-                    b.HasOne("NewLevel.Entities.User", null)
-                        .WithOne()
-                        .HasForeignKey("NewLevel.Entities.Artist", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NewLevel.Entities.User", null)
-                        .WithOne()
-                        .HasForeignKey("NewLevel.Entities.Artist", "UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("NewLevel.Entities.Media", b =>

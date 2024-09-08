@@ -16,8 +16,8 @@ namespace NewLevel.Services.AmazonS3
 
         public AmazonS3Service()
         {
-            AwsKeyId = Environment.GetEnvironmentVariable("AwsKeyId")!;
-            AwsKeySecret = Environment.GetEnvironmentVariable("AwsKeySecret")!;
+            AwsKeyId = "";
+            AwsKeySecret = "";
             AwsCredentials = new BasicAWSCredentials(AwsKeyId, AwsKeySecret);
             var config = new AmazonS3Config
             {

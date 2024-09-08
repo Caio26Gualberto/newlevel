@@ -78,7 +78,7 @@ namespace NewLevel.Services.Comment
 
         public async Task<bool> SaveComment(ReceiveCommentDto input)
         {
-            var user = await _utils.GetUser();
+            var user = await _utils.GetUserAsync();
 
             var comment = new Entities.Comment(input.Text, user.Id, input.MediaId, input.PhotoId, DateTime.Now.AddHours(-3));
             await _context.Comments.AddAsync(comment);

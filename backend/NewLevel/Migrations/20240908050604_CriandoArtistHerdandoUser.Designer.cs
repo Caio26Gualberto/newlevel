@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewLevel.Context;
 
@@ -11,9 +12,11 @@ using NewLevel.Context;
 namespace NewLevel.Migrations
 {
     [DbContext(typeof(NewLevelDbContext))]
-    partial class NewLevelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240908050604_CriandoArtistHerdandoUser")]
+    partial class CriandoArtistHerdandoUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -364,45 +367,6 @@ namespace NewLevel.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("Users", (string)null);
-
-                    b.UseTptMappingStrategy();
-                });
-
-            modelBuilder.Entity("NewLevel.Entities.Artist", b =>
-                {
-                    b.HasBaseType("NewLevel.Entities.User");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("IntegrantsSerialized")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MusicGenres")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasIndex("UserId")
-                        .IsUnique()
-                        .HasFilter("[UserId] IS NOT NULL");
-
-                    b.ToTable("Artists", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -501,21 +465,6 @@ namespace NewLevel.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("NewLevel.Entities.Artist", b =>
-                {
-                    b.HasOne("NewLevel.Entities.User", null)
-                        .WithOne()
-                        .HasForeignKey("NewLevel.Entities.Artist", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NewLevel.Entities.User", null)
-                        .WithOne()
-                        .HasForeignKey("NewLevel.Entities.Artist", "UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("NewLevel.Entities.Media", b =>

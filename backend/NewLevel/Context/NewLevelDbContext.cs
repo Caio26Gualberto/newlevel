@@ -14,6 +14,7 @@ namespace NewLevel.Context
         public DbSet<Media> Medias { get; set; }
         public DbSet<Photo> Photos { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Artist> Artists { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -54,6 +55,16 @@ namespace NewLevel.Context
             {
                 entity.ToTable("UserTokens");
             });
+
+            // Configura TPT (Table-per-Type) para Artist
+            builder.Entity<Artist>().ToTable("Artists");
+
+            // Configura a relação entre Artist e User
+            builder.Entity<Artist>()
+                .HasOne<User>()  // Relaciona com User
+                .WithOne()        // Cada Artist tem um User correspondente
+                .HasForeignKey<Artist>(a => a.UserId)  // Chave estrangeira em Artist
+                .OnDelete(DeleteBehavior.Restrict);    // Configura comportamento de deleção
 
             builder.Entity<User>()
                         .HasMany(u => u.Comments)

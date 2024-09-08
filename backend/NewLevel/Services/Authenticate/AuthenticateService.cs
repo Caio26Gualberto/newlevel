@@ -18,19 +18,22 @@ namespace NewLevel.Services.Authenticate
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly Utils.Utils _utils;
         private readonly IConfiguration _configuration;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AuthenticateService(UserManager<User> userManager, SignInManager<User> signInManager, NewLevelDbContext newLevelDbContext, IHttpContextAccessor httpContextAccessor, IConfiguration configuration)
+        public AuthenticateService(UserManager<User> userManager, SignInManager<User> signInManager, NewLevelDbContext newLevelDbContext, IHttpContextAccessor httpContextAccessor,
+            IConfiguration configuration, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _newLevelDbContext = newLevelDbContext;
             _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
-            _utils = new Utils.Utils(httpContextAccessor, userManager); 
+            _utils = new Utils.Utils(httpContextAccessor, userManager);
+            _roleManager = roleManager;
         }
         public async Task<TokensDto> GenerateNewAccessToken(string accessToken)
         {
-            var user = await _utils.GetUser();
+            var user = await _utils.GetUserAsync();
 
             if (user == null)
             {
@@ -63,7 +66,9 @@ namespace NewLevel.Services.Authenticate
                 var roles = await _userManager.GetRolesAsync(user);
                 var tokenString = GenerateJwtToken(user, roles);
 
-                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatarKey: user.AvatarKey, publicTimer:user.PublicTimer, avatarUrl: user.AvatarUrl, email: user.Email);
+                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatarKey: user.AvatarKey,
+                    publicTimer:user.PublicTimer, avatarUrl: user.AvatarUrl, email: user.Email);
+
                 var refreshToken = await _userManager.GenerateUserTokenAsync(user, tokenProvider: "local", purpose: "email");
                 await _userManager.SetAuthenticationTokenAsync(user, loginProvider: "email", tokenName: "refresh_token", tokenValue: refreshToken);
 
@@ -80,7 +85,7 @@ namespace NewLevel.Services.Authenticate
 
         public async Task<bool> Logout()
         {
-            var user = _utils.GetUser();
+            var user = _utils.GetUserAsync();
             await _signInManager.SignOutAsync();
             return true;
         }
@@ -96,7 +101,9 @@ namespace NewLevel.Services.Authenticate
                 { "PasswordRequiresUpper", "Senha requer letra maiúscula" }
             };
 
-            var user = new User(isFirstTimeLogin: true, nickName: input.Nickname, activityLocation: input.ActivityLocation, avatar: null, publicTimer: null, avatarUrl: null);
+            var user = new User(isFirstTimeLogin: true, nickName: input.Nickname, activityLocation: input.ActivityLocation, avatar: null, publicTimer: null,
+                avatarUrl: null);
+
             user.UserName = input.Email;
             user.Email = input.Email;
 
@@ -105,6 +112,45 @@ namespace NewLevel.Services.Authenticate
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
+                return new RegisterResponseDto { Result = true, Message = "Conta criada!" };
+            }
+            else if (result.Errors.Any(e => errors.ContainsKey(e.Code)) && result.Errors.Count() == 1)
+            {
+                var errorMessage = result.Errors.First();
+                return new RegisterResponseDto { Result = false, Message = errors[errorMessage.Code] };
+            }
+            else if (result.Errors.Any(e => errors.ContainsKey(e.Code)) && result.Errors.Count() > 1)
+            {
+                var errorMessages = result.Errors.Where(e => errors.ContainsKey(e.Code)).Select(e => errors[e.Code]);
+                var error = string.Join("\n - ", errorMessages);
+                return new RegisterResponseDto { Result = false, Message = error };
+            }
+
+            return new RegisterResponseDto { Result = false, Message = "Erro ao registrar usuário" };
+        }
+
+        public async Task<RegisterResponseDto> BandRegister(RegisterInputDto input)
+        {
+            Dictionary<string, string> errors = new Dictionary<string, string>()
+            {
+                { "PasswordTooShort", "Senha muito curta" },
+                { "PasswordRequiresNonAlphanumeric", "Senha requer caractere não alfanumérico" },
+                { "PasswordRequiresDigit", "Senha requer números" },
+                { "PasswordRequiresLower", "Senha requer letra minúscula" },
+                { "PasswordRequiresUpper", "Senha requer letra maiúscula" }
+            };
+
+            var artist = new Artist(input.Nickname, input.Description, DateTime.UtcNow.AddHours(-3), (DateTime)input.CreatedAt, isFirstTimeLogin: true, input.Nickname, avatar: null, input.ActivityLocation,
+                publicTimer: null, avatarUrl: null, input.Email);
+
+            artist.UserName = input.Email;
+            artist.Email = input.Email;
+
+            var result = await _userManager.CreateAsync(artist, input.Password);
+
+            if (result.Succeeded)
+            {
+                await _signInManager.SignInAsync(artist, isPersistent: false);
                 return new RegisterResponseDto { Result = true, Message = "Conta criada!" };
             }
             else if (result.Errors.Any(e => errors.ContainsKey(e.Code)) && result.Errors.Count() == 1)

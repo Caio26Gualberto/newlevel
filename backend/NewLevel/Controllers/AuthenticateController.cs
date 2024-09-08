@@ -56,6 +56,26 @@ namespace NewLevel.Controllers
             }
         }
 
+        [HttpPost("BandRegister")]
+        public async Task<ActionResult<NewLevelResponse<RegisterResponseDto>>> BandRegister(RegisterInputDto input)
+        {
+            try
+            {
+                var result = await _authenticateService.Register(input);
+
+                return Ok(new NewLevelResponse<RegisterResponseDto>()
+                {
+                    Data = result,
+                    IsSuccess = result.Result,
+                    Message = result.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<RegisterResponseDto> { IsSuccess = false, Message = ex.Message });
+            }
+        }
+
         [Authorize]
         [HttpGet("Logout")]
         public async Task<ActionResult<NewLevelResponse<bool>>> Logout()

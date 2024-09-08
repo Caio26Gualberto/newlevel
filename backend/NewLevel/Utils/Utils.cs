@@ -13,7 +13,7 @@ namespace NewLevel.Utils
             _userManager = userManager;
         }
 
-        public async Task<User> GetUser()
+        public async Task<User> GetUserAsync()
         {
             var userId = _httpContextAccessor.HttpContext!.Items["userId"];
 

@@ -265,7 +265,7 @@ const Navbar = () => {
                                 <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myProfile"><MenuItem>Meu Perfil</MenuItem></StyledLink>
                                 <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myVideos"><MenuItem>Meus Vídeos</MenuItem></StyledLink>
                                 <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myPhotos"><MenuItem>Minhas Fotos</MenuItem></StyledLink>
-                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/issueReport"><MenuItem>Reportar um Bug</MenuItem></StyledLink>
+                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/issueReport"><MenuItem>Reportar Problema</MenuItem></StyledLink>
                                 {isAdmin() && <StyledLinkForAdmin sx={{ color: "pink" }} onClick={handleCloseAvatar} to="/acceptContent"><MenuItem>Pedidos (Admin)</MenuItem></StyledLinkForAdmin>}
                                 <StyledMenu onClick={() => { handleCloseAvatar(); logout(); }}>Sair</StyledMenu>
                             </Menu>

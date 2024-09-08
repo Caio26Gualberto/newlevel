@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { TextField, Button, Container, Typography, Box, Checkbox, Chip, FormControl, InputLabel, MenuItem, Select, OutlinedInput } from '@mui/material';
+import { TextField, Button, Container, Typography, Box, Checkbox, Chip, FormControl, InputLabel, MenuItem, Select, OutlinedInput, LinearProgress } from '@mui/material';
 import ApiConfiguration from '../../apiConfig';
 import { CommonApi, EGitLabels, SelectOptionDto } from '../../gen/api/src';
 import NewLevelButton from '../../components/NewLevelButton';
 import NewLevelLoading from '../../components/NewLevelLoading';
 import Swal from 'sweetalert2';
+import * as toastr from 'toastr';
 
 const IssueReport = () => {
     const commonApi = new CommonApi(ApiConfiguration);
     const [loading, setLoading] = useState<boolean>(false);
+    const [issueCreated, setIssueCreated] = useState<string>('');
+    const [progress, setProgress] = useState(0);
     const [problemTypes, setProblemTypes] = useState<SelectOptionDto[]>([]);
     const [devices, setDevices] = useState<SelectOptionDto[]>([]);
     const [selectedProblemTypes, setSelectedProblemTypes] = useState<number[]>([]);
@@ -44,14 +47,15 @@ const IssueReport = () => {
                     gitLabels: allLabels as EGitLabels[]
                 }
             })
-
+            setFormData({
+                title: '',
+                description: ''
+            })
+            setSelectedDevices([])
+            setSelectedProblemTypes([])
             if (result.isSuccess) {
-                Swal.fire({
-                    title: result.message,
-                    text: `O problema foi criado com sucesso. Confira aqui: ${result.data}`,
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
+                toastr.success('Report criado com sucesso', 'Relatório criado', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
+                setIssueCreated(result.data!)
             } else {
                 Swal.fire({
                     title: 'Erro',
@@ -66,6 +70,33 @@ const IssueReport = () => {
         }
         console.log(formData);
     };
+
+    React.useEffect(() => {
+        if (issueCreated) {
+            const timeoutDuration = 10000;
+            const interval = timeoutDuration / 100;
+
+            let currentProgress = 0;
+            const timer = setInterval(() => {
+                currentProgress += 1;
+                setProgress(currentProgress);
+
+                if (currentProgress >= 100) {
+                    clearInterval(timer);
+                }
+            }, interval);
+
+            const timeout = setTimeout(() => {
+                setIssueCreated('');
+                setProgress(0);
+            }, timeoutDuration);
+
+            return () => {
+                clearTimeout(timeout);
+                clearInterval(timer);
+            };
+        }
+    }, [issueCreated]);
 
     React.useEffect(() => {
         (async () => {
@@ -95,7 +126,7 @@ const IssueReport = () => {
                     boxShadow: 3,
                     p: 3,
                     mt: 5,
-                    width: '100%',
+                    width: '100%'
                 }}
             >
                 <Typography variant="h4" component="h1" gutterBottom>
@@ -139,7 +170,7 @@ const IssueReport = () => {
                                 </div>
                             )}
                             sx={{
-                                maxHeight: 200, // Define uma altura máxima para o menu
+                                maxHeight: 200,
                             }}
                         >
                             {problemTypes.map((option) => (
@@ -177,6 +208,12 @@ const IssueReport = () => {
                             ))}
                         </Select>
                     </FormControl>
+                    {issueCreated &&
+                        <Box mb={1}>
+                            <Typography fontWeight="bold">Report criado, caso queira visualizar veja <a href={issueCreated} target='_blank'>aqui</a></Typography>
+                            <LinearProgress variant="determinate" value={progress} />
+                        </Box>
+                    }
                     <NewLevelButton onClick={(e: any) => { e.preventDefault(); handleSubmit(e); }} title='Enviar' maxWidth />
                 </form>
             </Box>

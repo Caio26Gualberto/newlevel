@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using NewLevel.Enums.Authenticate;
 using NewLevel.Validation;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NewLevel.Entities
 {
-    public sealed class User : IdentityUser
+    public class User : IdentityUser
     {
         public User()
         {
@@ -21,7 +22,13 @@ namespace NewLevel.Entities
         public EActivityLocation ActivityLocation { get; private set; }
         public bool IsFirstTimeLogin { get; private set; }
         public DateTime? PublicTimer { get; private set; }
-
+        [NotMapped]
+        public Dictionary<string, string>? IssuesIds { get; private set; }
+        public string IssuesIdsSerialized
+        {
+            get => JsonConvert.SerializeObject(IssuesIds);
+            set => IssuesIds = JsonConvert.DeserializeObject<Dictionary<string, string>>(value);
+        }
 
 
         [InverseProperty("User")]
