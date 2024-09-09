@@ -16,15 +16,12 @@
 import * as runtime from '../runtime';
 import type {
   CreateGitIssueInput,
-  DisplayActivityLocationDtoListNewLevelResponse,
   SelectOptionDtoListNewLevelResponse,
   StringNewLevelResponse,
 } from '../models/index';
 import {
     CreateGitIssueInputFromJSON,
     CreateGitIssueInputToJSON,
-    DisplayActivityLocationDtoListNewLevelResponseFromJSON,
-    DisplayActivityLocationDtoListNewLevelResponseToJSON,
     SelectOptionDtoListNewLevelResponseFromJSON,
     SelectOptionDtoListNewLevelResponseToJSON,
     StringNewLevelResponseFromJSON,
@@ -77,7 +74,7 @@ export class CommonApi extends runtime.BaseAPI {
 
     /**
      */
-    async apiCommonGetDisplayCitiesGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DisplayActivityLocationDtoListNewLevelResponse>> {
+    async apiCommonGetDisplayCitiesGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SelectOptionDtoListNewLevelResponse>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -97,12 +94,12 @@ export class CommonApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => DisplayActivityLocationDtoListNewLevelResponseFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => SelectOptionDtoListNewLevelResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async apiCommonGetDisplayCitiesGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DisplayActivityLocationDtoListNewLevelResponse> {
+    async apiCommonGetDisplayCitiesGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SelectOptionDtoListNewLevelResponse> {
         const response = await this.apiCommonGetDisplayCitiesGetRaw(initOverrides);
         return await response.value();
     }
@@ -136,6 +133,38 @@ export class CommonApi extends runtime.BaseAPI {
      */
     async apiCommonGetDisplayGitLabelsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SelectOptionDtoListNewLevelResponse> {
         const response = await this.apiCommonGetDisplayGitLabelsGetRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiCommonGetDisplayMusicGenresGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SelectOptionDtoListNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/Common/GetDisplayMusicGenres`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SelectOptionDtoListNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiCommonGetDisplayMusicGenresGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SelectOptionDtoListNewLevelResponse> {
+        const response = await this.apiCommonGetDisplayMusicGenresGetRaw(initOverrides);
         return await response.value();
     }
 

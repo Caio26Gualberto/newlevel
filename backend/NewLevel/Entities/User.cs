@@ -30,7 +30,6 @@ namespace NewLevel.Entities
             set => IssuesIds = JsonConvert.DeserializeObject<Dictionary<string, string>>(value);
         }
 
-
         [InverseProperty("User")]
         public List<Media> Medias { get; private set; }
 

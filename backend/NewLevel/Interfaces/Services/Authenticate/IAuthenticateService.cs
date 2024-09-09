@@ -7,6 +7,7 @@ namespace NewLevel.Interfaces.Services.Authenticate
         Task<LoginResponseDto> Login(string email, string password);
         Task<bool> Logout();
         Task<RegisterResponseDto> Register(RegisterInputDto input);
+        Task<RegisterResponseDto> BandRegister(RegisterInputDto input);
         Task<TokensDto> GenerateNewAccessToken(string accessToken);
     }
 }

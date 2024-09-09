@@ -37,6 +37,10 @@ import {
     TokensDtoToJSON,
 } from '../models/index';
 
+export interface ApiAuthenticateBandRegisterPostRequest {
+    registerInputDto?: RegisterInputDto;
+}
+
 export interface ApiAuthenticateLoginPostRequest {
     loginInputDto?: LoginInputDto;
 }
@@ -53,6 +57,41 @@ export interface ApiAuthenticateRenewTokenGetRequest {
  * 
  */
 export class AuthenticateApi extends runtime.BaseAPI {
+
+    /**
+     */
+    async apiAuthenticateBandRegisterPostRaw(requestParameters: ApiAuthenticateBandRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RegisterResponseDtoNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/Authenticate/BandRegister`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: RegisterInputDtoToJSON(requestParameters['registerInputDto']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => RegisterResponseDtoNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiAuthenticateBandRegisterPost(requestParameters: ApiAuthenticateBandRegisterPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterResponseDtoNewLevelResponse> {
+        const response = await this.apiAuthenticateBandRegisterPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      */

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewLevel.Context;
 
@@ -11,9 +12,11 @@ using NewLevel.Context;
 namespace NewLevel.Migrations
 {
     [DbContext(typeof(NewLevelDbContext))]
-    partial class NewLevelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240908160841_CriandoColunaVerificadoArtista")]
+    partial class CriandoColunaVerificadoArtista
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -397,6 +400,14 @@ namespace NewLevel.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
+
                     b.ToTable("Artists", (string)null);
                 });
 
@@ -504,6 +515,12 @@ namespace NewLevel.Migrations
                         .WithOne()
                         .HasForeignKey("NewLevel.Entities.Artist", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NewLevel.Entities.User", null)
+                        .WithOne()
+                        .HasForeignKey("NewLevel.Entities.Artist", "UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 

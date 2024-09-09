@@ -67,7 +67,7 @@ namespace NewLevel.Services.Authenticate
                 var tokenString = GenerateJwtToken(user, roles);
 
                 user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatarKey: user.AvatarKey,
-                    publicTimer:user.PublicTimer, avatarUrl: user.AvatarUrl, email: user.Email);
+                    publicTimer: user.PublicTimer, avatarUrl: user.AvatarUrl, email: user.Email);
 
                 var refreshToken = await _userManager.GenerateUserTokenAsync(user, tokenProvider: "local", purpose: "email");
                 await _userManager.SetAuthenticationTokenAsync(user, loginProvider: "email", tokenName: "refresh_token", tokenValue: refreshToken);
@@ -140,7 +140,8 @@ namespace NewLevel.Services.Authenticate
                 { "PasswordRequiresUpper", "Senha requer letra maiúscula" }
             };
 
-            var artist = new Artist(input.Nickname, input.Description, DateTime.UtcNow.AddHours(-3), (DateTime)input.CreatedAt, isFirstTimeLogin: true, input.Nickname, avatar: null, input.ActivityLocation,
+            var artist = new Artist(input.Nickname, input.Description, isVerified: false, DateTime.UtcNow.AddHours(-3), (DateTime)input.CreatedAt, musicGenres: input.MusicGenres,
+                integrants: input.Integrants, isFirstTimeLogin: true, input.Nickname, avatar: null, input.ActivityLocation,
                 publicTimer: null, avatarUrl: null, input.Email);
 
             artist.UserName = input.Email;

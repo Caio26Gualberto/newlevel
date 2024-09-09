@@ -2,7 +2,7 @@ import { Avatar, Box, Button, Divider, FormControl, Grid, IconButton, Input, Inp
 import { useEffect, useState } from "react";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import * as toastr from 'toastr';
-import { CommonApi, DisplayActivityLocationDto, EActivityLocation, UserApi } from "../../gen/api/src";
+import { CommonApi, EActivityLocation, SelectOptionDto, UserApi } from "../../gen/api/src";
 import ApiConfiguration from "../../apiConfig";
 import { UserInfoResponseDto } from "../../gen/api/src/models/UserInfoResponseDto";
 import Swal from "sweetalert2";
@@ -18,8 +18,8 @@ const MyProfile = () => {
     const [isHovered, setIsHovered] = useState<boolean>(false);
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [userInfos, setUserInfos] = useState<UserInfoResponseDto>({ email: '', nickname: '', activityLocation: 1 });
-    const [userLocation, setUserLocation] = useState<DisplayActivityLocationDto>({ name: '', value: 0 });
-    const [locations, setLocation] = useState<DisplayActivityLocationDto[]>([]);
+    const [userLocation, setUserLocation] = useState<SelectOptionDto>({ name: '', value: 0 });
+    const [locations, setLocation] = useState<SelectOptionDto[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [formUpdateRegister, setFormUpdateRegister] = useState({
         email: '',

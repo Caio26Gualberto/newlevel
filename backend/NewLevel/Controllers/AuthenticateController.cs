@@ -61,13 +61,12 @@ namespace NewLevel.Controllers
         {
             try
             {
-                var result = await _authenticateService.Register(input);
+                var result = await _authenticateService.BandRegister(input);
 
                 return Ok(new NewLevelResponse<RegisterResponseDto>()
                 {
-                    Data = result,
-                    IsSuccess = result.Result,
-                    Message = result.Message
+                    IsSuccess = true,
+                    Message = ""
                 });
             }
             catch (Exception ex)

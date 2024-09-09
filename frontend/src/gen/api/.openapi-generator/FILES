@@ -16,10 +16,9 @@ src/models/CommentsListDto.ts
 src/models/CommentsPhotoResponseDto.ts
 src/models/CommentsPhotoResponseDtoNewLevelResponse.ts
 src/models/CreateGitIssueInput.ts
-src/models/DisplayActivityLocationDto.ts
-src/models/DisplayActivityLocationDtoListNewLevelResponse.ts
 src/models/EActivityLocation.ts
 src/models/EGitLabels.ts
+src/models/EMusicGenres.ts
 src/models/LoginInputDto.ts
 src/models/LoginResponseDto.ts
 src/models/LoginResponseDtoNewLevelResponse.ts

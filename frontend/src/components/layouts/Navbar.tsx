@@ -71,6 +71,7 @@ const Navbar = () => {
         "/",
         "/welcome",
         "/register",
+        "/bandRegister",
         "/security/resetPassword",
         "/newAvatar"
     ];
@@ -188,7 +189,8 @@ const Navbar = () => {
                                     <StyledLink to="/photos"><ListItem button>Fotos</ListItem></StyledLink>
                                     <StyledLink to="/podcasts"><ListItem button>Podcasts</ListItem></StyledLink>
                                     <StyledLink to="/aboutMe"><ListItem button>Sobre mim</ListItem></StyledLink>
-                                    <StyledLink to="/myProfile"><ListItem>Meu Perfil</ListItem></StyledLink>
+                                    <StyledLink to="/myAccount"><ListItem>Minha Conta</ListItem></StyledLink>
+                                    <StyledLink to="/profile"><ListItem>Minha Conta</ListItem></StyledLink>
                                     <StyledLink to="/partnerStore"><ListItem>Loja Parceira</ListItem></StyledLink>
                                     {isAdmin() && <StyledLinkForAdmin sx={{ color: "white" }} onClick={handleCloseAvatar} to="/acceptContent"><MenuItem>Pedidos (Admin)</MenuItem></StyledLinkForAdmin>}
                                     <StyledLink to="/" onClick={() => { handleCloseAvatar(); logout(); }}><ListItem>Sair</ListItem></StyledLink>
@@ -262,7 +264,8 @@ const Navbar = () => {
                                     'aria-labelledby': 'basic-button',
                                 }}
                             >
-                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myProfile"><MenuItem>Meu Perfil</MenuItem></StyledLink>
+                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myAccount"><MenuItem>Minha Conta</MenuItem></StyledLink>
+                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/profile"><MenuItem>Meu Perfil</MenuItem></StyledLink>
                                 <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myVideos"><MenuItem>Meus Vídeos</MenuItem></StyledLink>
                                 <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myPhotos"><MenuItem>Minhas Fotos</MenuItem></StyledLink>
                                 <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/issueReport"><MenuItem>Reportar Problema</MenuItem></StyledLink>

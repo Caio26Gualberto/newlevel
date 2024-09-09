@@ -17,6 +17,9 @@ import MyPhotos from '../views/myPhotos/MyPhotos';
 import PartnerStore from '../views/partnerStore/PartnerStore';
 import { MobileProvider } from '../MobileContext';
 import IssueReport from '../views/issueReport/IssueReport';
+import BandRegister from '../views/loginAndRegister/BandRegister';
+import NotFound from '../views/notFound/NotFound';
+import Profile from '../views/profile/Profile';
 
 const Rotas = () => {
   return (
@@ -27,6 +30,7 @@ const Rotas = () => {
           <Switch>
             <Route path="/" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/bandRegister" element={<BandRegister />} />
             <Route path="/welcome" element={<Apresentation />} />
             <Route path="/videos" element={<Videos />} />
             <Route path="/photos" element={<Photos />} />
@@ -34,12 +38,14 @@ const Rotas = () => {
             <Route path="/aboutMe" element={<AboutMe />} />
             <Route path="/myVideos" element={<MyVideos />} />
             <Route path="/myPhotos" element={<MyPhotos />} />
-            <Route path="/myProfile" element={<MyProfile />} />
+            <Route path="/myAccount" element={<MyProfile />} />
+            <Route path="/profile/:nickname" element={<Profile />} />
             <Route path="/security/resetPassword" element={<ResetPassword />} />
             <Route path="/newAvatar" element={<ChooseUserAvatar />} />
             <Route path="/acceptContent" element={<Request />} />
             <Route path="/partnerStore" element={<PartnerStore />} />
             <Route path="/issueReport" element={<IssueReport />} />
+            <Route path="*" element={<NotFound />} />
           </Switch>
         </Router>
       </MobileProvider>

@@ -4,6 +4,9 @@ using NewLevel.Dtos.ApiResponse;
 using NewLevel.Dtos.Authenticate;
 using NewLevel.Dtos.Common;
 using NewLevel.Dtos.Utils;
+using NewLevel.Enums;
+using NewLevel.Enums.Authenticate;
+using NewLevel.Enums.GithubLabels;
 using NewLevel.Interfaces.Services.Common;
 using NewLevel.Interfaces.Services.Github;
 
@@ -22,21 +25,33 @@ namespace NewLevel.Controllers
         }
 
         [HttpGet("GetDisplayCities")]
-        public async Task<ActionResult<NewLevelResponse<List<DisplayActivityLocationDto>>>> GetDisplayCities()
+        public async Task<ActionResult<NewLevelResponse<List<SelectOptionDto>>>> GetDisplayCities()
         {
-            var displayList = _commonService.GetDisplayActivityLocation();
+            var displayList = _commonService.GetDisplayOptions<EActivityLocation>();
             if (displayList == null)
             {
                 return NotFound();
             }
 
-            return Ok(new NewLevelResponse<List<DisplayActivityLocationDto>> { IsSuccess = true, Data = displayList});
+            return Ok(new NewLevelResponse<List<SelectOptionDto>> { IsSuccess = true, Data = displayList});
         }
 
         [HttpGet("GetDisplayGitLabels")]
         public async Task<ActionResult<NewLevelResponse<List<SelectOptionDto>>>> GetDisplayGitLabels()
         {
-            var displayList = _commonService.GetDisplayGitLabels();
+            var displayList = _commonService.GetDisplayOptions<EGitLabels>();
+            if (displayList == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new NewLevelResponse<List<SelectOptionDto>> { IsSuccess = true, Data = displayList });
+        }
+
+        [HttpGet("GetDisplayMusicGenres")]
+        public async Task<ActionResult<NewLevelResponse<List<SelectOptionDto>>>> GetDisplayMusicGenres()
+        {
+            var displayList = _commonService.GetDisplayOptions<EMusicGenres>();
             if (displayList == null)
             {
                 return NotFound();

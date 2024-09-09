@@ -19,6 +19,12 @@ import {
     EActivityLocationFromJSONTyped,
     EActivityLocationToJSON,
 } from './EActivityLocation';
+import type { EMusicGenres } from './EMusicGenres';
+import {
+    EMusicGenresFromJSON,
+    EMusicGenresFromJSONTyped,
+    EMusicGenresToJSON,
+} from './EMusicGenres';
 
 /**
  * 
@@ -50,6 +56,30 @@ export interface RegisterInputDto {
      * @memberof RegisterInputDto
      */
     activityLocation?: EActivityLocation;
+    /**
+     * 
+     * @type {Array<EMusicGenres>}
+     * @memberof RegisterInputDto
+     */
+    musicGenres?: Array<EMusicGenres>;
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterInputDto
+     */
+    description?: string;
+    /**
+     * 
+     * @type {Date}
+     * @memberof RegisterInputDto
+     */
+    createdAt?: Date;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof RegisterInputDto
+     */
+    integrants?: { [key: string]: string; };
 }
 
 /**
@@ -73,6 +103,10 @@ export function RegisterInputDtoFromJSONTyped(json: any, ignoreDiscriminator: bo
         'nickname': json['nickname'] == null ? undefined : json['nickname'],
         'password': json['password'] == null ? undefined : json['password'],
         'activityLocation': json['activityLocation'] == null ? undefined : EActivityLocationFromJSON(json['activityLocation']),
+        'musicGenres': json['musicGenres'] == null ? undefined : ((json['musicGenres'] as Array<any>).map(EMusicGenresFromJSON)),
+        'description': json['description'] == null ? undefined : json['description'],
+        'createdAt': json['createdAt'] == null ? undefined : (new Date(json['createdAt'])),
+        'integrants': json['integrants'] == null ? undefined : json['integrants'],
     };
 }
 
@@ -86,6 +120,10 @@ export function RegisterInputDtoToJSON(value?: RegisterInputDto | null): any {
         'nickname': value['nickname'],
         'password': value['password'],
         'activityLocation': EActivityLocationToJSON(value['activityLocation']),
+        'musicGenres': value['musicGenres'] == null ? undefined : ((value['musicGenres'] as Array<any>).map(EMusicGenresToJSON)),
+        'description': value['description'],
+        'createdAt': value['createdAt'] == null ? undefined : ((value['createdAt'] as any).toISOString()),
+        'integrants': value['integrants'],
     };
 }
 

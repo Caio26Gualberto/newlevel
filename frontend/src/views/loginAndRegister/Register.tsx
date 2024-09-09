@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import ApiConfiguration from "../../apiConfig"
-import { AuthenticateApi, CommonApi, DisplayActivityLocationDto, EActivityLocation } from "../../gen/api/src"
+import { AuthenticateApi, CommonApi, EActivityLocation, SelectOptionDto } from "../../gen/api/src"
 import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Tooltip, Typography, Zoom } from "@mui/material";
 import Swal from "sweetalert2";
 import * as toastr from 'toastr';
@@ -13,7 +13,7 @@ interface IFormRegister {
     nickname: string,
     password: string,
     confirmPassword: string,
-    birthPlace: DisplayActivityLocationDto,
+    birthPlace: SelectOptionDto,
 }
 
 const Register = () => {
@@ -21,8 +21,8 @@ const Register = () => {
     const { isMobile } = useMobile()
     const authenticateService = new AuthenticateApi(ApiConfiguration)
     const commonService = new CommonApi(ApiConfiguration)
-    const [cities, setCities] = useState<DisplayActivityLocationDto[]>([])
-    const [selectedCity, setSelectedCity] = useState<DisplayActivityLocationDto>({ name: '', value: -1 })
+    const [cities, setCities] = useState<SelectOptionDto[]>([])
+    const [selectedCity, setSelectedCity] = useState<SelectOptionDto>({ name: '', value: -1 })
     const [formRegister, setFormRegister] = useState<IFormRegister>({
         email: '',
         nickname: '',
@@ -96,124 +96,187 @@ const Register = () => {
     }, [])
 
     return (
-        <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            width="100%"
-            bgcolor="#4F4F4F"
-            p={isMobile ? 2 : 4} // Ajusta o padding para dispositivos móveis
-        >
-            <Box display="flex" flexDirection={isMobile ? "column" : "row"} height="100vh">
-                <Grid
-                    container
-                    m={isMobile ? 0 : 10}
-                    bgcolor="white"
-                    borderRadius={2}
-                    spacing={2}
+        <>
+            {isMobile ? (
+                // Renderização para mobile
+                <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    width="100%"
+                    bgcolor="#4F4F4F"
+                    p={2} // Padding para mobile
                 >
-                    <Grid
-                        item
-                        xs={12}
-                        md={8}
-                        display="flex"
-                        justifyContent="center"
-                        alignItems="center"
-                        overflow="hidden"
-                        p={isMobile ? 1 : 0}
-                    >
-                        <img
-                            src={require('../../assets/slayer.gif')}
-                            alt="loading..."
-                            style={{
-                                width: isMobile ? "100%" : "auto",
-                                height: isMobile ? "auto" : "105%",
-                            }}
-                        />
-                    </Grid>
-                    <Grid
-                        item
-                        xs={12}
-                        md={4}
-                        display="flex"
-                        flexDirection="column"
-                        justifyContent="space-evenly"
-                        p={isMobile ? 1 : 2}
-                    >
-                        <Box display="flex" justifyContent="center">
-                            <Typography variant={isMobile ? "h5" : "h3"}>Registre-se</Typography>
-                        </Box>
-                        <Box>
-                            <Typography>*Alguma dúvida sobre o preenchimento?</Typography>
-                            <Typography>Repouse o mouse sobre qualquer título dos campos abaixo 😀</Typography>
-                        </Box>
-                        <Box>
-                            <Tooltip TransitionComponent={Zoom} title={<Typography>Seu email será usado como forma de login, posteriormente será utilizado para entrar no site</Typography>}>
-                                <InputLabel variant="standard"><Typography fontWeight="bold">Email:</Typography></InputLabel>
-                            </Tooltip>
-                            <TextField
-                                fullWidth
-                                type="email"
-                                placeholder="Email"
-                                onChange={(event) => setFormRegister({ ...formRegister, email: event.target.value })}
-                            />
-                        </Box>
-                        <Box>
-                            <Tooltip TransitionComponent={Zoom} title={<Typography>Seu apelido como era conhecido na época, seja punk, cabeludo ou qualquer outra coisa</Typography>}>
-                                <InputLabel variant="standard"><Typography fontWeight="bold">Apelido:</Typography></InputLabel>
-                            </Tooltip>
-                            <TextField
-                                fullWidth
-                                placeholder="Apelido"
-                                onChange={(event) => setFormRegister({ ...formRegister, nickname: event.target.value })}
-                            />
-                        </Box>
-                        <Box>
-                            <InputLabel variant="standard"><Typography fontWeight="bold">Senha:</Typography></InputLabel>
-                            <TextField
-                                fullWidth
-                                type="password"
-                                placeholder="Senha"
-                                onChange={(event) => setFormRegister({ ...formRegister, password: event.target.value })}
-                            />
-                        </Box>
-                        <Box>
-                            <InputLabel variant="standard"><Typography fontWeight="bold">Confirme a senha:</Typography></InputLabel>
-                            <TextField
-                                fullWidth
-                                type="password"
-                                placeholder="Confirme a senha"
-                                onChange={(event) => setFormRegister({ ...formRegister, confirmPassword: event.target.value })}
-                            />
-                        </Box>
-                        <Box>
-                            <Tooltip TransitionComponent={Zoom} title={<Typography>De onde era, ou cidade que costumava ser reconhecido</Typography>}>
-                                <InputLabel id="demo-simple-select-label"><Typography fontWeight="bold">Cidade:</Typography></InputLabel>
-                            </Tooltip>
-                            <FormControl fullWidth>
-                                <Select
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    value={selectedCity.value}
-                                    onChange={handleCityChange}
-                                >
-                                    {cities.map((city) => (
-                                        <MenuItem key={city.value} value={city.value}>{city.name}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Box>
-                        <Button
-                            onClick={registerAction}
-                            sx={{ backgroundColor: "#b81414", "&:hover": { backgroundColor: "white" }, color: "black", marginTop: isMobile ? 1 : 0 }}
+                    <Box display="flex" flexDirection="column" height="100vh">
+                        <Grid
+                            container
+                            m={0}
+                            bgcolor="white"
+                            borderRadius={2}
+                            spacing={2}
                         >
-                            <Typography fontWeight="bold" variant="overline">Cadastrar</Typography>
-                        </Button>
-                    </Grid>
-                </Grid>
-            </Box>
-        </Box>
+                            <Grid
+                                item
+                                xs={12}
+                                md={8}
+                                display="flex"
+                                justifyContent="center"
+                                alignItems="center"
+                                overflow="hidden"
+                                p={1}
+                            >
+                                <img
+                                    src={require('../../assets/slayer.gif')}
+                                    alt="loading..."
+                                    style={{
+                                        width: "100%",
+                                        height: "auto",
+                                    }}
+                                />
+                            </Grid>
+                            <Grid
+                                item
+                                xs={12}
+                                md={4}
+                                display="flex"
+                                flexDirection="column"
+                                justifyContent="space-evenly"
+                                p={1}
+                            >
+                                <Box display="flex" justifyContent="center">
+                                    <Typography variant="h5">Registre-se</Typography>
+                                </Box>
+                                <Box>
+                                    <Typography>*Alguma dúvida sobre o preenchimento?</Typography>
+                                    <Typography>Repouse o mouse sobre qualquer título dos campos abaixo 😀</Typography>
+                                </Box>
+                                <Box>
+                                    <Tooltip TransitionComponent={Zoom} title={<Typography>Seu email será usado como forma de login, posteriormente será utilizado para entrar no site</Typography>}>
+                                        <InputLabel variant="standard"><Typography fontWeight="bold">Email:</Typography></InputLabel>
+                                    </Tooltip>
+                                    <TextField
+                                        fullWidth
+                                        type="email"
+                                        placeholder="Email"
+                                        onChange={(event) => setFormRegister({ ...formRegister, email: event.target.value })}
+                                    />
+                                </Box>
+                                <Box>
+                                    <Tooltip TransitionComponent={Zoom} title={<Typography>Seu apelido como era conhecido na época, seja punk, cabeludo ou qualquer outra coisa</Typography>}>
+                                        <InputLabel variant="standard"><Typography fontWeight="bold">Apelido:</Typography></InputLabel>
+                                    </Tooltip>
+                                    <TextField
+                                        fullWidth
+                                        placeholder="Apelido"
+                                        onChange={(event) => setFormRegister({ ...formRegister, nickname: event.target.value })}
+                                    />
+                                </Box>
+                                <Box>
+                                    <InputLabel variant="standard"><Typography fontWeight="bold">Senha:</Typography></InputLabel>
+                                    <TextField
+                                        fullWidth
+                                        type="password"
+                                        placeholder="Senha"
+                                        onChange={(event) => setFormRegister({ ...formRegister, password: event.target.value })}
+                                    />
+                                </Box>
+                                <Box>
+                                    <InputLabel variant="standard"><Typography fontWeight="bold">Confirme a senha:</Typography></InputLabel>
+                                    <TextField
+                                        fullWidth
+                                        type="password"
+                                        placeholder="Confirme a senha"
+                                        onChange={(event) => setFormRegister({ ...formRegister, confirmPassword: event.target.value })}
+                                    />
+                                </Box>
+                                <Box>
+                                    <Tooltip TransitionComponent={Zoom} title={<Typography>De onde era, ou cidade que costumava ser reconhecido</Typography>}>
+                                        <InputLabel id="demo-simple-select-label"><Typography fontWeight="bold">Cidade:</Typography></InputLabel>
+                                    </Tooltip>
+                                    <FormControl fullWidth>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            value={selectedCity.value}
+                                            onChange={handleCityChange}
+                                        >
+                                            {cities.map((city) => (
+                                                <MenuItem key={city.value} value={city.value}>{city.name}</MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                </Box>
+                                <Button
+                                    onClick={registerAction}
+                                    sx={{ backgroundColor: "#b81414", "&:hover": { backgroundColor: "white" }, color: "black", marginTop: 1 }}
+                                >
+                                    <Typography fontWeight="bold" variant="overline">Cadastrar</Typography>
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </Box>
+                </Box>
+            ) : (
+                <Box display="flex" alignItems="center" justifyContent="center" width="100%" bgcolor="#4F4F4F">
+                    <Box display="flex" flex={1} height="100vh">
+                        <Grid container m={10} bgcolor="white" borderRadius={2}>
+                            <Grid item xs={8} overflow="hidden">
+                                <img src={require('../../assets/slayer.gif')} alt="loading..." style={{ height: "100%" }} />
+                            </Grid>
+                            <Grid pr={2} item xs={4} display="flex" flexDirection="column" justifyContent="space-evenly">
+                                <Box alignSelf="center" display="flex" justifyContent="center" flexDirection="column">
+                                    <Typography overflow="hidden" variant="h3">Registre-se</Typography>
+                                </Box>
+                                <Box>
+                                    <Typography>*Alguma dúvida sobre o preenchimento?</Typography>
+                                    <Typography>Repouse o mouse sobre qualquer título dos campos abaixo 😀</Typography>
+                                </Box>
+                                <Box>
+                                    <Tooltip TransitionComponent={Zoom} title={<Typography>Seu email será usado como forma de login, posteriormente será utilizado para entrar no site</Typography>}>
+                                        <InputLabel variant="standard"><Typography fontWeight="bold">Email:</Typography></InputLabel>
+                                    </Tooltip>
+                                    <TextField fullWidth type="email" placeholder="Email" onChange={(event) => setFormRegister({ ...formRegister, email: event.target.value })}></TextField>
+                                </Box>
+                                <Box>
+                                    <Tooltip TransitionComponent={Zoom} title={<Typography>Seu apelido como era conhecido na época, seja punk, cabeludo ou qualquer outra coisa</Typography>}>
+                                        <InputLabel variant="standard"><Typography fontWeight="bold">Apelido:</Typography></InputLabel>
+                                    </Tooltip>
+                                    <TextField fullWidth placeholder="Apelido" onChange={(event) => setFormRegister({ ...formRegister, nickname: event.target.value })}></TextField>
+                                </Box>
+                                <Box>
+                                    <InputLabel variant="standard"><Typography fontWeight="bold">Senha:</Typography></InputLabel>
+                                    <TextField fullWidth type="password" placeholder="Senha" onChange={(event) => setFormRegister({ ...formRegister, password: event.target.value })}></TextField>
+                                </Box>
+                                <Box>
+                                    <InputLabel variant="standard"><Typography fontWeight="bold">Confirme a senha:</Typography></InputLabel>
+                                    <TextField fullWidth type="password" placeholder="Confirme a senha" onChange={(event) => setFormRegister({ ...formRegister, confirmPassword: event.target.value })}></TextField>
+                                </Box>
+                                <Box>
+                                    <Tooltip TransitionComponent={Zoom} title={<Typography>De onde era, ou cidade que costumava ser reconhecido</Typography>}>
+                                        <InputLabel id="demo-simple-select-label"><Typography fontWeight="bold">Cidade:</Typography></InputLabel>
+                                    </Tooltip>
+                                    <FormControl fullWidth>
+                                        <Select
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
+                                            value={selectedCity.value}
+                                            onChange={handleCityChange}
+                                        >
+                                            {cities.map((city) => {
+                                                return <MenuItem key={city.value} value={city.value}>{city.name}</MenuItem>
+                                            })}
+                                        </Select>
+                                    </FormControl>
+                                </Box>
+                                <Button onClick={registerAction} sx={{ backgroundColor: "#b81414", "&:hover": { backgroundColor: "white" }, color: "black" }}><Typography fontWeight="bold" variant="overline">Cadastrar</Typography></Button>
+                            </Grid>
+                        </Grid>
+                    </Box>
+                </Box>
+            )}
+        </>
     );
+
 }
 
 export default Register

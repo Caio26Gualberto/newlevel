@@ -7,6 +7,7 @@ import * as toastr from 'toastr';
 import ModalPassword from "./modalResetPassword/ModalPassword";
 import { useAuth } from "../../AuthContext";
 import { useMobile } from "../../MobileContext";
+import ChoiceTypeUserModal from "./choiceTypeUserModal/ChoiceTypeUserModal";
 
 const style = {
   transform: 'translate(-50%, -50%)',
@@ -25,6 +26,7 @@ const Login = () => {
     password: ''
   });
   const [openModal, setOpenModal] = useState<boolean>(false);
+  const [openChoiceModal, setOpenChoiceModal] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -38,6 +40,10 @@ const Login = () => {
 
   const handleSetModal = () => {
     setOpenModal(!openModal);
+  }
+
+  const handleSetChoiceModal = () => {
+    setOpenChoiceModal(!openChoiceModal);
   }
 
   const login = async () => {
@@ -81,11 +87,11 @@ const Login = () => {
         rootElement.classList.remove('image-with-opacity');
       };
     }
-  }
-    , [])
+  }, [])
 
   return (
     <>
+      <ChoiceTypeUserModal open={openChoiceModal} onClose={handleSetChoiceModal} />
       <ModalPassword open={openModal} onClose={handleSetModal} />
       <Box>
         <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center"
@@ -103,7 +109,7 @@ const Login = () => {
             <Button onClick={login} sx={{ color: "white" }}>Entrar</Button>
           </Box>
           <Box>
-            <Typography color="white" fontSize={15}>Não tem uma conta? <Link to="/register" style={{ color: "white" }}>Registre-se</Link></Typography>
+            <Typography color="white" fontSize={15}>Não tem uma conta? <Link to="" onClick={handleSetChoiceModal} style={{ color: "white" }}>Registre-se</Link></Typography>
           </Box>
           <Box>
             <Typography color="white" fontSize={15}>Esqueceu sua senha? <Link to="" onClick={handleSetModal} style={{ color: "white" }}>Clique aqui!</Link></Typography>
