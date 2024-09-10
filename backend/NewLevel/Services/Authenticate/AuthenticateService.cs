@@ -111,8 +111,9 @@ namespace NewLevel.Services.Authenticate
 
             if (result.Succeeded)
             {
+                var userCreated = await _userManager.FindByEmailAsync(input.Email);
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                return new RegisterResponseDto { Result = true, Message = "Conta criada!" };
+                return new RegisterResponseDto { Result = true, Message = "Conta criada!", UserId = userCreated.Id };
             }
             else if (result.Errors.Any(e => errors.ContainsKey(e.Code)) && result.Errors.Count() == 1)
             {
@@ -140,33 +141,65 @@ namespace NewLevel.Services.Authenticate
                 { "PasswordRequiresUpper", "Senha requer letra maiúscula" }
             };
 
-            var artist = new Artist(input.Nickname, input.Description, isVerified: false, DateTime.UtcNow.AddHours(-3), (DateTime)input.CreatedAt, musicGenres: input.MusicGenres,
-                integrants: input.Integrants, isFirstTimeLogin: true, input.Nickname, avatar: null, input.ActivityLocation,
-                publicTimer: null, avatarUrl: null, input.Email);
-
-            artist.UserName = input.Email;
-            artist.Email = input.Email;
-
-            var result = await _userManager.CreateAsync(artist, input.Password);
-
-            if (result.Succeeded)
+            using (var transaction = await _newLevelDbContext.Database.BeginTransactionAsync())
             {
-                await _signInManager.SignInAsync(artist, isPersistent: false);
-                return new RegisterResponseDto { Result = true, Message = "Conta criada!" };
-            }
-            else if (result.Errors.Any(e => errors.ContainsKey(e.Code)) && result.Errors.Count() == 1)
-            {
-                var errorMessage = result.Errors.First();
-                return new RegisterResponseDto { Result = false, Message = errors[errorMessage.Code] };
-            }
-            else if (result.Errors.Any(e => errors.ContainsKey(e.Code)) && result.Errors.Count() > 1)
-            {
-                var errorMessages = result.Errors.Where(e => errors.ContainsKey(e.Code)).Select(e => errors[e.Code]);
-                var error = string.Join("\n - ", errorMessages);
-                return new RegisterResponseDto { Result = false, Message = error };
+                try
+                {
+                    var user = await Register(new RegisterInputDto
+                    {
+                        Email = input.Email,
+                        Nickname = input.Nickname,
+                        Password = input.Password,
+                        ActivityLocation = input.ActivityLocation
+                    });
+
+                    var band = new Band(
+                        input.Nickname,
+                        input.Description,
+                        isVerified: false,
+                        DateTime.UtcNow.AddHours(-3),
+                        (DateTime)input.CreatedAt,
+                        musicGenres: input.MusicGenres,
+                        integrants: input.Integrants,
+                        isFirstTimeLogin: true,
+                        input.Nickname,
+                        avatar: null,
+                        input.ActivityLocation,
+                        publicTimer: null,
+                        avatarUrl: null,
+                        input.Email
+                    );
+
+                    _newLevelDbContext.Bands.Add(band);
+
+                    await _newLevelDbContext.SaveChangesAsync();
+
+                    var bandUser = new BandsUsers
+                    {
+                        BandId = band.Id,
+                        UserId = user.UserId
+                    };
+
+                    _newLevelDbContext.BandsUsers.Add(bandUser);
+
+                    await _newLevelDbContext.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+
+                    return new RegisterResponseDto
+                    {
+                        Result = true,
+                        Message = "Banda registrada com sucesso"
+                    };
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+
+                    throw new Exception("Ocorreu um erro durante o registro da banda.", ex);
+                }
             }
 
-            return new RegisterResponseDto { Result = false, Message = "Erro ao registrar usuário" };
         }
 
         private string GenerateJwtToken(User user, IList<string> roles)

@@ -14,7 +14,8 @@ namespace NewLevel.Context
         public DbSet<Media> Medias { get; set; }
         public DbSet<Photo> Photos { get; set; }
         public DbSet<Comment> Comments { get; set; }
-        public DbSet<Artist> Artists { get; set; }
+        public DbSet<Band> Bands { get; set; }
+        public DbSet<BandsUsers> BandsUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -56,9 +57,6 @@ namespace NewLevel.Context
                 entity.ToTable("UserTokens");
             });
 
-            // Configura TPT (Table-per-Type) para Artist
-            builder.Entity<Artist>().ToTable("Artists");
-
             builder.Entity<User>()
                         .HasMany(u => u.Comments)
                         .WithOne(c => c.User)
@@ -77,6 +75,22 @@ namespace NewLevel.Context
                 .HasMany(p => p.Comments)
                 .WithOne(c => c.Photo)
                 .HasForeignKey(c => c.PhotoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configuração da tabela de junção
+            builder.Entity<BandsUsers>()
+                .HasKey(bu => new { bu.BandId, bu.UserId });
+
+            builder.Entity<BandsUsers>()
+                .HasOne(bu => bu.Band)
+                .WithMany(b => b.BandsUsers)
+                .HasForeignKey(bu => bu.BandId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<BandsUsers>()
+                .HasOne(bu => bu.User)
+                .WithMany(u => u.BandsUsers)
+                .HasForeignKey(bu => bu.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

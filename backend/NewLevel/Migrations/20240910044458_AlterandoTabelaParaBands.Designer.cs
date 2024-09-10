@@ -12,8 +12,8 @@ using NewLevel.Context;
 namespace NewLevel.Migrations
 {
     [DbContext(typeof(NewLevelDbContext))]
-    [Migration("20240516010000_AdicionandoColunaPublicTimerInPhoto")]
-    partial class AdicionandoColunaPublicTimerInPhoto
+    [Migration("20240910044458_AlterandoTabelaParaBands")]
+    partial class AlterandoTabelaParaBands
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -158,6 +158,99 @@ namespace NewLevel.Migrations
                     b.ToTable("UserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("NewLevel.Entities.Band", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IntegrantsSerialized")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MusicGenres")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Bands");
+                });
+
+            modelBuilder.Entity("NewLevel.Entities.BandsUsers", b =>
+                {
+                    b.Property<int>("BandId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("BandId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BandsUsers");
+                });
+
+            modelBuilder.Entity("NewLevel.Entities.Comment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("MediaId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PhotoId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MediaId");
+
+                    b.HasIndex("PhotoId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments");
+                });
+
             modelBuilder.Entity("NewLevel.Entities.Media", b =>
                 {
                     b.Property<int>("Id")
@@ -203,6 +296,9 @@ namespace NewLevel.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CaptureDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
 
@@ -215,6 +311,9 @@ namespace NewLevel.Migrations
 
                     b.Property<string>("KeyS3")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PrivateURL")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("PublicTimer")
@@ -250,6 +349,12 @@ namespace NewLevel.Migrations
                     b.Property<int>("ActivityLocation")
                         .HasColumnType("int");
 
+                    b.Property<string>("AvatarKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -263,6 +368,9 @@ namespace NewLevel.Migrations
 
                     b.Property<bool>("IsFirstTimeLogin")
                         .HasColumnType("bit");
+
+                    b.Property<string>("IssuesIdsSerialized")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -290,6 +398,9 @@ namespace NewLevel.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime?>("PublicTimer")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -365,6 +476,50 @@ namespace NewLevel.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NewLevel.Entities.BandsUsers", b =>
+                {
+                    b.HasOne("NewLevel.Entities.Band", "Band")
+                        .WithMany("BandsUsers")
+                        .HasForeignKey("BandId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("NewLevel.Entities.User", "User")
+                        .WithMany("BandsUsers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Band");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("NewLevel.Entities.Comment", b =>
+                {
+                    b.HasOne("NewLevel.Entities.Media", "Media")
+                        .WithMany("Comments")
+                        .HasForeignKey("MediaId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("NewLevel.Entities.Photo", "Photo")
+                        .WithMany("Comments")
+                        .HasForeignKey("PhotoId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("NewLevel.Entities.User", "User")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Media");
+
+                    b.Navigation("Photo");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("NewLevel.Entities.Media", b =>
                 {
                     b.HasOne("NewLevel.Entities.User", "User")
@@ -387,8 +542,27 @@ namespace NewLevel.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("NewLevel.Entities.Band", b =>
+                {
+                    b.Navigation("BandsUsers");
+                });
+
+            modelBuilder.Entity("NewLevel.Entities.Media", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("NewLevel.Entities.Photo", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
             modelBuilder.Entity("NewLevel.Entities.User", b =>
                 {
+                    b.Navigation("BandsUsers");
+
+                    b.Navigation("Comments");
+
                     b.Navigation("Medias");
 
                     b.Navigation("Photos");

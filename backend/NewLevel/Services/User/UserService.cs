@@ -204,7 +204,9 @@ namespace NewLevel.Services.UserService
             if (searchedUser == null)
                 throw new Exception("Não foi possivel encontrar o usuário selecionado");
 
-            var searchedArtist = await _newLevelDbContext.Artists.FirstOrDefaultAsync(x => x.Id == userId);
+            var searchedArtist = await _newLevelDbContext.Bands
+                .FirstOrDefaultAsync(band => band.BandsUsers.Any(user => user.UserId == userId));
+
 
             return new ProfileInfoDto
             {
