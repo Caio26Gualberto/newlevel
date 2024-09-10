@@ -1,5 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
+export * from './ArtistDto';
 export * from './BooleanNewLevelResponse';
 export * from './CommentsListDto';
 export * from './CommentsPhotoResponseDto';
@@ -21,6 +22,8 @@ export * from './Pagination';
 export * from './PhotoResponseDto';
 export * from './PhotoResponseDtoGenericList';
 export * from './PhotoResponseDtoGenericListNewLevelResponse';
+export * from './ProfileInfoDto';
+export * from './ProfileInfoDtoNewLevelResponse';
 export * from './ReceiveCommentDto';
 export * from './RegisterInputDto';
 export * from './RegisterResponseDto';

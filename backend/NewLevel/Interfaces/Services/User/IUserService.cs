@@ -12,6 +12,7 @@ namespace NewLevel.Interfaces.Services.User
         public Task<bool> UploadAvatarImage(UploadAvatarImageInput input);
         public Task<bool> UpdateUser(UpdateUserInput input);
         Task<bool> ResetPassword(ResetPasswordInput input);
+        Task<ProfileInfoDto> GetProfile(string nickname, string userId);
 
     }
 }

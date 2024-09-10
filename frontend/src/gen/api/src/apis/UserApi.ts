@@ -17,6 +17,7 @@ import * as runtime from '../runtime';
 import type {
   BooleanNewLevelResponse,
   EActivityLocation,
+  ProfileInfoDtoNewLevelResponse,
   ResetPasswordInput,
   StringNewLevelResponse,
   UserInfoResponseDtoNewLevelResponse,
@@ -26,6 +27,8 @@ import {
     BooleanNewLevelResponseToJSON,
     EActivityLocationFromJSON,
     EActivityLocationToJSON,
+    ProfileInfoDtoNewLevelResponseFromJSON,
+    ProfileInfoDtoNewLevelResponseToJSON,
     ResetPasswordInputFromJSON,
     ResetPasswordInputToJSON,
     StringNewLevelResponseFromJSON,
@@ -36,6 +39,11 @@ import {
 
 export interface ApiUserGenerateTokenToResetPasswordByEmailPostRequest {
     email?: string;
+}
+
+export interface ApiUserGetProfileGetRequest {
+    nickname?: string;
+    userId?: string;
 }
 
 export interface ApiUserResetPasswordPostRequest {
@@ -159,6 +167,46 @@ export class UserApi extends runtime.BaseAPI {
      */
     async apiUserGenerateTokenToResetPasswordPost(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<StringNewLevelResponse> {
         const response = await this.apiUserGenerateTokenToResetPasswordPostRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiUserGetProfileGetRaw(requestParameters: ApiUserGetProfileGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ProfileInfoDtoNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['nickname'] != null) {
+            queryParameters['nickname'] = requestParameters['nickname'];
+        }
+
+        if (requestParameters['userId'] != null) {
+            queryParameters['userId'] = requestParameters['userId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/User/GetProfile`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ProfileInfoDtoNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiUserGetProfileGet(requestParameters: ApiUserGetProfileGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ProfileInfoDtoNewLevelResponse> {
+        const response = await this.apiUserGetProfileGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

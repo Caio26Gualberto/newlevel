@@ -24,9 +24,9 @@ namespace NewLevel.Entities
         public DateTime? PublicTimer { get; private set; }
         [NotMapped]
         public Dictionary<string, string>? IssuesIds { get; private set; }
-        public string IssuesIdsSerialized
+        public string? IssuesIdsSerialized
         {
-            get => JsonConvert.SerializeObject(IssuesIds);
+            get => JsonConvert.SerializeObject(IssuesIds) ?? null;
             set => IssuesIds = JsonConvert.DeserializeObject<Dictionary<string, string>>(value);
         }
 

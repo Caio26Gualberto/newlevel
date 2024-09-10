@@ -31,6 +31,12 @@ export interface UserInfoResponseDto {
      * @type {string}
      * @memberof UserInfoResponseDto
      */
+    id?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserInfoResponseDto
+     */
     email?: string;
     /**
      * 
@@ -75,6 +81,7 @@ export function UserInfoResponseDtoFromJSONTyped(json: any, ignoreDiscriminator:
     }
     return {
         
+        'id': json['id'] == null ? undefined : json['id'],
         'email': json['email'] == null ? undefined : json['email'],
         'nickname': json['nickname'] == null ? undefined : json['nickname'],
         'password': json['password'] == null ? undefined : json['password'],
@@ -89,6 +96,7 @@ export function UserInfoResponseDtoToJSON(value?: UserInfoResponseDto | null): a
     }
     return {
         
+        'id': value['id'],
         'email': value['email'],
         'nickname': value['nickname'],
         'password': value['password'],

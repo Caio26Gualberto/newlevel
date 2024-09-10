@@ -157,5 +157,28 @@ namespace NewLevel.Controllers
                 });
             }
         }
+
+        [HttpGet("GetProfile")]
+        public async Task<ActionResult<NewLevelResponse<ProfileInfoDto>>> GetProfile(string nickname, string userId)
+        {
+            try
+            {
+                var dto = await _userService.GetProfile(nickname, userId);
+                return Ok(new NewLevelResponse<ProfileInfoDto>
+                {
+                    IsSuccess = true,
+                    Message = "Senha alterada com sucesso!",
+                    Data = dto
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<ProfileInfoDto>
+                {
+                    Message = ex.Message,
+                    IsSuccess = false
+                });
+            }
+        }
     }
 }

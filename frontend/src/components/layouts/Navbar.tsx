@@ -49,6 +49,7 @@ const Navbar = () => {
     const { isMobile } = useMobile()
     const [showNavbar, setShowNavbar] = useState<boolean>(false)
     const [profileSrc, setProfileSrc] = useState({
+        userId: "",
         profilePicture: "",
         nickname: ""
     })
@@ -124,7 +125,7 @@ const Navbar = () => {
     const getAvatarToNavbar = async () => {
         const result = await userService.apiUserGetUserInfoGet()
         if (result.isSuccess) {
-            setProfileSrc({ profilePicture: result.data!.profilePicture!, nickname: result.data!.nickname! })
+            setProfileSrc({ userId: result.data?.id!, profilePicture: result.data!.profilePicture!, nickname: result.data!.nickname! })
         } else {
             toastr.error(result.message!, 'Erro!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
         }
@@ -190,7 +191,7 @@ const Navbar = () => {
                                     <StyledLink to="/podcasts"><ListItem button>Podcasts</ListItem></StyledLink>
                                     <StyledLink to="/aboutMe"><ListItem button>Sobre mim</ListItem></StyledLink>
                                     <StyledLink to="/myAccount"><ListItem>Minha Conta</ListItem></StyledLink>
-                                    <StyledLink to="/profile"><ListItem>Minha Conta</ListItem></StyledLink>
+                                    <StyledLink to="/profile"><ListItem>Meu Perfil</ListItem></StyledLink>
                                     <StyledLink to="/partnerStore"><ListItem>Loja Parceira</ListItem></StyledLink>
                                     {isAdmin() && <StyledLinkForAdmin sx={{ color: "white" }} onClick={handleCloseAvatar} to="/acceptContent"><MenuItem>Pedidos (Admin)</MenuItem></StyledLinkForAdmin>}
                                     <StyledLink to="/" onClick={() => { handleCloseAvatar(); logout(); }}><ListItem>Sair</ListItem></StyledLink>
@@ -265,7 +266,7 @@ const Navbar = () => {
                                 }}
                             >
                                 <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myAccount"><MenuItem>Minha Conta</MenuItem></StyledLink>
-                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/profile"><MenuItem>Meu Perfil</MenuItem></StyledLink>
+                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to={`/profile/${profileSrc.nickname}/${profileSrc.userId}`}><MenuItem>Meu Perfil</MenuItem></StyledLink>
                                 <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myVideos"><MenuItem>Meus Vídeos</MenuItem></StyledLink>
                                 <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myPhotos"><MenuItem>Minhas Fotos</MenuItem></StyledLink>
                                 <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/issueReport"><MenuItem>Reportar Problema</MenuItem></StyledLink>

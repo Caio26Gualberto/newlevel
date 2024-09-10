@@ -8,6 +8,7 @@ using NewLevel.Interfaces.Services.Email;
 using NewLevel.Interfaces.Services.Photo;
 using NewLevel.Interfaces.Services.User;
 using NewLevel.Services.AmazonS3;
+using System.ComponentModel.DataAnnotations;
 
 namespace NewLevel.Services.UserService
 {
@@ -47,8 +48,8 @@ namespace NewLevel.Services.UserService
 
             return new UserInfoResponseDto
             {
+                Id = user.Id,
                 Nickname = user.Nickname,
-                ActivityLocation = user.ActivityLocation,
                 Email = user.Email,
                 Password = user.PasswordHash,
                 ProfilePicture = await GetOrSetAvatarURL(user)
@@ -195,5 +196,35 @@ namespace NewLevel.Services.UserService
             return false;
         }
 
+        public async Task<ProfileInfoDto> GetProfile(string nickname, string userId)
+        {
+            var searchedUser = await _userManager.FindByIdAsync(userId);
+            var user = await _utils.GetUserAsync();
+
+            if (searchedUser == null)
+                throw new Exception("Não foi possivel encontrar o usuário selecionado");
+
+            var searchedArtist = await _newLevelDbContext.Artists.FirstOrDefaultAsync(x => x.Id == userId);
+
+            return new ProfileInfoDto
+            {
+                Name = searchedUser.Nickname,
+                CityName = searchedUser.ActivityLocation.GetType()
+                    .GetMember(searchedUser.ActivityLocation.ToString())[0]
+                    .GetCustomAttributes(typeof(DisplayAttribute), false)
+                    .Cast<DisplayAttribute>()
+                    .FirstOrDefault()?.Name ?? searchedUser.ActivityLocation.ToString(),
+                AvatarUrl = searchedUser.AvatarUrl,
+                IsEnabledToEdit = user.Id == searchedUser.Id,
+                Artist = searchedArtist == null ? null : new ArtistDto
+                {
+                    CreatedAt = searchedArtist.CreatedAt,
+                    Description = searchedArtist.Description,
+                    IsVerified = searchedArtist.IsVerified,
+                    MusicGenres = searchedArtist.MusicGenres,
+                    Integrants = searchedArtist.Integrants
+                }
+            };
+        }
     }
 }

@@ -39,7 +39,7 @@ const Rotas = () => {
             <Route path="/myVideos" element={<MyVideos />} />
             <Route path="/myPhotos" element={<MyPhotos />} />
             <Route path="/myAccount" element={<MyProfile />} />
-            <Route path="/profile/:nickname" element={<Profile />} />
+            <Route path="/profile/:nickname/:id" element={<Profile />} />
             <Route path="/security/resetPassword" element={<ResetPassword />} />
             <Route path="/newAvatar" element={<ChooseUserAvatar />} />
             <Route path="/acceptContent" element={<Request />} />
