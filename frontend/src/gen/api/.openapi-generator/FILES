@@ -11,7 +11,7 @@ src/apis/PhotoApi.ts
 src/apis/UserApi.ts
 src/apis/index.ts
 src/index.ts
-src/models/ArtistDto.ts
+src/models/BandDto.ts
 src/models/BooleanNewLevelResponse.ts
 src/models/CommentsListDto.ts
 src/models/CommentsPhotoResponseDto.ts
@@ -20,6 +20,7 @@ src/models/CreateGitIssueInput.ts
 src/models/EActivityLocation.ts
 src/models/EGitLabels.ts
 src/models/EMusicGenres.ts
+src/models/IntegrantInfoDto.ts
 src/models/LoginInputDto.ts
 src/models/LoginResponseDto.ts
 src/models/LoginResponseDtoNewLevelResponse.ts
@@ -41,6 +42,8 @@ src/models/RegisterResponseDto.ts
 src/models/RegisterResponseDtoNewLevelResponse.ts
 src/models/RequestMediaDto.ts
 src/models/ResetPasswordInput.ts
+src/models/SearchBarUserDetailDto.ts
+src/models/SearchBarUserDetailDtoListNewLevelResponse.ts
 src/models/SelectOptionDto.ts
 src/models/SelectOptionDtoListNewLevelResponse.ts
 src/models/StringNewLevelResponse.ts

@@ -19,57 +19,69 @@ import {
     EMusicGenresFromJSONTyped,
     EMusicGenresToJSON,
 } from './EMusicGenres';
+import type { IntegrantInfoDto } from './IntegrantInfoDto';
+import {
+    IntegrantInfoDtoFromJSON,
+    IntegrantInfoDtoFromJSONTyped,
+    IntegrantInfoDtoToJSON,
+} from './IntegrantInfoDto';
 
 /**
  * 
  * @export
- * @interface ArtistDto
+ * @interface BandDto
  */
-export interface ArtistDto {
+export interface BandDto {
     /**
      * 
      * @type {string}
-     * @memberof ArtistDto
+     * @memberof BandDto
      */
     description?: string;
     /**
      * 
      * @type {boolean}
-     * @memberof ArtistDto
+     * @memberof BandDto
      */
     isVerified?: boolean;
     /**
      * 
      * @type {Date}
-     * @memberof ArtistDto
+     * @memberof BandDto
      */
     createdAt?: Date;
     /**
      * 
      * @type {Array<EMusicGenres>}
-     * @memberof ArtistDto
+     * @memberof BandDto
      */
     musicGenres?: Array<EMusicGenres>;
     /**
      * 
      * @type {{ [key: string]: string; }}
-     * @memberof ArtistDto
+     * @memberof BandDto
      */
     integrants?: { [key: string]: string; };
+    /**
+     * 
+     * @type {Array<IntegrantInfoDto>}
+     * @memberof BandDto
+     */
+    integrantsWithUrl?: Array<IntegrantInfoDto>;
 }
 
 /**
- * Check if a given object implements the ArtistDto interface.
+ * Check if a given object implements the BandDto interface.
  */
-export function instanceOfArtistDto(value: object): boolean {
+export function instanceOfBandDto(value: object): boolean {
     return true;
 }
 
-export function ArtistDtoFromJSON(json: any): ArtistDto {
-    return ArtistDtoFromJSONTyped(json, false);
+export function BandDtoFromJSON(json: any): BandDto {
+    return BandDtoFromJSONTyped(json, false);
 }
 
-export function ArtistDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): ArtistDto {
+export function BandDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): BandDto {
     if (json == null) {
         return json;
     }
@@ -80,10 +92,11 @@ export function ArtistDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         'createdAt': json['createdAt'] == null ? undefined : (new Date(json['createdAt'])),
         'musicGenres': json['musicGenres'] == null ? undefined : ((json['musicGenres'] as Array<any>).map(EMusicGenresFromJSON)),
         'integrants': json['integrants'] == null ? undefined : json['integrants'],
+        'integrantsWithUrl': json['integrantsWithUrl'] == null ? undefined : ((json['integrantsWithUrl'] as Array<any>).map(IntegrantInfoDtoFromJSON)),
     };
 }
 
-export function ArtistDtoToJSON(value?: ArtistDto | null): any {
+export function BandDtoToJSON(value?: BandDto | null): any {
     if (value == null) {
         return value;
     }
@@ -94,6 +107,7 @@ export function ArtistDtoToJSON(value?: ArtistDto | null): any {
         'createdAt': value['createdAt'] == null ? undefined : ((value['createdAt']).toISOString()),
         'musicGenres': value['musicGenres'] == null ? undefined : ((value['musicGenres'] as Array<any>).map(EMusicGenresToJSON)),
         'integrants': value['integrants'],
+        'integrantsWithUrl': value['integrantsWithUrl'] == null ? undefined : ((value['integrantsWithUrl'] as Array<any>).map(IntegrantInfoDtoToJSON)),
     };
 }
 

@@ -1,15 +1,16 @@
-import { Avatar, Box, Drawer, Grid, IconButton, List, ListItem, Menu, MenuItem, styled, useMediaQuery, useTheme } from "@mui/material"
+import { Avatar, Badge, Box, Drawer, Grid, IconButton, List, ListItem, Menu, MenuItem, styled, useMediaQuery, useTheme } from "@mui/material"
 import { useEffect, useState } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
-import Logo from "../../assets/128982_logo.png"
+import Logo from "../../../assets/128982_logo.png"
 import React from "react";
-import { useAuth } from "../../AuthContext";
-import { AuthenticateApi, UserApi } from "../../gen/api/src";
-import ApiConfiguration from "../../apiConfig";
+import { useAuth } from "../../../AuthContext";
+import { AuthenticateApi, UserApi } from "../../../gen/api/src";
+import ApiConfiguration from "../../../apiConfig";
 import * as toastr from 'toastr';
-import { profile } from "console";
 import MenuIcon from '@mui/icons-material/Menu';
-import { useMobile } from "../../MobileContext";
+import { useMobile } from "../../../MobileContext";
+import MailIcon from '@mui/icons-material/Mail';
+import InviteIntegrantsModal from "./InviteIntegrantsModal/InviteIntegrantsModal";
 
 const StyledLink = styled(Link)`
   text-decoration: none;
@@ -45,14 +46,23 @@ const Navbar = () => {
     const userService = new UserApi(ApiConfiguration)
     const navigate = useNavigate();
     const location = useLocation()
-    const { isAdmin } = useAuth()
+    const { isAdmin, isBand } = useAuth()
     const { isMobile } = useMobile()
     const [showNavbar, setShowNavbar] = useState<boolean>(false)
+    const [openIntegrantsInvite, setOpenIntegrantsInvite] = useState<boolean>(false)
     const [profileSrc, setProfileSrc] = useState({
         userId: "",
         profilePicture: "",
         nickname: ""
     })
+    
+    const handleClickOpen = () => { 
+        setOpenIntegrantsInvite(true);
+    }
+
+    const handleClickClose = () => { 
+        setOpenIntegrantsInvite(false);
+    }
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [anchorElAvatar, setAnchorElAvatar] = React.useState<null | HTMLElement>(null);
@@ -148,6 +158,7 @@ const Navbar = () => {
     return (
         <>{showNavbar &&
             <>
+            <InviteIntegrantsModal onClose={handleClickClose} open={openIntegrantsInvite} title="Convide Membros"/>
                 {isMobile ? (
                     <>
                         <Box
@@ -254,6 +265,11 @@ const Navbar = () => {
                                 </Grid>
                             </Grid>
                         </Box>
+                        <Box sx={{ cursor: "pointer", mr: 1}}>
+                            <Badge badgeContent={4} sx={{color: "yellow"}}>
+                                <MailIcon color="primary" />
+                            </Badge>
+                        </Box>
                         <Box pr={2} pl={2} sx={{ cursor: "pointer" }}>
                             {rederizeAvatar()}
                             <Menu
@@ -269,6 +285,7 @@ const Navbar = () => {
                                 <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to={`/profile/${profileSrc.nickname}/${profileSrc.userId}`}><MenuItem>Meu Perfil</MenuItem></StyledLink>
                                 <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myVideos"><MenuItem>Meus Vídeos</MenuItem></StyledLink>
                                 <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myPhotos"><MenuItem>Minhas Fotos</MenuItem></StyledLink>
+                                {isBand() && <StyledMenu onClick={() => { handleCloseAvatar(); handleClickOpen(); }}>Integrantes</StyledMenu>}
                                 <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/issueReport"><MenuItem>Reportar Problema</MenuItem></StyledLink>
                                 {isAdmin() && <StyledLinkForAdmin sx={{ color: "pink" }} onClick={handleCloseAvatar} to="/acceptContent"><MenuItem>Pedidos (Admin)</MenuItem></StyledLinkForAdmin>}
                                 <StyledMenu onClick={() => { handleCloseAvatar(); logout(); }}>Sair</StyledMenu>

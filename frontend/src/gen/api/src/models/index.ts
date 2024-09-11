@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './ArtistDto';
+export * from './BandDto';
 export * from './BooleanNewLevelResponse';
 export * from './CommentsListDto';
 export * from './CommentsPhotoResponseDto';
@@ -9,6 +9,7 @@ export * from './CreateGitIssueInput';
 export * from './EActivityLocation';
 export * from './EGitLabels';
 export * from './EMusicGenres';
+export * from './IntegrantInfoDto';
 export * from './LoginInputDto';
 export * from './LoginResponseDto';
 export * from './LoginResponseDtoNewLevelResponse';
@@ -30,6 +31,8 @@ export * from './RegisterResponseDto';
 export * from './RegisterResponseDtoNewLevelResponse';
 export * from './RequestMediaDto';
 export * from './ResetPasswordInput';
+export * from './SearchBarUserDetailDto';
+export * from './SearchBarUserDetailDtoListNewLevelResponse';
 export * from './SelectOptionDto';
 export * from './SelectOptionDtoListNewLevelResponse';
 export * from './StringNewLevelResponse';

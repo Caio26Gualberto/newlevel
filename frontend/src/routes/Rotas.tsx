@@ -3,7 +3,7 @@ import Login from '../views/loginAndRegister/Login';
 import Register from '../views/loginAndRegister/Register';
 import Apresentation from '../views/apresentation/Apresentation';
 import Videos from '../views/videos/Videos';
-import Navbar from '../components/layouts/Navbar';
+import Navbar from '../components/layouts/navbar/Navbar';
 import Photos from '../views/photos/Photos';
 import Podcast from '../views/podcast/Podcast';
 import AboutMe from '../views/aboutMe/AboutMe';

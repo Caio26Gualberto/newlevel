@@ -12,13 +12,14 @@ namespace NewLevel.Entities
         {
                 
         }
-        public User(bool isFirstTimeLogin, string nickName, string? avatar, EActivityLocation activityLocation, DateTime? publicTimer, string avatarUrl)
+        public User(bool isFirstTimeLogin, string nickName, string? avatar, EActivityLocation activityLocation, DateTime? publicTimer, string avatarUrl, string? instrument = "")
         {
-            ValidateDomainEntity(isFirstTimeLogin, nickName, avatar, activityLocation, publicTimer, avatarUrl, null);
+            ValidateDomainEntity(isFirstTimeLogin, nickName, avatar, activityLocation, publicTimer, avatarUrl, null, instrument);
         }
         public string Nickname { get; private set; }
         public string? AvatarKey { get; private set; }
         public string? AvatarUrl { get; private set; }
+        public string? Instrument { get; private set; }
         public EActivityLocation ActivityLocation { get; private set; }
         public bool IsFirstTimeLogin { get; private set; }
         public DateTime? PublicTimer { get; private set; }
@@ -39,13 +40,13 @@ namespace NewLevel.Entities
         public List<Photo> Photos { get; private set; }
         public List<Comment> Comments { get; set; } 
 
-        public void Update(bool? isFirstTimeLogin, string nickName, string? avatarKey, EActivityLocation activityLocation, DateTime? publicTimer, string avatarUrl, string? email)
+        public void Update(bool? isFirstTimeLogin, string nickName, string? avatarKey, EActivityLocation activityLocation, DateTime? publicTimer, string avatarUrl, string? email, string? instrument = "")
         {
-            ValidateDomainEntity(isFirstTimeLogin, nickName, avatarKey, activityLocation, publicTimer, avatarUrl, email);
+            ValidateDomainEntity(isFirstTimeLogin, nickName, avatarKey, activityLocation, publicTimer, avatarUrl, email, instrument);
         }
 
         private void ValidateDomainEntity(bool? isFirstTimeLogin, string nickName, string? avatarKey, EActivityLocation activityLocation, DateTime? publicTimer,
-            string avatarUrl, string? email)
+            string avatarUrl, string? email, string? instrument)
         {
             DomainExceptionValidation.When(string.IsNullOrWhiteSpace(nickName), "Apelido inválido. Apelido é necessário!");  
             DomainExceptionValidation.When(email != null && !email.Contains("@"), "Email inválido, valide o mesmo");

@@ -13,6 +13,7 @@ namespace NewLevel.Interfaces.Services.User
         public Task<bool> UpdateUser(UpdateUserInput input);
         Task<bool> ResetPassword(ResetPasswordInput input);
         Task<ProfileInfoDto> GetProfile(string nickname, string userId);
+        Task<List<SearchBarUserDetailDto>> GetUsersForSearchBar(string nickname);
 
     }
 }

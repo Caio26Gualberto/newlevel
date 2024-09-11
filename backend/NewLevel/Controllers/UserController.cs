@@ -180,5 +180,26 @@ namespace NewLevel.Controllers
                 });
             }
         }
+
+        [HttpGet("GetUsersForSearchBar")]
+        public async Task<ActionResult<NewLevelResponse<List<SearchBarUserDetailDto>>>> GetUsersForSearchBar(string searchTerm)
+        {
+            try
+            {
+                var dto = await _userService.GetUsersForSearchBar(searchTerm);
+                return Ok(new NewLevelResponse<List<SearchBarUserDetailDto>>
+                {
+                    Data = dto
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<ProfileInfoDto>
+                {
+                    Message = ex.Message,
+                    IsSuccess = false
+                });
+            }
+        }
     }
 }

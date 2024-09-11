@@ -31,6 +31,12 @@ export interface RegisterResponseDto {
      * @memberof RegisterResponseDto
      */
     message?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RegisterResponseDto
+     */
+    userId?: string;
 }
 
 /**
@@ -52,6 +58,7 @@ export function RegisterResponseDtoFromJSONTyped(json: any, ignoreDiscriminator:
         
         'result': json['result'] == null ? undefined : json['result'],
         'message': json['message'] == null ? undefined : json['message'],
+        'userId': json['userId'] == null ? undefined : json['userId'],
     };
 }
 
@@ -63,6 +70,7 @@ export function RegisterResponseDtoToJSON(value?: RegisterResponseDto | null): a
         
         'result': value['result'],
         'message': value['message'],
+        'userId': value['userId'],
     };
 }
 

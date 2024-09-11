@@ -13,6 +13,7 @@ interface JwtPayload {
 interface AuthContextType {
   token: string | null;
   isAdmin: () => boolean;
+  isBand: () => boolean;
   setToken: (token: string) => void;
 }
 
@@ -45,8 +46,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return false;
   };
 
+  const isBand = (): boolean => {
+    if (token) {
+      try {
+        const decodedToken = jwtDecode<JwtPayload>(token);
+        return decodedToken.role === 'Band';
+      } catch (error) {
+        console.error('Erro ao decodificar o token', error);
+        return false;
+      }
+    }
+    return false;
+  };
+
   return (
-    <AuthContext.Provider value={{ token, isAdmin, setToken }}>
+    <AuthContext.Provider value={{ token, isAdmin, isBand, setToken }}>
       {children}
     </AuthContext.Provider>
   );

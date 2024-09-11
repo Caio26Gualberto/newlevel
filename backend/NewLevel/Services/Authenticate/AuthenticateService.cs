@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using NewLevel.Context;
 using NewLevel.Dtos.Authenticate;
@@ -34,6 +35,12 @@ namespace NewLevel.Services.Authenticate
         public async Task<TokensDto> GenerateNewAccessToken(string accessToken)
         {
             var user = await _utils.GetUserAsync();
+            var band = await _newLevelDbContext.BandsUsers
+                        .Include(bu => bu.Band)
+                        .Where(bu => bu.UserId == user.Id)
+                        .Select(bu => bu.Band)
+                        .FirstOrDefaultAsync();
+
 
             if (user == null)
             {
@@ -43,6 +50,9 @@ namespace NewLevel.Services.Authenticate
             var refreshToken = await _userManager.GetAuthenticationTokenAsync(user, loginProvider: "email", tokenName: "refresh_token");
             var result = await _userManager.VerifyUserTokenAsync(user, tokenProvider: "local", purpose: "email", refreshToken);
             var roles = await _userManager.GetRolesAsync(user);
+
+            if (band != null && band.IsVerified)
+                roles.Add("Band");
 
             if (result)
             {
@@ -63,7 +73,12 @@ namespace NewLevel.Services.Authenticate
             if (result.Succeeded)
             {
                 var user = await _signInManager.UserManager.FindByEmailAsync(email);
+                var band = await _newLevelDbContext.BandsUsers.Include(bu => bu.Band).Where(bu => bu.UserId == user.Id).Select(bu => bu.Band).FirstOrDefaultAsync();
                 var roles = await _userManager.GetRolesAsync(user);
+
+                if (band != null && band.IsVerified)
+                    roles.Add("Band");
+
                 var tokenString = GenerateJwtToken(user, roles);
 
                 user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatarKey: user.AvatarKey,
@@ -212,7 +227,8 @@ namespace NewLevel.Services.Authenticate
                 Subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim("userId", user.Id),
-                    roles.Contains("Admin") ? new Claim(ClaimTypes.Role, "Admin") : null
+                    roles.Contains("Admin") ? new Claim(ClaimTypes.Role, "Admin") : null,
+                    roles.Contains("Band") ? new Claim(ClaimTypes.Role, "Band") : null
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(10),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

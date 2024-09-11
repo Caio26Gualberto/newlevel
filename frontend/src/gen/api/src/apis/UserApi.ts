@@ -19,6 +19,7 @@ import type {
   EActivityLocation,
   ProfileInfoDtoNewLevelResponse,
   ResetPasswordInput,
+  SearchBarUserDetailDtoListNewLevelResponse,
   StringNewLevelResponse,
   UserInfoResponseDtoNewLevelResponse,
 } from '../models/index';
@@ -31,6 +32,8 @@ import {
     ProfileInfoDtoNewLevelResponseToJSON,
     ResetPasswordInputFromJSON,
     ResetPasswordInputToJSON,
+    SearchBarUserDetailDtoListNewLevelResponseFromJSON,
+    SearchBarUserDetailDtoListNewLevelResponseToJSON,
     StringNewLevelResponseFromJSON,
     StringNewLevelResponseToJSON,
     UserInfoResponseDtoNewLevelResponseFromJSON,
@@ -44,6 +47,10 @@ export interface ApiUserGenerateTokenToResetPasswordByEmailPostRequest {
 export interface ApiUserGetProfileGetRequest {
     nickname?: string;
     userId?: string;
+}
+
+export interface ApiUserGetUsersForSearchBarGetRequest {
+    searchTerm?: string;
 }
 
 export interface ApiUserResetPasswordPostRequest {
@@ -239,6 +246,42 @@ export class UserApi extends runtime.BaseAPI {
      */
     async apiUserGetUserInfoGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserInfoResponseDtoNewLevelResponse> {
         const response = await this.apiUserGetUserInfoGetRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiUserGetUsersForSearchBarGetRaw(requestParameters: ApiUserGetUsersForSearchBarGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SearchBarUserDetailDtoListNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['searchTerm'] != null) {
+            queryParameters['searchTerm'] = requestParameters['searchTerm'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/User/GetUsersForSearchBar`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SearchBarUserDetailDtoListNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiUserGetUsersForSearchBarGet(requestParameters: ApiUserGetUsersForSearchBarGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SearchBarUserDetailDtoListNewLevelResponse> {
+        const response = await this.apiUserGetUsersForSearchBarGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

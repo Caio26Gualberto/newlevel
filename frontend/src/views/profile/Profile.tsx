@@ -16,7 +16,7 @@ const Profile = () => {
   const { nickname, id } = useParams();
   const [loading, setLoading] = React.useState<boolean>(false);
   const [showIntegrants, setShowIntegrants] = React.useState<boolean>(false);
-  const [data, setData] = React.useState<ProfileInfoDto>({ artist: undefined, cityName: "", avatarUrl: "", name: "" });
+  const [data, setData] = React.useState<ProfileInfoDto>({ band: undefined, cityName: "", avatarUrl: "", name: "" });
 
   const handleClickOpen = () => {
     setShowIntegrants(true);
@@ -52,14 +52,21 @@ const Profile = () => {
 
   const renderizeSecondaryInfos = (): JSX.Element | null => {
     debugger
-    if (data.artist) {
+    if (data.band && (!data.band.integrantsWithUrl || data.band.integrantsWithUrl.length === 0)) {
       return (
         <Box>
           <Button onClick={handleClickOpen} variant='contained' color='warning'>Ver Integrantes</Button>
-          <IntegrantsDialog data={data.artist.integrants!} onClose={handleClose} open={showIntegrants} title='Integrantes' />
+          <IntegrantsDialog data={data.band.integrants!} onClose={handleClose} open={showIntegrants} title='Integrantes' />
         </Box>
       );
-    } else if (!data.artist) {
+    }else if (data.band && data.band.integrantsWithUrl && data.band.integrantsWithUrl.length > 0) {
+      return (
+        <Box>
+          <Button onClick={handleClickOpen} variant='contained' color='warning'>Ver Integrantes</Button>
+          <IntegrantsDialog data={data.band.integrants!} dataWithUrl={data.band.integrantsWithUrl} onClose={handleClose} open={showIntegrants} title='Integrantes' />
+        </Box>
+      );
+    } else if (!data.band) {
       return (
         <Box>
           <Typography variant="h6">{data.cityName}</Typography>
@@ -102,7 +109,7 @@ const Profile = () => {
             <Box>
               <Box display="flex">
                 <Typography variant="h4">{data.name}</Typography>
-                {data.artist?.isVerified && <Icon color='primary' sx={{ mt: 1.2, ml: 1, cursor: "pointer" }}><VerifiedIcon /></Icon>}
+                {data.band?.isVerified && <Icon color='primary' sx={{ mt: 1.2, ml: 1, cursor: "pointer" }}><VerifiedIcon /></Icon>}
                 {data.isEnabledToEdit && <Icon color='primary' sx={{ mt: 1.2, ml: 1, cursor: "pointer" }}><EditIcon /></Icon>}
               </Box>
               <Typography variant="subtitle1">{data.cityName}</Typography>
@@ -112,9 +119,9 @@ const Profile = () => {
             }
           </Box>
           {
-            data.artist &&
+            data.band &&
             <Box mt={3}>
-              {data.artist.description}
+              {data.band.description}
             </Box>
           }
           <Box mt={5}>

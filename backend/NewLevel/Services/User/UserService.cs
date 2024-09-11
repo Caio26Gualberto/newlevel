@@ -128,7 +128,7 @@ namespace NewLevel.Services.UserService
                 throw new Exception("Erro ao adicionar imagem a nuvem, caso o problema persista entre em contato com o desenvolvedor");
             }
 
-            user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatarKey: key, 
+            user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatarKey: key,
                 publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: url, email: user.Email);
 
             await _userManager.UpdateAsync(user);
@@ -204,9 +204,22 @@ namespace NewLevel.Services.UserService
             if (searchedUser == null)
                 throw new Exception("Não foi possivel encontrar o usuário selecionado");
 
-            var searchedArtist = await _newLevelDbContext.Bands
-                .FirstOrDefaultAsync(band => band.BandsUsers.Any(user => user.UserId == userId));
+            var searchedBand = await _newLevelDbContext.BandsUsers.Include(bandUser => bandUser.Band)
+                .Where(x => x.UserId == searchedUser.Id)
+                .Select(bandUser => bandUser.Band)
+                .FirstOrDefaultAsync();
 
+            var integrants = await _newLevelDbContext.BandsUsers.Include(x => x.User)
+                .Where(x => x.BandId == searchedBand.Id)
+                .Select(x => x.User)
+                .ToListAsync();
+
+            var bandToRemove = await _newLevelDbContext.BandsUsers.Include(bandUser => bandUser.User)
+                .Where(x => x.BandId == searchedBand.Id)
+                .Select(bandUser => bandUser.User)
+                .FirstOrDefaultAsync();
+
+            integrants.Remove(bandToRemove);
 
             return new ProfileInfoDto
             {
@@ -218,15 +231,45 @@ namespace NewLevel.Services.UserService
                     .FirstOrDefault()?.Name ?? searchedUser.ActivityLocation.ToString(),
                 AvatarUrl = searchedUser.AvatarUrl,
                 IsEnabledToEdit = user.Id == searchedUser.Id,
-                Artist = searchedArtist == null ? null : new ArtistDto
+                Band = searchedBand == null ? null : new BandDto
                 {
-                    CreatedAt = searchedArtist.CreatedAt,
-                    Description = searchedArtist.Description,
-                    IsVerified = searchedArtist.IsVerified,
-                    MusicGenres = searchedArtist.MusicGenres,
-                    Integrants = searchedArtist.Integrants
+                    CreatedAt = searchedBand.CreatedAt,
+                    Description = searchedBand.Description,
+                    IsVerified = searchedBand.IsVerified,
+                    MusicGenres = searchedBand.MusicGenres,
+                    Integrants = searchedBand.Integrants,
+                    IntegrantsWithUrl = integrants?.Select(integrant => new IntegrantInfoDto
+                    {
+                        Name = integrant.Nickname,
+                        Instrument = integrant.Instrument,
+                        ProfileUrl = $"http://localhost:3000/profile/{integrant.Nickname}/{integrant.Id}"
+                    }).ToList()
                 }
             };
+        }
+
+        public async Task<List<SearchBarUserDetailDto>> GetUsersForSearchBar(string nickname)
+        {
+            if (string.IsNullOrEmpty(nickname))
+            {
+                return new List<SearchBarUserDetailDto>();
+            }
+
+            var lowerSearchTerm = nickname.ToLower();
+
+            var users = await _newLevelDbContext.Users
+                .Where(u => u.Nickname.ToLower().Contains(lowerSearchTerm) ||
+                            u.Email.ToLower().Contains(lowerSearchTerm))
+                .Take(10)
+                .Select(u => new SearchBarUserDetailDto
+                {
+                    UserId = u.Id,
+                    NickName = u.Nickname,
+                    AvatarUrl = u.AvatarUrl
+                })
+                .ToListAsync();
+
+            return users;
         }
     }
 }

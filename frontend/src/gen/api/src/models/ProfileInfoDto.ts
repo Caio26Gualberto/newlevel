@@ -13,12 +13,12 @@
  */
 
 import { mapValues } from '../runtime';
-import type { ArtistDto } from './ArtistDto';
+import type { BandDto } from './BandDto';
 import {
-    ArtistDtoFromJSON,
-    ArtistDtoFromJSONTyped,
-    ArtistDtoToJSON,
-} from './ArtistDto';
+    BandDtoFromJSON,
+    BandDtoFromJSONTyped,
+    BandDtoToJSON,
+} from './BandDto';
 
 /**
  * 
@@ -52,10 +52,10 @@ export interface ProfileInfoDto {
     isEnabledToEdit?: boolean;
     /**
      * 
-     * @type {ArtistDto}
+     * @type {BandDto}
      * @memberof ProfileInfoDto
      */
-    artist?: ArtistDto;
+    band?: BandDto;
 }
 
 /**
@@ -79,7 +79,7 @@ export function ProfileInfoDtoFromJSONTyped(json: any, ignoreDiscriminator: bool
         'cityName': json['cityName'] == null ? undefined : json['cityName'],
         'avatarUrl': json['avatarUrl'] == null ? undefined : json['avatarUrl'],
         'isEnabledToEdit': json['isEnabledToEdit'] == null ? undefined : json['isEnabledToEdit'],
-        'artist': json['artist'] == null ? undefined : ArtistDtoFromJSON(json['artist']),
+        'band': json['band'] == null ? undefined : BandDtoFromJSON(json['band']),
     };
 }
 
@@ -93,7 +93,7 @@ export function ProfileInfoDtoToJSON(value?: ProfileInfoDto | null): any {
         'cityName': value['cityName'],
         'avatarUrl': value['avatarUrl'],
         'isEnabledToEdit': value['isEnabledToEdit'],
-        'artist': ArtistDtoToJSON(value['artist']),
+        'band': BandDtoToJSON(value['band']),
     };
 }
 
