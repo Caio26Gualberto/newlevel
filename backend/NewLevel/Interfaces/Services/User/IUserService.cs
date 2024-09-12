@@ -14,6 +14,6 @@ namespace NewLevel.Interfaces.Services.User
         Task<bool> ResetPassword(ResetPasswordInput input);
         Task<ProfileInfoDto> GetProfile(string nickname, string userId);
         Task<List<SearchBarUserDetailDto>> GetUsersForSearchBar(string nickname);
-
+        Task<bool> InviteMemberBand(InviteMemberInput input);
     }
 }

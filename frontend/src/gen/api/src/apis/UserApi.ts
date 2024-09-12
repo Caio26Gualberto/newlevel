@@ -17,6 +17,7 @@ import * as runtime from '../runtime';
 import type {
   BooleanNewLevelResponse,
   EActivityLocation,
+  InviteMemberInput,
   ProfileInfoDtoNewLevelResponse,
   ResetPasswordInput,
   SearchBarUserDetailDtoListNewLevelResponse,
@@ -28,6 +29,8 @@ import {
     BooleanNewLevelResponseToJSON,
     EActivityLocationFromJSON,
     EActivityLocationToJSON,
+    InviteMemberInputFromJSON,
+    InviteMemberInputToJSON,
     ProfileInfoDtoNewLevelResponseFromJSON,
     ProfileInfoDtoNewLevelResponseToJSON,
     ResetPasswordInputFromJSON,
@@ -51,6 +54,10 @@ export interface ApiUserGetProfileGetRequest {
 
 export interface ApiUserGetUsersForSearchBarGetRequest {
     searchTerm?: string;
+}
+
+export interface ApiUserInviteMemberBandPostRequest {
+    inviteMemberInput?: InviteMemberInput;
 }
 
 export interface ApiUserResetPasswordPostRequest {
@@ -282,6 +289,41 @@ export class UserApi extends runtime.BaseAPI {
      */
     async apiUserGetUsersForSearchBarGet(requestParameters: ApiUserGetUsersForSearchBarGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SearchBarUserDetailDtoListNewLevelResponse> {
         const response = await this.apiUserGetUsersForSearchBarGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiUserInviteMemberBandPostRaw(requestParameters: ApiUserInviteMemberBandPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/User/InviteMemberBand`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: InviteMemberInputToJSON(requestParameters['inviteMemberInput']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiUserInviteMemberBandPost(requestParameters: ApiUserInviteMemberBandPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiUserInviteMemberBandPostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

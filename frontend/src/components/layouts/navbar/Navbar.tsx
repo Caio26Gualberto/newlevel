@@ -4,13 +4,14 @@ import { Link, useLocation, useNavigate } from "react-router-dom"
 import Logo from "../../../assets/128982_logo.png"
 import React from "react";
 import { useAuth } from "../../../AuthContext";
-import { AuthenticateApi, UserApi } from "../../../gen/api/src";
+import { AuthenticateApi, GeneralNotificationInfoDto, SystemNotificationApi, UserApi } from "../../../gen/api/src";
 import ApiConfiguration from "../../../apiConfig";
 import * as toastr from 'toastr';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useMobile } from "../../../MobileContext";
 import MailIcon from '@mui/icons-material/Mail';
 import InviteIntegrantsModal from "./InviteIntegrantsModal/InviteIntegrantsModal";
+import PopoverNotifications from "./popoverNotifications/PopoverNotifications";
 
 const StyledLink = styled(Link)`
   text-decoration: none;
@@ -44,23 +45,37 @@ const StyledMenu = styled(MenuItem)`
 const Navbar = () => {
     const authService = new AuthenticateApi(ApiConfiguration)
     const userService = new UserApi(ApiConfiguration)
+    const systemNotificationService = new SystemNotificationApi(ApiConfiguration)
     const navigate = useNavigate();
     const location = useLocation()
     const { isAdmin, isBand } = useAuth()
     const { isMobile } = useMobile()
     const [showNavbar, setShowNavbar] = useState<boolean>(false)
     const [openIntegrantsInvite, setOpenIntegrantsInvite] = useState<boolean>(false)
+    const [notifications, setNotifications] = useState<GeneralNotificationInfoDto>({ totalCount: 0, notifications: [] })
     const [profileSrc, setProfileSrc] = useState({
         userId: "",
         profilePicture: "",
         nickname: ""
     })
-    
-    const handleClickOpen = () => { 
+    const [anchorElPop, setAnchorElPop] = React.useState<HTMLButtonElement | null>(null);
+    const [openPop, setOpenPop] = React.useState(false);
+
+    const handleClickPop = (event: React.MouseEvent<HTMLDivElement>) => {
+        setAnchorElPop(event.currentTarget.parentElement as HTMLButtonElement);
+        setOpenPop(true);
+    };
+
+    const handleClosePop = () => {
+        setOpenPop(false);
+        setAnchorElPop(null);
+    };
+
+    const handleClickOpen = () => {
         setOpenIntegrantsInvite(true);
     }
 
-    const handleClickClose = () => { 
+    const handleClickClose = () => {
         setOpenIntegrantsInvite(false);
     }
 
@@ -141,6 +156,13 @@ const Navbar = () => {
         }
     }
 
+    const getNotifications = async () => {
+        const result = await systemNotificationService.apiSystemNotificationGetAllNotificationByUserGet()
+        if (result.isSuccess) {
+            setNotifications(result.data!)
+        }
+    }
+
     useEffect(() => {
         const currentPath = location.pathname;
         if (notAllowedPaths.includes(currentPath)) {
@@ -151,6 +173,7 @@ const Navbar = () => {
 
         if (!notAllowedPaths.includes(currentPath)) {
             getAvatarToNavbar();
+            getNotifications();
         }
     }
         , [location])
@@ -158,7 +181,7 @@ const Navbar = () => {
     return (
         <>{showNavbar &&
             <>
-            <InviteIntegrantsModal onClose={handleClickClose} open={openIntegrantsInvite} title="Convide Membros"/>
+                <InviteIntegrantsModal onClose={handleClickClose} open={openIntegrantsInvite} title="Convide Membros" />
                 {isMobile ? (
                     <>
                         <Box
@@ -202,7 +225,7 @@ const Navbar = () => {
                                     <StyledLink to="/podcasts"><ListItem button>Podcasts</ListItem></StyledLink>
                                     <StyledLink to="/aboutMe"><ListItem button>Sobre mim</ListItem></StyledLink>
                                     <StyledLink to="/myAccount"><ListItem>Minha Conta</ListItem></StyledLink>
-                                    <StyledLink to="/profile"><ListItem>Meu Perfil</ListItem></StyledLink>
+                                    <StyledLink to={`/profile/${profileSrc.nickname}/${profileSrc.userId}`}><ListItem>Meu Perfil</ListItem></StyledLink>
                                     <StyledLink to="/partnerStore"><ListItem>Loja Parceira</ListItem></StyledLink>
                                     {isAdmin() && <StyledLinkForAdmin sx={{ color: "white" }} onClick={handleCloseAvatar} to="/acceptContent"><MenuItem>Pedidos (Admin)</MenuItem></StyledLinkForAdmin>}
                                     <StyledLink to="/" onClick={() => { handleCloseAvatar(); logout(); }}><ListItem>Sair</ListItem></StyledLink>
@@ -265,11 +288,12 @@ const Navbar = () => {
                                 </Grid>
                             </Grid>
                         </Box>
-                        <Box sx={{ cursor: "pointer", mr: 1}}>
-                            <Badge badgeContent={4} sx={{color: "yellow"}}>
+                        <Box sx={{ cursor: "pointer", mr: 1 }}>
+                            <Badge onClick={handleClickPop} badgeContent={notifications.totalCount} sx={{ color: "yellow" }}>
                                 <MailIcon color="primary" />
                             </Badge>
                         </Box>
+                        <PopoverNotifications open={openPop} anchorEl={anchorElPop} onClose={handleClosePop} notificationList={notifications.notifications}/>
                         <Box pr={2} pl={2} sx={{ cursor: "pointer" }}>
                             {rederizeAvatar()}
                             <Menu

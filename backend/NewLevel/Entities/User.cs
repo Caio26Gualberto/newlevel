@@ -24,12 +24,18 @@ namespace NewLevel.Entities
         public bool IsFirstTimeLogin { get; private set; }
         public DateTime? PublicTimer { get; private set; }
         [NotMapped]
-        public Dictionary<string, string>? IssuesIds { get; private set; }
+        public Dictionary<string, string>? IssuesIds { get; private set; } = new Dictionary<string, string>
+        {
+            { "IssueId1", "Description of Issue 1" }
+        };
         public string? IssuesIdsSerialized
         {
-            get => JsonConvert.SerializeObject(IssuesIds) ?? null;
-            set => IssuesIds = JsonConvert.DeserializeObject<Dictionary<string, string>>(value);
+            get => IssuesIds != null ? JsonConvert.SerializeObject(IssuesIds) : null;
+            set => IssuesIds = value != null
+                ? JsonConvert.DeserializeObject<Dictionary<string, string>>(value)
+                : null;
         }
+
 
         public virtual List<BandsUsers> BandsUsers { get; private set; }
 
@@ -39,6 +45,8 @@ namespace NewLevel.Entities
         [InverseProperty("User")]
         public List<Photo> Photos { get; private set; }
         public List<Comment> Comments { get; set; } 
+        public List<SystemNotification> SystemNotifications { get; set; }
+
 
         public void Update(bool? isFirstTimeLogin, string nickName, string? avatarKey, EActivityLocation activityLocation, DateTime? publicTimer, string avatarUrl, string? email, string? instrument = "")
         {

@@ -3,26 +3,20 @@ import { IntegrantInfoDto } from "../../../gen/api/src";
 
 
 interface SimpleDialogProps {
-    open: boolean;
     title: string;
     data: { [key: string]: string };
     dataWithUrl?: IntegrantInfoDto[];
-    onClose: (value: string) => void;
 }
 
-const IntegrantsDialog: React.FC<SimpleDialogProps> = ({ open, title, data, dataWithUrl, onClose }) => {
-
-    const handleClose = () => {
-        onClose('');
-    };
+const IntegrantsDialog: React.FC<SimpleDialogProps> = ({ title, data, dataWithUrl }) => {
 
     return (
-        <Dialog fullWidth onClose={handleClose} open={open}>
+        <>
             {!dataWithUrl ?
                 (
-                    <Box m={1} mb={3}>
-                        <Box display="flex" justifyContent="center" alignItems="center">
-                            <DialogTitle>{title}</DialogTitle>
+                    <Box mb={3}>
+                        <Box mb={2} display="flex" justifyContent="center" alignItems="center">
+                            <Typography variant="h5">{title}</Typography>
                         </Box>
                         {data &&
                             Object.entries(data).map(([member, instrument], index) => (
@@ -56,7 +50,7 @@ const IntegrantsDialog: React.FC<SimpleDialogProps> = ({ open, title, data, data
                 )
             }
 
-        </Dialog>
+        </>
     )
 }
 

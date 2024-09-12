@@ -10,6 +10,7 @@ namespace NewLevel.Dtos.User
         public string? AvatarUrl { get; set; }
         public bool IsEnabledToEdit { get; set; }
         public BandDto? Band { get; set; }
+        public List<ProfileInfoPhotoDto>? ProfileInfoPhotos { get; set; }
     }
 
     public class BandDto
@@ -28,5 +29,12 @@ namespace NewLevel.Dtos.User
         public string Instrument { get; set; }
         public string ProfileUrl { get; set; }
 
+    }
+
+    public class ProfileInfoPhotoDto
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string PhotoSrc { get; set; }
     }
 }

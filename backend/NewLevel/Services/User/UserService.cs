@@ -1,11 +1,9 @@
-﻿using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NewLevel.Context;
 using NewLevel.Dtos.User;
 using NewLevel.Entities;
 using NewLevel.Interfaces.Services.Email;
-using NewLevel.Interfaces.Services.Photo;
 using NewLevel.Interfaces.Services.User;
 using NewLevel.Services.AmazonS3;
 using System.ComponentModel.DataAnnotations;
@@ -198,7 +196,9 @@ namespace NewLevel.Services.UserService
 
         public async Task<ProfileInfoDto> GetProfile(string nickname, string userId)
         {
-            var searchedUser = await _userManager.FindByIdAsync(userId);
+            var searchedUser = await _newLevelDbContext.Users.Include(x => x.Photos)
+                .Include(x => x.Medias).FirstOrDefaultAsync(x => x.Id == userId);
+
             var user = await _utils.GetUserAsync();
 
             if (searchedUser == null)
@@ -218,6 +218,8 @@ namespace NewLevel.Services.UserService
                 .Where(x => x.BandId == searchedBand.Id)
                 .Select(bandUser => bandUser.User)
                 .FirstOrDefaultAsync();
+
+            
 
             integrants.Remove(bandToRemove);
 
@@ -244,12 +246,20 @@ namespace NewLevel.Services.UserService
                         Instrument = integrant.Instrument,
                         ProfileUrl = $"http://localhost:3000/profile/{integrant.Nickname}/{integrant.Id}"
                     }).ToList()
-                }
+                },
+                ProfileInfoPhotos = searchedUser?.Photos?.Select(photo => new ProfileInfoPhotoDto
+                {
+                    Id = photo.Id,
+                    Title = photo.Title,
+                    PhotoSrc = photo.PrivateURL
+                }).ToList()
+
             };
         }
 
         public async Task<List<SearchBarUserDetailDto>> GetUsersForSearchBar(string nickname)
         {
+            var user = await _utils.GetUserAsync();
             if (string.IsNullOrEmpty(nickname))
             {
                 return new List<SearchBarUserDetailDto>();
@@ -258,6 +268,7 @@ namespace NewLevel.Services.UserService
             var lowerSearchTerm = nickname.ToLower();
 
             var users = await _newLevelDbContext.Users
+                .Where(x => x.Id != user.Id)
                 .Where(u => u.Nickname.ToLower().Contains(lowerSearchTerm) ||
                             u.Email.ToLower().Contains(lowerSearchTerm))
                 .Take(10)
@@ -270,6 +281,33 @@ namespace NewLevel.Services.UserService
                 .ToListAsync();
 
             return users;
+        }
+
+        public async Task<bool> InviteMemberBand(InviteMemberInput input)
+        {
+            try
+            {
+                var user = await _utils.GetUserAsync();
+                var band = await _newLevelDbContext.BandsUsers
+                            .Where(x => x.UserId == user.Id)
+                            .Select(x => x.Band)
+                            .FirstOrDefaultAsync();
+
+
+                SystemNotification systemNotification = new SystemNotification("Convite para banda", $"Você foi convidado para tocar na banda {band.Name} como {input.Instrument}", Enums.SystemNotification.ESystemNotificationType.Invite);
+                systemNotification.Update(systemNotification.Title, systemNotification.Message, systemNotification.SystemNotificationType, hiddenInfos: $"ID da Banda: {user.Id}");
+                systemNotification.UserId = input.UserInvited.UserId;
+
+                await _newLevelDbContext.SystemNotifications.AddAsync(systemNotification);
+                await _newLevelDbContext.SaveChangesAsync();
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            
         }
     }
 }

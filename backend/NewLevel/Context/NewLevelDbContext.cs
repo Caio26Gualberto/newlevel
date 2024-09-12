@@ -16,6 +16,7 @@ namespace NewLevel.Context
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Band> Bands { get; set; }
         public DbSet<BandsUsers> BandsUsers { get; set; }
+        public DbSet<SystemNotification> SystemNotifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -92,6 +93,12 @@ namespace NewLevel.Context
                 .WithMany(u => u.BandsUsers)
                 .HasForeignKey(bu => bu.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Configuração do relacionamento notificações
+            builder.Entity<User>()
+                .HasMany(u => u.SystemNotifications)
+                .WithOne(n => n.User)
+                .HasForeignKey(n => n.UserId);
         }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewLevel.Context;
 
@@ -11,9 +12,11 @@ using NewLevel.Context;
 namespace NewLevel.Migrations
 {
     [DbContext(typeof(NewLevelDbContext))]
-    partial class NewLevelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240911231303_AddColumnSocialMediasForBand")]
+    partial class AddColumnSocialMediasForBand
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -347,51 +350,6 @@ namespace NewLevel.Migrations
                     b.ToTable("Photos");
                 });
 
-            modelBuilder.Entity("NewLevel.Entities.SystemNotification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("Deadline")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("HiddenInfos")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ImageURL")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Link")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SystemNotificationType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("SystemNotifications");
-                });
-
             modelBuilder.Entity("NewLevel.Entities.User", b =>
                 {
                     b.Property<string>("Id")
@@ -599,17 +557,6 @@ namespace NewLevel.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("NewLevel.Entities.SystemNotification", b =>
-                {
-                    b.HasOne("NewLevel.Entities.User", "User")
-                        .WithMany("SystemNotifications")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("NewLevel.Entities.Band", b =>
                 {
                     b.Navigation("BandsUsers");
@@ -634,8 +581,6 @@ namespace NewLevel.Migrations
                     b.Navigation("Medias");
 
                     b.Navigation("Photos");
-
-                    b.Navigation("SystemNotifications");
                 });
 #pragma warning restore 612, 618
         }

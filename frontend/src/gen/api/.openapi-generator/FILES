@@ -8,6 +8,7 @@ src/apis/CommentApi.ts
 src/apis/CommonApi.ts
 src/apis/MediaApi.ts
 src/apis/PhotoApi.ts
+src/apis/SystemNotificationApi.ts
 src/apis/UserApi.ts
 src/apis/index.ts
 src/index.ts
@@ -20,7 +21,11 @@ src/models/CreateGitIssueInput.ts
 src/models/EActivityLocation.ts
 src/models/EGitLabels.ts
 src/models/EMusicGenres.ts
+src/models/ESystemNotificationType.ts
+src/models/GeneralNotificationInfoDto.ts
+src/models/GeneralNotificationInfoDtoNewLevelResponse.ts
 src/models/IntegrantInfoDto.ts
+src/models/InviteMemberInput.ts
 src/models/LoginInputDto.ts
 src/models/LoginResponseDto.ts
 src/models/LoginResponseDtoNewLevelResponse.ts
@@ -30,12 +35,14 @@ src/models/MediaByUserIdDtoGenericListNewLevelResponse.ts
 src/models/MediaDto.ts
 src/models/MediaDtoGenericList.ts
 src/models/MediaDtoGenericListNewLevelResponse.ts
+src/models/NotificationDto.ts
 src/models/Pagination.ts
 src/models/PhotoResponseDto.ts
 src/models/PhotoResponseDtoGenericList.ts
 src/models/PhotoResponseDtoGenericListNewLevelResponse.ts
 src/models/ProfileInfoDto.ts
 src/models/ProfileInfoDtoNewLevelResponse.ts
+src/models/ProfileInfoPhotoDto.ts
 src/models/ReceiveCommentDto.ts
 src/models/RegisterInputDto.ts
 src/models/RegisterResponseDto.ts

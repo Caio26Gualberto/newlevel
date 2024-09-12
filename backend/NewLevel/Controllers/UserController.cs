@@ -194,7 +194,29 @@ namespace NewLevel.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new NewLevelResponse<ProfileInfoDto>
+                return StatusCode(500, new NewLevelResponse<SearchBarUserDetailDto>
+                {
+                    Message = ex.Message,
+                    IsSuccess = false
+                });
+            }
+        }
+
+        [HttpPost("InviteMemberBand")]
+        public async Task<ActionResult<NewLevelResponse<bool>>> InviteMemberBand(InviteMemberInput input)
+        {
+            try
+            {
+                var dto = await _userService.InviteMemberBand(input);
+                return Ok(new NewLevelResponse<bool>
+                {
+                    IsSuccess = true,
+                    Message = "Membro convidado"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<bool>
                 {
                     Message = ex.Message,
                     IsSuccess = false
