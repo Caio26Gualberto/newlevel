@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using NewLevel.Context;
 using NewLevel.Entities;
 using NewLevel.Interfaces.Services.Authenticate;
+using NewLevel.Interfaces.Services.Band;
 using NewLevel.Interfaces.Services.Comment;
 using NewLevel.Interfaces.Services.Common;
 using NewLevel.Interfaces.Services.Email;
@@ -14,6 +15,7 @@ using NewLevel.Interfaces.Services.Photo;
 using NewLevel.Interfaces.Services.SystemNotification;
 using NewLevel.Interfaces.Services.User;
 using NewLevel.Services.Authenticate;
+using NewLevel.Services.Band;
 using NewLevel.Services.Comment;
 using NewLevel.Services.Common;
 using NewLevel.Services.Github;
@@ -78,7 +80,8 @@ namespace NewLevel
             services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<IGithubService, GithubService>();
-            services.AddScoped<ISystemNotification, SystemNotificationService>();
+            services.AddScoped<ISystemNotificationService, SystemNotificationService>();
+            services.AddScoped<IBandService, BandService>();
 
             return services;
         }

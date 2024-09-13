@@ -4,6 +4,7 @@
 README.md
 package.json
 src/apis/AuthenticateApi.ts
+src/apis/BandApi.ts
 src/apis/CommentApi.ts
 src/apis/CommonApi.ts
 src/apis/MediaApi.ts
@@ -35,8 +36,12 @@ src/models/MediaByUserIdDtoGenericListNewLevelResponse.ts
 src/models/MediaDto.ts
 src/models/MediaDtoGenericList.ts
 src/models/MediaDtoGenericListNewLevelResponse.ts
+src/models/MemberInfoDto.ts
+src/models/MemberInfoDtoListNewLevelResponse.ts
 src/models/NotificationDto.ts
 src/models/Pagination.ts
+src/models/PendingInvitesDto.ts
+src/models/PendingInvitesDtoListNewLevelResponse.ts
 src/models/PhotoResponseDto.ts
 src/models/PhotoResponseDtoGenericList.ts
 src/models/PhotoResponseDtoGenericListNewLevelResponse.ts

@@ -15,5 +15,7 @@ namespace NewLevel.Interfaces.Services.User
         Task<ProfileInfoDto> GetProfile(string nickname, string userId);
         Task<List<SearchBarUserDetailDto>> GetUsersForSearchBar(string nickname);
         Task<bool> InviteMemberBand(InviteMemberInput input);
+        Task<bool> AddMemberToBand(int notificationId);
+        Task<bool> DeleteMemberInvite(string nickname);
     }
 }

@@ -223,5 +223,27 @@ namespace NewLevel.Controllers
                 });
             }
         }
+
+        [HttpPost("DeleteInviteMember")]
+        public async Task<ActionResult<NewLevelResponse<bool>>> DeleteInviteMember(string nickname)
+        {
+            try
+            {
+                var dto = await _userService.DeleteMemberInvite(nickname);
+                return Ok(new NewLevelResponse<bool>
+                {
+                    IsSuccess = true,
+                    Message = "Convite deletado"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<bool>
+                {
+                    Message = ex.Message,
+                    IsSuccess = false
+                });
+            }
+        }
     }
 }

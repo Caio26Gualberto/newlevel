@@ -168,7 +168,7 @@ namespace NewLevel.Services.Authenticate
                         ActivityLocation = input.ActivityLocation
                     });
 
-                    var band = new Band(
+                    var band = new Entities.Band(
                         input.Nickname,
                         input.Description,
                         isVerified: false,

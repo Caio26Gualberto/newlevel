@@ -7,6 +7,7 @@ using NewLevel.Interfaces.Services.Email;
 using NewLevel.Interfaces.Services.User;
 using NewLevel.Services.AmazonS3;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace NewLevel.Services.UserService
 {
@@ -15,14 +16,14 @@ namespace NewLevel.Services.UserService
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<User> _userManager;
         private readonly IEmailService _emailService;
-        private readonly NewLevelDbContext _newLevelDbContext;
+        private readonly NewLevelDbContext _context;
         private readonly NewLevel.Utils.Utils _utils;
         public UserService(IHttpContextAccessor httpContextAccessor, UserManager<User> userManager, IEmailService emailService, NewLevelDbContext newLevelDbContext)
         {
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
             _emailService = emailService;
-            _newLevelDbContext = newLevelDbContext;
+            _context = newLevelDbContext;
             _utils = new Utils.Utils(httpContextAccessor, userManager);
         }
 
@@ -130,7 +131,7 @@ namespace NewLevel.Services.UserService
                 publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: url, email: user.Email);
 
             await _userManager.UpdateAsync(user);
-            await _newLevelDbContext.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return true;
         }
@@ -160,7 +161,7 @@ namespace NewLevel.Services.UserService
                     avatarKey: key, publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: url, email: input.Email);
 
                 await _userManager.UpdateAsync(user);
-                await _newLevelDbContext.SaveChangesAsync();
+                await _context.SaveChangesAsync();
             }
             else
             {
@@ -168,7 +169,7 @@ namespace NewLevel.Services.UserService
                     avatarKey: user.AvatarUrl, publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: user.AvatarUrl, email: input.Email);
 
                 await _userManager.UpdateAsync(user);
-                await _newLevelDbContext.SaveChangesAsync();
+                await _context.SaveChangesAsync();
             }
 
             return true;
@@ -196,7 +197,7 @@ namespace NewLevel.Services.UserService
 
         public async Task<ProfileInfoDto> GetProfile(string nickname, string userId)
         {
-            var searchedUser = await _newLevelDbContext.Users.Include(x => x.Photos)
+            var searchedUser = await _context.Users.Include(x => x.Photos)
                 .Include(x => x.Medias).FirstOrDefaultAsync(x => x.Id == userId);
 
             var user = await _utils.GetUserAsync();
@@ -204,24 +205,28 @@ namespace NewLevel.Services.UserService
             if (searchedUser == null)
                 throw new Exception("Não foi possivel encontrar o usuário selecionado");
 
-            var searchedBand = await _newLevelDbContext.BandsUsers.Include(bandUser => bandUser.Band)
+            var searchedBand = await _context.BandsUsers.Include(bandUser => bandUser.Band)
                 .Where(x => x.UserId == searchedUser.Id)
                 .Select(bandUser => bandUser.Band)
                 .FirstOrDefaultAsync();
 
-            var integrants = await _newLevelDbContext.BandsUsers.Include(x => x.User)
-                .Where(x => x.BandId == searchedBand.Id)
-                .Select(x => x.User)
-                .ToListAsync();
+            List<User>? integrants = new List<User>();
 
-            var bandToRemove = await _newLevelDbContext.BandsUsers.Include(bandUser => bandUser.User)
-                .Where(x => x.BandId == searchedBand.Id)
-                .Select(bandUser => bandUser.User)
-                .FirstOrDefaultAsync();
+            if (searchedBand != null)
+            {
+                integrants = await _context.BandsUsers.Include(x => x.User)
+                    .Where(x => x.BandId == searchedBand.Id)
+                    .Select(x => x.User)
+                    .ToListAsync();
 
-            
+                var bandToRemove = await _context.BandsUsers.Include(bandUser => bandUser.User)
+                    .Where(x => x.BandId == searchedBand.Id)
+                    .Select(bandUser => bandUser.User)
+                    .FirstOrDefaultAsync();
 
-            integrants.Remove(bandToRemove);
+                integrants.Remove(bandToRemove);
+            }
+
 
             return new ProfileInfoDto
             {
@@ -244,7 +249,7 @@ namespace NewLevel.Services.UserService
                     {
                         Name = integrant.Nickname,
                         Instrument = integrant.Instrument,
-                        ProfileUrl = $"http://localhost:3000/profile/{integrant.Nickname}/{integrant.Id}"
+                        ProfileUrl = $"/profile/{integrant.Nickname}/{integrant.Id}"
                     }).ToList()
                 },
                 ProfileInfoPhotos = searchedUser?.Photos?.Select(photo => new ProfileInfoPhotoDto
@@ -267,7 +272,7 @@ namespace NewLevel.Services.UserService
 
             var lowerSearchTerm = nickname.ToLower();
 
-            var users = await _newLevelDbContext.Users
+            var users = await _context.Users
                 .Where(x => x.Id != user.Id)
                 .Where(u => u.Nickname.ToLower().Contains(lowerSearchTerm) ||
                             u.Email.ToLower().Contains(lowerSearchTerm))
@@ -288,18 +293,28 @@ namespace NewLevel.Services.UserService
             try
             {
                 var user = await _utils.GetUserAsync();
-                var band = await _newLevelDbContext.BandsUsers
+                var band = await _context.BandsUsers
                             .Where(x => x.UserId == user.Id)
                             .Select(x => x.Band)
                             .FirstOrDefaultAsync();
 
+                bool notificationExists = await _context.SystemNotifications
+                                        .AnyAsync(n => n.UserId == input.UserInvited.UserId
+                                        && n.SystemNotificationType == Enums.SystemNotification.ESystemNotificationType.Invite
+                                        && n.Message.Contains(band.Name) && !n.IsRead && !n.IsDeleted);
+
+                if (notificationExists)
+                {
+                    throw new Exception("Você já enviou um convite a esse usuário, aguarde a resposta do mesmo");
+                }
+
 
                 SystemNotification systemNotification = new SystemNotification("Convite para banda", $"Você foi convidado para tocar na banda {band.Name} como {input.Instrument}", Enums.SystemNotification.ESystemNotificationType.Invite);
-                systemNotification.Update(systemNotification.Title, systemNotification.Message, systemNotification.SystemNotificationType, hiddenInfos: $"ID da Banda: {user.Id}");
+                systemNotification.Update(systemNotification.Title, systemNotification.Message, systemNotification.SystemNotificationType, hiddenInfos: $"ID da Banda: {band.Id}", false, false);
                 systemNotification.UserId = input.UserInvited.UserId;
 
-                await _newLevelDbContext.SystemNotifications.AddAsync(systemNotification);
-                await _newLevelDbContext.SaveChangesAsync();
+                await _context.SystemNotifications.AddAsync(systemNotification);
+                await _context.SaveChangesAsync();
                 return true;
 
             }
@@ -307,7 +322,59 @@ namespace NewLevel.Services.UserService
             {
                 throw new Exception(ex.Message);
             }
-            
+
+        }
+
+        public async Task<bool> AddMemberToBand(int notificationId)
+        {
+            var user = await _utils.GetUserAsync();
+            var notification = _context.SystemNotifications.FirstOrDefault(x => x.Id == notificationId);
+            var bandId = Convert.ToInt32(notification.HiddenInfos.Replace("ID da Banda:", "").Trim());
+            string instrument = Regex.Match(notification.Message, @"como\s(.*)").Groups[1].Value;
+
+            var band = await _context.BandsUsers.Include(x => x.Band).FirstOrDefaultAsync(x => x.BandId == bandId);
+
+            if (band != null)
+            {
+                try
+                {
+                    await _context.BandsUsers.AddAsync(new BandsUsers
+                    {
+                        BandId = bandId,
+                        UserId = user.Id
+                    });
+                    notification.Update(notification.Title, notification.Message, Enums.SystemNotification.ESystemNotificationType.Invite, notification.HiddenInfos, isRead: true, notification.IsDeleted);
+                    user.Update(user.IsFirstTimeLogin, user.Nickname, user.AvatarKey, user.ActivityLocation, user.PublicTimer, user.AvatarUrl, user.Email, instrument);
+                    await _context.SaveChangesAsync(); return true;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message);
+                }
+            }
+
+            return false;
+        }
+
+        public async Task<bool> DeleteMemberInvite(string nickname)
+        {
+            var user = await _utils.GetUserAsync();
+            var memberInvited = _context.Users.FirstOrDefault(x => x.Nickname == nickname);
+            var band = await _context.BandsUsers.Include(x => x.Band).Where(x => x.UserId == user.Id).Select(x => x.Band).FirstOrDefaultAsync();
+
+            try
+            {
+                var notification = await _context.SystemNotifications.FirstOrDefaultAsync(x => x.Message.Contains(band.Name) && x.UserId == memberInvited.Id);
+
+                _context.SystemNotifications.Remove(notification);
+                await _context.SaveChangesAsync();
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

@@ -43,6 +43,10 @@ import {
     UserInfoResponseDtoNewLevelResponseToJSON,
 } from '../models/index';
 
+export interface ApiUserDeleteInviteMemberPostRequest {
+    nickname?: string;
+}
+
 export interface ApiUserGenerateTokenToResetPasswordByEmailPostRequest {
     email?: string;
 }
@@ -113,6 +117,42 @@ export class UserApi extends runtime.BaseAPI {
      */
     async apiUserDeleteDelete(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<boolean> {
         const response = await this.apiUserDeleteDeleteRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiUserDeleteInviteMemberPostRaw(requestParameters: ApiUserDeleteInviteMemberPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['nickname'] != null) {
+            queryParameters['nickname'] = requestParameters['nickname'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/User/DeleteInviteMember`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiUserDeleteInviteMemberPost(requestParameters: ApiUserDeleteInviteMemberPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiUserDeleteInviteMemberPostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

@@ -1,23 +1,45 @@
 import { Box, Button, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Popover, styled, Typography } from '@mui/material';
-import { ESystemNotificationType, NotificationDto } from '../../../../gen/api/src';
+import { ESystemNotificationType, NotificationDto, SystemNotificationApi } from '../../../../gen/api/src';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import FiberNewIcon from '@mui/icons-material/FiberNew';
 import DeleteIcon from '@mui/icons-material/Delete';
 import React from 'react';
+import ApiConfiguration from '../../../../apiConfig';
+import * as toastr from 'toastr';
+import ViewInviteModal from './viewInviteModal/ViewInviteModal';
 
 interface PopoverNotificationsProps {
     anchorEl: HTMLButtonElement | null;
     notificationList: NotificationDto[] | undefined;
     open: boolean;
     onClose: () => void;
+    onOpenInviteModal: () => void;
+    updateNotifications: () => void;
+    getNotification: (notification: NotificationDto) => void;
 }
 
-const PopoverNotifications: React.FC<PopoverNotificationsProps> = ({ anchorEl, notificationList, open, onClose }) => {
-    const [isButtonHovered, setIsButtonHovered] = React.useState(false);
+const PopoverNotifications: React.FC<PopoverNotificationsProps> = ({ anchorEl, notificationList, open, onClose, onOpenInviteModal, getNotification, updateNotifications }) => {
+    const systemNotificationService = new SystemNotificationApi(ApiConfiguration);
+    const [isButtonHovered, setIsButtonHovered] = React.useState<boolean>(false);
 
-    async function readMessage(notificationId: number) {
-        console.log(notificationId);
+    const handleOpenInviteMessage = (notificationId: number) => {
+        getNotification(notificationList?.find(notification => notification.id === notificationId)!);
+        onOpenInviteModal();
+    }
+
+    async function deleteMessage(notificationId: number) {
+        try {
+            const result = await systemNotificationService.apiSystemNotificationDeleteNotificationDelete({ notificationId: notificationId });
+            if (result.isSuccess) {
+                updateNotifications();
+                toastr.warning(result.message!, '', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
+            } else {
+                toastr.error(result.message!, 'Erro!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
+            }
+        } catch (error) {
+            console.error('Error while marking notification as read', error);
+        }
     }
 
     return (
@@ -39,9 +61,14 @@ const PopoverNotifications: React.FC<PopoverNotificationsProps> = ({ anchorEl, n
                     {notificationList?.map((notification) => (
                         <ListItem key={notification.title} disablePadding>
                             <ListItemButton
+                                disableRipple={isButtonHovered}
+                                onClick={(event) => {
+                                    handleOpenInviteMessage(notification.id!);
+                                    onClose();
+                                }}
                                 sx={{
                                     '&:hover': {
-                                        backgroundColor: isButtonHovered ? 'transparent' : 'default', // Use 'default' for the normal hover color
+                                        backgroundColor: isButtonHovered ? 'transparent' : 'default',
                                     }
                                 }}
                             >
@@ -54,11 +81,13 @@ const PopoverNotifications: React.FC<PopoverNotificationsProps> = ({ anchorEl, n
                                         <Box>
                                             <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
                                                 <Typography variant="body2">{notification.createdDate?.toLocaleDateString()}</Typography>
-                                                <Box onClick={() => readMessage(notification.id!)}>
+                                                <Box>
                                                     <IconButton
-                                                        disableRipple
                                                         color='error'
-                                                        onClick={onClose}
+                                                        onClick={(event) => {
+                                                            event.stopPropagation();
+                                                            deleteMessage(notification.id!);
+                                                        }}
                                                         onMouseEnter={() => setIsButtonHovered(true)}
                                                         onMouseLeave={() => setIsButtonHovered(false)}
                                                         sx={{
@@ -77,6 +106,13 @@ const PopoverNotifications: React.FC<PopoverNotificationsProps> = ({ anchorEl, n
                             </ListItemButton>
                         </ListItem>
                     ))}
+                    {notificationList?.length === 0 &&
+                        (
+                            <Box height="100%">
+                                <Typography variant="body2" align="center">Nenhuma notificação</Typography>
+                            </Box>
+                        )
+                    }
                 </List>
             </Box>
         </Popover>

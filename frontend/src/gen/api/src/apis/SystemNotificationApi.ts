@@ -15,17 +15,72 @@
 
 import * as runtime from '../runtime';
 import type {
+  BooleanNewLevelResponse,
   GeneralNotificationInfoDtoNewLevelResponse,
+  PendingInvitesDtoListNewLevelResponse,
 } from '../models/index';
 import {
+    BooleanNewLevelResponseFromJSON,
+    BooleanNewLevelResponseToJSON,
     GeneralNotificationInfoDtoNewLevelResponseFromJSON,
     GeneralNotificationInfoDtoNewLevelResponseToJSON,
+    PendingInvitesDtoListNewLevelResponseFromJSON,
+    PendingInvitesDtoListNewLevelResponseToJSON,
 } from '../models/index';
+
+export interface ApiSystemNotificationDeleteNotificationDeleteRequest {
+    notificationId?: number;
+}
+
+export interface ApiSystemNotificationReadNotificationPostRequest {
+    notificationId?: number;
+}
+
+export interface ApiSystemNotificationRespondToInvitePutRequest {
+    notificationId?: number;
+    isAccept?: boolean;
+}
 
 /**
  * 
  */
 export class SystemNotificationApi extends runtime.BaseAPI {
+
+    /**
+     */
+    async apiSystemNotificationDeleteNotificationDeleteRaw(requestParameters: ApiSystemNotificationDeleteNotificationDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['notificationId'] != null) {
+            queryParameters['notificationId'] = requestParameters['notificationId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/SystemNotification/DeleteNotification`,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiSystemNotificationDeleteNotificationDelete(requestParameters: ApiSystemNotificationDeleteNotificationDeleteRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiSystemNotificationDeleteNotificationDeleteRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      */
@@ -56,6 +111,114 @@ export class SystemNotificationApi extends runtime.BaseAPI {
      */
     async apiSystemNotificationGetAllNotificationByUserGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GeneralNotificationInfoDtoNewLevelResponse> {
         const response = await this.apiSystemNotificationGetAllNotificationByUserGetRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiSystemNotificationGetPendingInvitationsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PendingInvitesDtoListNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/SystemNotification/GetPendingInvitations`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PendingInvitesDtoListNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiSystemNotificationGetPendingInvitationsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PendingInvitesDtoListNewLevelResponse> {
+        const response = await this.apiSystemNotificationGetPendingInvitationsGetRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiSystemNotificationReadNotificationPostRaw(requestParameters: ApiSystemNotificationReadNotificationPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['notificationId'] != null) {
+            queryParameters['notificationId'] = requestParameters['notificationId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/SystemNotification/ReadNotification`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiSystemNotificationReadNotificationPost(requestParameters: ApiSystemNotificationReadNotificationPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiSystemNotificationReadNotificationPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiSystemNotificationRespondToInvitePutRaw(requestParameters: ApiSystemNotificationRespondToInvitePutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['notificationId'] != null) {
+            queryParameters['notificationId'] = requestParameters['notificationId'];
+        }
+
+        if (requestParameters['isAccept'] != null) {
+            queryParameters['isAccept'] = requestParameters['isAccept'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/SystemNotification/RespondToInvite`,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiSystemNotificationRespondToInvitePut(requestParameters: ApiSystemNotificationRespondToInvitePutRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiSystemNotificationRespondToInvitePutRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

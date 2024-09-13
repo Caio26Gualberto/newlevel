@@ -35,8 +35,6 @@ const IssueReport = () => {
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        debugger
-
         try {
             setLoading(true)
             const allLabels = [...selectedDevices, ...selectedProblemTypes]

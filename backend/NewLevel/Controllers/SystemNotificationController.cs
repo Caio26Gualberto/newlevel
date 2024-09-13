@@ -10,11 +10,11 @@ namespace NewLevel.Controllers
     [ApiController]
     public class SystemNotificationController : Controller
     {
-        private readonly ISystemNotification _systemNotification;
+        private readonly ISystemNotificationService _systemNotificationService;
 
-        public SystemNotificationController(ISystemNotification systemNotification)
+        public SystemNotificationController(ISystemNotificationService systemNotification)
         {
-            _systemNotification = systemNotification;
+            _systemNotificationService = systemNotification;
         }
 
         [HttpGet("GetAllNotificationByUser")]
@@ -22,17 +22,122 @@ namespace NewLevel.Controllers
         {
             try
             {
-                var resultLogin = await _systemNotification.GetAllNotificationByUser();
+                var result = await _systemNotificationService.GetAllNotificationByUser();
 
                 return new NewLevelResponse<GeneralNotificationInfoDto>()
                 {
-                    Data = resultLogin,
+                    Data = result,
                     IsSuccess = true
                 };
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new NewLevelResponse<GeneralNotificationInfoDto> { IsSuccess = false, Message = ex.Message });
+            }
+        }
+
+        [HttpDelete("DeleteNotification")]
+        public async Task<ActionResult<NewLevelResponse<bool>>> DeleteNotification(int notificationId)
+        {
+            try
+            {
+                var result = await _systemNotificationService.DeleteNotification(notificationId);
+
+                return new NewLevelResponse<bool>()
+                {
+                    IsSuccess = true,
+                    Message = "Notificação deletada"
+                };
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<bool> { IsSuccess = false, Message = ex.Message });
+            }
+        }
+
+        [HttpPost("ReadNotification")]
+        public async Task<ActionResult<NewLevelResponse<bool>>> ReadNotification(int notificationId)
+        {
+            try
+            {
+                var result = await _systemNotificationService.DeleteNotification(notificationId);
+
+                return new NewLevelResponse<bool>()
+                {
+                    IsSuccess = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<bool> { IsSuccess = false, Message = ex.Message });
+            }
+        }
+
+        [HttpPut("RespondToInvite")]
+        public async Task<ActionResult<NewLevelResponse<bool>>> RespondToInvite(int notificationId, bool isAccept)
+        {
+            try
+            {
+                bool result;
+
+                if (isAccept)
+                {
+                    result = await _systemNotificationService.AcceptInvite(notificationId);
+                    if (result)
+                    {
+                        return new NewLevelResponse<bool>
+                        {
+                            IsSuccess = true,
+                            Message = "Convite aceito"
+                        };
+                    }
+                }
+                else
+                {
+                    result = await _systemNotificationService.DeclineInvite(notificationId);
+                    if (result)
+                    {
+                        return new NewLevelResponse<bool>
+                        {
+                            IsSuccess = true,
+                            Message = "Convite recusado"
+                        };
+                    }
+                }
+
+                return new NewLevelResponse<bool>
+                {
+                    IsSuccess = false,
+                    Message = "Algo deu errado, por favor entre em contato com o desenvolvedor"
+                };
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<bool>
+                {
+                    IsSuccess = false,
+                    Message = $"Erro interno: {ex.Message}"
+                });
+            }
+        }
+
+
+        [HttpGet("GetPendingInvitations")]
+        public async Task<ActionResult<NewLevelResponse<List<PendingInvitesDto>>>> GetPendingInvitations()
+        {
+            try
+            {
+                var result = await _systemNotificationService.GetPendingInvitations();
+
+                return new NewLevelResponse<List<PendingInvitesDto>>()
+                {
+                    IsSuccess = true,
+                    Data = result
+                };
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<List<PendingInvitesDto>> { IsSuccess = false, Message = ex.Message });
             }
         }
     }

@@ -13,7 +13,7 @@ namespace NewLevel.Entities
         }
         public SystemNotification(string title, string message, ESystemNotificationType notificationType)
         {
-            ValidateDomainEntity(title, message, notificationType, null);
+            ValidateDomainEntity(title, message, notificationType, null, false, false);
         }
         public int Id { get; private set; }
         [Required]
@@ -21,6 +21,8 @@ namespace NewLevel.Entities
         [Required]
         public string Message { get; private set; }
         public string? Link { get; private set; }
+        public bool IsRead { get; private set; } = false;
+        public bool IsDeleted { get; private set; } = false;
         public DateTime? Deadline { get; private set; }
         public DateTime CreationTime { get; private set; } = DateTime.Now.AddHours(-3);
         public string? ImageURL { get; private set; }
@@ -31,12 +33,12 @@ namespace NewLevel.Entities
         public string UserId { get; set; }
         public User User { get; set; }
 
-        public void Update(string? title, string? message, ESystemNotificationType? notificationType, string? hiddenInfos)
+        public void Update(string? title, string? message, ESystemNotificationType? notificationType, string? hiddenInfos, bool isRead, bool isDeleted)
         {
-            ValidateDomainEntity(title, message, notificationType, hiddenInfos);
+            ValidateDomainEntity(title, message, notificationType, hiddenInfos, isRead, isDeleted);
         }
 
-        private void ValidateDomainEntity(string title, string message, ESystemNotificationType? notificationType, string? hiddenInfos)
+        private void ValidateDomainEntity(string title, string message, ESystemNotificationType? notificationType, string? hiddenInfos, bool isRead, bool isDeleted)
         {
             Title = title;
             Message = message;
@@ -45,6 +47,8 @@ namespace NewLevel.Entities
                 SystemNotificationType = (ESystemNotificationType)notificationType;
 
             HiddenInfos = hiddenInfos;
+            IsRead = isRead;
+            IsDeleted = isDeleted;
         }
 
     }

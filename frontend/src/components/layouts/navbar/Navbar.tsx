@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom"
 import Logo from "../../../assets/128982_logo.png"
 import React from "react";
 import { useAuth } from "../../../AuthContext";
-import { AuthenticateApi, GeneralNotificationInfoDto, SystemNotificationApi, UserApi } from "../../../gen/api/src";
+import { AuthenticateApi, GeneralNotificationInfoDto, NotificationDto, SystemNotificationApi, UserApi } from "../../../gen/api/src";
 import ApiConfiguration from "../../../apiConfig";
 import * as toastr from 'toastr';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -12,6 +12,8 @@ import { useMobile } from "../../../MobileContext";
 import MailIcon from '@mui/icons-material/Mail';
 import InviteIntegrantsModal from "./InviteIntegrantsModal/InviteIntegrantsModal";
 import PopoverNotifications from "./popoverNotifications/PopoverNotifications";
+import ViewInviteModal from "./popoverNotifications/viewInviteModal/ViewInviteModal";
+import DraftsIcon from '@mui/icons-material/Drafts';
 
 const StyledLink = styled(Link)`
   text-decoration: none;
@@ -52,7 +54,9 @@ const Navbar = () => {
     const { isMobile } = useMobile()
     const [showNavbar, setShowNavbar] = useState<boolean>(false)
     const [openIntegrantsInvite, setOpenIntegrantsInvite] = useState<boolean>(false)
+    const [openIntegrantsAccept, setOpenIntegrantsAccept] = useState<boolean>(false)
     const [notifications, setNotifications] = useState<GeneralNotificationInfoDto>({ totalCount: 0, notifications: [] })
+    const [selectedInviteInfos, setSelectedInviteInfos] = React.useState<NotificationDto>({});
     const [profileSrc, setProfileSrc] = useState({
         userId: "",
         profilePicture: "",
@@ -69,6 +73,19 @@ const Navbar = () => {
     const handleClosePop = () => {
         setOpenPop(false);
         setAnchorElPop(null);
+    };
+
+    const handleGetNotification = (notification: NotificationDto) => {
+        setSelectedInviteInfos(notification);
+    }
+
+    const handleOpenAcceptModal = () => {
+        setOpenIntegrantsAccept(true);
+    };
+
+    const handleCloseAcceptModal = () => {
+        setOpenIntegrantsAccept(false);
+        getNotifications();
     };
 
     const handleClickOpen = () => {
@@ -181,7 +198,7 @@ const Navbar = () => {
     return (
         <>{showNavbar &&
             <>
-                <InviteIntegrantsModal onClose={handleClickClose} open={openIntegrantsInvite} title="Convide Membros" />
+                {isBand() && <InviteIntegrantsModal onClose={handleClickClose} open={openIntegrantsInvite} title="Convide Membros" />}
                 {isMobile ? (
                     <>
                         <Box
@@ -290,10 +307,19 @@ const Navbar = () => {
                         </Box>
                         <Box sx={{ cursor: "pointer", mr: 1 }}>
                             <Badge onClick={handleClickPop} badgeContent={notifications.totalCount} sx={{ color: "yellow" }}>
-                                <MailIcon color="primary" />
+                                {openPop ? <DraftsIcon color="primary" /> : <MailIcon color="primary" />}
                             </Badge>
                         </Box>
-                        <PopoverNotifications open={openPop} anchorEl={anchorElPop} onClose={handleClosePop} notificationList={notifications.notifications}/>
+                        <PopoverNotifications open={openPop}
+                            anchorEl={anchorElPop}
+                            onClose={handleClosePop}
+                            notificationList={notifications.notifications}
+                            updateNotifications={getNotifications}
+                            onOpenInviteModal={handleOpenAcceptModal}
+                            getNotification={handleGetNotification} />
+
+                        <ViewInviteModal open={openIntegrantsAccept} onClose={handleCloseAcceptModal} notification={selectedInviteInfos} />
+
                         <Box pr={2} pl={2} sx={{ cursor: "pointer" }}>
                             {rederizeAvatar()}
                             <Menu

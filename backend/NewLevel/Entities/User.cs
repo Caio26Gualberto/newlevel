@@ -68,6 +68,7 @@ namespace NewLevel.Entities
             PublicTimer = publicTimer;
             AvatarUrl = avatarUrl;
             Email = email;
+            Instrument = instrument;
         }
     }
 }

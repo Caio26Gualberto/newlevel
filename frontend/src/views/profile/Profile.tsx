@@ -83,9 +83,7 @@ const Profile = () => {
       );
     } else if (!data.band) {
       return (
-        <Box>
-          <Typography variant="h6">{data.cityName}</Typography>
-        </Box>
+        <></>
       );
     }
     return null;
