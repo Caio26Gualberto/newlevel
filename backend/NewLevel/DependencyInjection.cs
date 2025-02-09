@@ -14,6 +14,7 @@ using NewLevel.Interfaces.Services.Media;
 using NewLevel.Interfaces.Services.Photo;
 using NewLevel.Interfaces.Services.SystemNotification;
 using NewLevel.Interfaces.Services.User;
+using NewLevel.Services.AmazonS3;
 using NewLevel.Services.Authenticate;
 using NewLevel.Services.Band;
 using NewLevel.Services.Comment;

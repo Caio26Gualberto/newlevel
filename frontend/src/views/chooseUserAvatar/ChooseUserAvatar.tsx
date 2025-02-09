@@ -117,7 +117,7 @@ const ChooseUserAvatar = () => {
                     />
                 </Box>
                 <Box mt={6} width="100%" display="flex" justifyContent="center">
-                    <Box mr={2}><NewLevelButton onClick={handleRemoveImage} icon={CloseIcon} title="Remover foto" /></Box>
+                    {imageSrc && <Box mr={2}><NewLevelButton onClick={handleRemoveImage} icon={CloseIcon} title="Remover foto" /></Box>}
                     <Box><NewLevelButton onClick={redirectToNextPageAndSaveAvatar} icon={ArrowForwardIcon} title="Próximo" /></Box>
                 </Box>
             </Box>

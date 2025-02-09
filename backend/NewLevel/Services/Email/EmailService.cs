@@ -5,7 +5,12 @@ using System.Web;
 
 public class EmailService : IEmailService
 {
-    private readonly string _sendGridApiKey = "";
+    private readonly string _sendGridApiKey;
+
+    public EmailService(IConfiguration configuration)
+    {
+        _sendGridApiKey = configuration["SendgridApiKey"] ?? throw new ArgumentNullException("SendGrid ApiKey não configurada!");
+    }
 
     public async Task SendEmail(string recipient, string subject, string body, string templateId = "", object templateObj = null)
     {
@@ -30,7 +35,7 @@ public class EmailService : IEmailService
         catch (Exception ex)
         {
             // Handle error here
-            Console.WriteLine($"Error sending email: {ex.Message}");
+            throw new Exception($"Error sending email: {ex.Message}");
         }
     }
 

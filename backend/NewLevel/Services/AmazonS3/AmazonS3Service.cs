@@ -2,7 +2,6 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
-using Azure.Core;
 
 namespace NewLevel.Services.AmazonS3
 {
@@ -14,10 +13,10 @@ namespace NewLevel.Services.AmazonS3
 
         private readonly IAmazonS3 _s3Client;
 
-        public AmazonS3Service()
+        public AmazonS3Service(IConfiguration configuration)
         {
-            AwsKeyId = "";
-            AwsKeySecret = "";
+            AwsKeyId = configuration["Amazon:AwsKeyId"]!;
+            AwsKeySecret = configuration["Amazon:AwsKeySecret"]!; ;
             AwsCredentials = new BasicAWSCredentials(AwsKeyId, AwsKeySecret);
             var config = new AmazonS3Config
             {
