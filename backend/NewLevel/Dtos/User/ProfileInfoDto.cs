@@ -11,11 +11,15 @@ namespace NewLevel.Dtos.User
         public bool IsEnabledToEdit { get; set; }
         public BandDto? Band { get; set; }
         public List<ProfileInfoPhotoDto>? ProfileInfoPhotos { get; set; }
+        public List<ProfileInfoVideoDto>? ProfileInfoVideos { get; set; }
     }
 
     public class BandDto
     {
         public string Description { get; set; }
+        public string? InstagramUrl { get; set; }
+        public string? YoutubeUrl { get; set; }
+        public string? SpotifyUrl { get; set; }
         public bool IsVerified { get; set; }
         public DateTime CreatedAt { get; set; }
         public List<EMusicGenres> MusicGenres { get; set; }
@@ -36,5 +40,12 @@ namespace NewLevel.Dtos.User
         public int Id { get; set; }
         public string Title { get; set; }
         public string PhotoSrc { get; set; }
+    }
+
+    public class ProfileInfoVideoDto
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string MediaSrc { get; set; }
     }
 }

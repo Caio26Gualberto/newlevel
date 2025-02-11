@@ -35,6 +35,7 @@ export * from './PhotoResponseDtoGenericListNewLevelResponse';
 export * from './ProfileInfoDto';
 export * from './ProfileInfoDtoNewLevelResponse';
 export * from './ProfileInfoPhotoDto';
+export * from './ProfileInfoVideoDto';
 export * from './ReceiveCommentDto';
 export * from './RegisterInputDto';
 export * from './RegisterResponseDto';

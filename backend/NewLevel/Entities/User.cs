@@ -20,6 +20,8 @@ namespace NewLevel.Entities
         public string? AvatarKey { get; private set; }
         public string? AvatarUrl { get; private set; }
         public string? Instrument { get; private set; }
+        public string? BannerKey { get; private set; }
+        public string? BannerUrl { get; private set; }
         public EActivityLocation ActivityLocation { get; private set; }
         public bool IsFirstTimeLogin { get; private set; }
         public DateTime? PublicTimer { get; private set; }

@@ -18,13 +18,15 @@ namespace NewLevel.Services.UserService
         private readonly IEmailService _emailService;
         private readonly NewLevelDbContext _context;
         private readonly NewLevel.Utils.Utils _utils;
-        public UserService(IHttpContextAccessor httpContextAccessor, UserManager<User> userManager, IEmailService emailService, NewLevelDbContext newLevelDbContext)
+        private readonly IConfiguration _configuration;
+        public UserService(IHttpContextAccessor httpContextAccessor, UserManager<User> userManager, IEmailService emailService, NewLevelDbContext newLevelDbContext, IConfiguration configuration)
         {
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
             _emailService = emailService;
             _context = newLevelDbContext;
             _utils = new Utils.Utils(httpContextAccessor, userManager);
+            _configuration = configuration;
         }
 
         public async Task GenerateTokenToResetPasswordByEmail(string email)
@@ -59,7 +61,7 @@ namespace NewLevel.Services.UserService
         {
             if (user.PublicTimer == null || user.PublicTimer < DateTime.UtcNow.AddHours(-3))
             {
-                AmazonS3Service s3 = new AmazonS3Service();
+                AmazonS3Service s3 = new AmazonS3Service(_configuration);
                 string key = user.AvatarKey!;
                 var url = await s3.CreateTempURLS3("newlevel-images", key);
                 return url;
@@ -117,7 +119,7 @@ namespace NewLevel.Services.UserService
         {
             var user = await _utils.GetUserAsync();
 
-            AmazonS3Service s3 = new AmazonS3Service();
+            AmazonS3Service s3 = new AmazonS3Service(_configuration);
             string key = $"avatars/{user.Id}/{Guid.NewGuid()}";
             var result = await s3.UploadFilesAsync("newlevel-images", key, input.File);
             var url = await s3.CreateTempURLS3("newlevel-images", key);
@@ -139,7 +141,7 @@ namespace NewLevel.Services.UserService
         public async Task<bool> UpdateUser(UpdateUserInput input)
         {
             User user = await _utils.GetUserAsync();
-            AmazonS3Service s3 = new AmazonS3Service();
+            AmazonS3Service s3 = new AmazonS3Service(_configuration);
             string key = $"avatars/{user.Id}/{Guid.NewGuid()}";
 
             if (input.File != null)
@@ -240,6 +242,9 @@ namespace NewLevel.Services.UserService
                 IsEnabledToEdit = user.Id == searchedUser.Id,
                 Band = searchedBand == null ? null : new BandDto
                 {
+                    InstagramUrl = searchedBand.InstagramUrl,
+                    SpotifyUrl = searchedBand.SpotifyUrl,
+                    YoutubeUrl = searchedBand.YoutubeUrl,
                     CreatedAt = searchedBand.CreatedAt,
                     Description = searchedBand.Description,
                     IsVerified = searchedBand.IsVerified,
@@ -257,8 +262,13 @@ namespace NewLevel.Services.UserService
                     Id = photo.Id,
                     Title = photo.Title,
                     PhotoSrc = photo.PrivateURL
+                }).ToList(),
+                ProfileInfoVideos = searchedUser?.Medias?.Select(media => new ProfileInfoVideoDto
+                {
+                    Id = media.Id,
+                    MediaSrc = media.Src,
+                    Title = media.Title,
                 }).ToList()
-
             };
         }
 

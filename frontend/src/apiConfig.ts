@@ -2,8 +2,16 @@ import { Configuration, ErrorContext, ResponseContext } from "./gen/api/src";
 
 let originalRequest: ResponseContext | null
 
+let basePathAPI = process.env.NODE_ENV === "production"
+    ? process.env.REACT_APP_API_URL_PROD
+    : process.env.REACT_APP_API_URL_LOCAL
+
+let basePathFront = process.env.NODE_ENV === "production"
+    ? process.env.REACT_APP_FRONT_URL_PROD
+    : process.env.REACT_APP_FRONT_URL_LOCAL
+
 const ApiConfiguration = new Configuration({
-    basePath: "https://localhost:7082",
+    basePath: basePathAPI,
 
     accessToken: async (name, scopes) => {
         var accessToken = window.localStorage.getItem('accessToken');
@@ -23,7 +31,7 @@ const ApiConfiguration = new Configuration({
                 originalRequest = context;
                 let contentType = context.response.headers.get('content-type');
                 if (context.response.status == 401 || context.response.status == 403) {
-                    const response = await fetch(`https://localhost:7082/api/Authenticate/RenewToken?accessToken=${window.localStorage.getItem('accessToken')}`);
+                    const response = await fetch(`${basePathAPI}/api/Authenticate/RenewToken?accessToken=${window.localStorage.getItem('accessToken')}`);
                     if (response.ok && response.status != 204) {
                         const newTokens = await response.json();
                         if (newTokens.token && newTokens.refreshToken) {
@@ -43,12 +51,12 @@ const ApiConfiguration = new Configuration({
                                 keepalive: originalRequest.init.keepalive,
                                 signal: originalRequest.init.signal
                             });
-            
+
                             newRequest.headers.set('Authorization', `Bearer ${newTokens.token}`);
-            
+
                             ret = await fetch(newRequest);
                         } else {
-                            
+
                         }
                     } else {
                         window.location.href = 'http://localhost:3000';
@@ -59,10 +67,10 @@ const ApiConfiguration = new Configuration({
                         return result;
                     };
                 }
-            
+
                 return ret;
             }
-            
+
 
         },
         {

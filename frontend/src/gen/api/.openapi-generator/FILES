@@ -48,6 +48,7 @@ src/models/PhotoResponseDtoGenericListNewLevelResponse.ts
 src/models/ProfileInfoDto.ts
 src/models/ProfileInfoDtoNewLevelResponse.ts
 src/models/ProfileInfoPhotoDto.ts
+src/models/ProfileInfoVideoDto.ts
 src/models/ReceiveCommentDto.ts
 src/models/RegisterInputDto.ts
 src/models/RegisterResponseDto.ts

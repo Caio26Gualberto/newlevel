@@ -40,6 +40,24 @@ export interface BandDto {
     description?: string;
     /**
      * 
+     * @type {string}
+     * @memberof BandDto
+     */
+    instagramUrl?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BandDto
+     */
+    youtubeUrl?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BandDto
+     */
+    spotifyUrl?: string;
+    /**
+     * 
      * @type {boolean}
      * @memberof BandDto
      */
@@ -88,6 +106,9 @@ export function BandDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): B
     return {
         
         'description': json['description'] == null ? undefined : json['description'],
+        'instagramUrl': json['instagramUrl'] == null ? undefined : json['instagramUrl'],
+        'youtubeUrl': json['youtubeUrl'] == null ? undefined : json['youtubeUrl'],
+        'spotifyUrl': json['spotifyUrl'] == null ? undefined : json['spotifyUrl'],
         'isVerified': json['isVerified'] == null ? undefined : json['isVerified'],
         'createdAt': json['createdAt'] == null ? undefined : (new Date(json['createdAt'])),
         'musicGenres': json['musicGenres'] == null ? undefined : ((json['musicGenres'] as Array<any>).map(EMusicGenresFromJSON)),
@@ -103,6 +124,9 @@ export function BandDtoToJSON(value?: BandDto | null): any {
     return {
         
         'description': value['description'],
+        'instagramUrl': value['instagramUrl'],
+        'youtubeUrl': value['youtubeUrl'],
+        'spotifyUrl': value['spotifyUrl'],
         'isVerified': value['isVerified'],
         'createdAt': value['createdAt'] == null ? undefined : ((value['createdAt']).toISOString()),
         'musicGenres': value['musicGenres'] == null ? undefined : ((value['musicGenres'] as Array<any>).map(EMusicGenresToJSON)),

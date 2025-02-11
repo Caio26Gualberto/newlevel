@@ -11,9 +11,9 @@ namespace NewLevel.Entities
         public string Name { get; private set; }
         public string Description { get; private set; }
         public string Email { get; private set; }
-        public string SpotifyUrl { get; private set; }
-        public string YoutubeUrl { get; private set; }
-        public string InstagramUrl { get; private set; }
+        public string? SpotifyUrl { get; private set; }
+        public string? YoutubeUrl { get; private set; }
+        public string? InstagramUrl { get; private set; }
         public bool IsVerified { get; private set; }
         public DateTime CreationTime { get; private set; }
         public DateTime CreatedAt { get; private set; }

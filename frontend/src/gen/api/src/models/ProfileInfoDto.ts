@@ -25,6 +25,12 @@ import {
     ProfileInfoPhotoDtoFromJSONTyped,
     ProfileInfoPhotoDtoToJSON,
 } from './ProfileInfoPhotoDto';
+import type { ProfileInfoVideoDto } from './ProfileInfoVideoDto';
+import {
+    ProfileInfoVideoDtoFromJSON,
+    ProfileInfoVideoDtoFromJSONTyped,
+    ProfileInfoVideoDtoToJSON,
+} from './ProfileInfoVideoDto';
 
 /**
  * 
@@ -68,6 +74,12 @@ export interface ProfileInfoDto {
      * @memberof ProfileInfoDto
      */
     profileInfoPhotos?: Array<ProfileInfoPhotoDto>;
+    /**
+     * 
+     * @type {Array<ProfileInfoVideoDto>}
+     * @memberof ProfileInfoDto
+     */
+    profileInfoVideos?: Array<ProfileInfoVideoDto>;
 }
 
 /**
@@ -93,6 +105,7 @@ export function ProfileInfoDtoFromJSONTyped(json: any, ignoreDiscriminator: bool
         'isEnabledToEdit': json['isEnabledToEdit'] == null ? undefined : json['isEnabledToEdit'],
         'band': json['band'] == null ? undefined : BandDtoFromJSON(json['band']),
         'profileInfoPhotos': json['profileInfoPhotos'] == null ? undefined : ((json['profileInfoPhotos'] as Array<any>).map(ProfileInfoPhotoDtoFromJSON)),
+        'profileInfoVideos': json['profileInfoVideos'] == null ? undefined : ((json['profileInfoVideos'] as Array<any>).map(ProfileInfoVideoDtoFromJSON)),
     };
 }
 
@@ -108,6 +121,7 @@ export function ProfileInfoDtoToJSON(value?: ProfileInfoDto | null): any {
         'isEnabledToEdit': value['isEnabledToEdit'],
         'band': BandDtoToJSON(value['band']),
         'profileInfoPhotos': value['profileInfoPhotos'] == null ? undefined : ((value['profileInfoPhotos'] as Array<any>).map(ProfileInfoPhotoDtoToJSON)),
+        'profileInfoVideos': value['profileInfoVideos'] == null ? undefined : ((value['profileInfoVideos'] as Array<any>).map(ProfileInfoVideoDtoToJSON)),
     };
 }
 

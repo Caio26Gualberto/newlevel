@@ -15,11 +15,13 @@ namespace NewLevel.Services.Photo
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<User> _userManager;
         private readonly NewLevelDbContext _context;
-        public PhotoService(IHttpContextAccessor httpContextAccessor, UserManager<User> userManager, NewLevelDbContext newLevelDbContext)
+        private readonly IConfiguration _configuration;
+        public PhotoService(IHttpContextAccessor httpContextAccessor, UserManager<User> userManager, NewLevelDbContext newLevelDbContext, IConfiguration configuration)
         {
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
             _context = newLevelDbContext;
+            _configuration = configuration;
         }
 
         public async Task<bool> ApprovePhoto(int photoId, bool isApprove)
@@ -58,7 +60,7 @@ namespace NewLevel.Services.Photo
                 .ToListAsync();
 
             var response = new List<PhotoResponseDto>();
-            var s3 = new AmazonS3Service();
+            var s3 = new AmazonS3Service(_configuration);
 
             foreach (var photo in photos)
             {
@@ -114,7 +116,7 @@ namespace NewLevel.Services.Photo
             if (user == null)
                 throw new Exception("Usuário não encontrado");
 
-            var s3 = new AmazonS3Service();
+            var s3 = new AmazonS3Service(_configuration);
             string key = "imagens/" + $"{file.Title}-{Guid.NewGuid()}";
 
             var photo = new NewLevel.Entities.Photo(key, file.Title, file.Subtitle, file.Description, false, DateTime.UtcNow.AddHours(-3), user.Id, formattedDate);
@@ -134,7 +136,7 @@ namespace NewLevel.Services.Photo
         {
             if (photo.User.PublicTimer == null || photo.User.PublicTimer < DateTime.UtcNow.AddHours(-3))
             {
-                var s3 = new AmazonS3Service();
+                var s3 = new AmazonS3Service(_configuration);
                 var url = await s3.CreateTempURLS3("newlevel-images", photo.KeyS3);
                 photo.User.Update(photo.User.IsFirstTimeLogin, photo.User.Nickname, photo.User.AvatarUrl, photo.User.ActivityLocation, DateTime.Now.AddDays(2).AddHours(-3),
                     url, email: photo.User.Email);
