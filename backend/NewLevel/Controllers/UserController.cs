@@ -93,7 +93,7 @@ namespace NewLevel.Controllers
         }
 
         [HttpPost("UploadAvatarImage")]
-        public async Task<ActionResult<NewLevelResponse<string>>> UploadAvatarImage(UploadAvatarImageInput input)
+        public async Task<ActionResult<NewLevelResponse<string>>> UploadAvatarImage(UploadImageInput input)
         {
             try
             {
@@ -102,6 +102,28 @@ namespace NewLevel.Controllers
                 {
                     IsSuccess = true,
                     Message = "Avatar atualizado com sucesso"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<string>
+                {
+                    Message = ex.Message,
+                    IsSuccess = false
+                });
+            }
+        }
+
+        [HttpPost("UploadBannerImage")]
+        public async Task<ActionResult<NewLevelResponse<string>>> UploadBannerImage([FromForm]UploadImageInput input)
+        {
+            try
+            {
+                await _userService.UploadBannerImage(input);
+                return Ok(new NewLevelResponse<string>
+                {
+                    IsSuccess = true,
+                    Message = "Banner atualizado com sucesso!"
                 });
             }
             catch (Exception ex)

@@ -7,6 +7,7 @@ namespace NewLevel.Services.AmazonS3
 {
     public class AmazonS3Service
     {
+        public static string Bucket = "newlevel-images";
         public string AwsKeyId { get; private set; }
         public string AwsKeySecret { get; private set; }
         public BasicAWSCredentials AwsCredentials { get; private set; }

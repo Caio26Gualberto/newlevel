@@ -6,6 +6,7 @@ using NewLevel.Entities;
 using NewLevel.Interfaces.Services.Email;
 using NewLevel.Interfaces.Services.User;
 using NewLevel.Services.AmazonS3;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
@@ -53,21 +54,36 @@ namespace NewLevel.Services.UserService
                 Nickname = user.Nickname,
                 Email = user.Email,
                 Password = user.PasswordHash,
-                ProfilePicture = await GetOrSetAvatarURL(user)
+                ProfilePicture = string.IsNullOrEmpty(user.AvatarUrl) ? null : await GetOrSetAvatarURL(user),
+                ProfileBanner = string.IsNullOrEmpty(user.BannerUrl) ? null : await GetOrSetBannerURL(user),
+                BannerPosition = user.BannerPosition
             };
         }
 
         private async Task<string> GetOrSetAvatarURL(User user)
         {
-            if (user.PublicTimer == null || user.PublicTimer < DateTime.UtcNow.AddHours(-3))
+            if (user.PublicTimerAvatar == null || user.PublicTimerAvatar < DateTime.UtcNow.AddHours(-3))
             {
                 AmazonS3Service s3 = new AmazonS3Service(_configuration);
                 string key = user.AvatarKey!;
-                var url = await s3.CreateTempURLS3("newlevel-images", key);
+                var url = await s3.CreateTempURLS3(AmazonS3Service.Bucket, key);
                 return url;
             }
 
             return user.AvatarUrl!;
+        }
+
+        private async Task<string> GetOrSetBannerURL(User user)
+        {
+            if (user.PublicTimerBanner == null || user.PublicTimerBanner < DateTime.UtcNow.AddHours(-3))
+            {
+                AmazonS3Service s3 = new AmazonS3Service(_configuration);
+                string key = user.BannerKey!;
+                var url = await s3.CreateTempURLS3(AmazonS3Service.Bucket, key);
+                return url;
+            }
+
+            return user.BannerUrl!;
         }
         public async Task<bool> Delete()
         {
@@ -92,10 +108,11 @@ namespace NewLevel.Services.UserService
             {
                 var user = await _utils.GetUserAsync();
 
-                user.Update(isFirstTimeLogin: false, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatarKey: user.AvatarKey, publicTimer: user.PublicTimer,
-                    avatarUrl: user.AvatarUrl, email: user.Email);
+                user.Update(false, null, null, null, null,
+                    null, null, null, null, null, null, null);
 
                 await _userManager.UpdateAsync(user);
+                await _context.SaveChangesAsync();
             }
             catch (Exception e)
             {
@@ -115,22 +132,50 @@ namespace NewLevel.Services.UserService
             await _emailService.SendEmail(user.Email!, subject, body);
         }
 
-        public async Task<bool> UploadAvatarImage(UploadAvatarImageInput input)
+        public async Task<bool> UploadAvatarImage(UploadImageInput input)
         {
             var user = await _utils.GetUserAsync();
 
             AmazonS3Service s3 = new AmazonS3Service(_configuration);
             string key = $"avatars/{user.Id}/{Guid.NewGuid()}";
-            var result = await s3.UploadFilesAsync("newlevel-images", key, input.File);
-            var url = await s3.CreateTempURLS3("newlevel-images", key);
+            var result = await s3.UploadFilesAsync(AmazonS3Service.Bucket, key, input.File);
+            var url = await s3.CreateTempURLS3(AmazonS3Service.Bucket, key);
 
             if (!result)
             {
                 throw new Exception("Erro ao adicionar imagem a nuvem, caso o problema persista entre em contato com o desenvolvedor");
             }
 
-            user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatarKey: key,
-                publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: url, email: user.Email);
+            user.Update(null, null, key, null, publicTimer: DateTime.Now.AddDays(2).AddHours(-3),
+                 url, null, null, null, null, null, null);
+
+            await _userManager.UpdateAsync(user);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> UploadBannerImage(UploadImageInput input)
+        {
+            var user = await _utils.GetUserAsync();
+            AmazonS3Service s3 = new AmazonS3Service(_configuration);
+
+            if (!string.IsNullOrEmpty(user.BannerKey))
+            {
+                await s3.DeleteFileAsync(AmazonS3Service.Bucket, user.BannerKey);
+            }
+
+            string key = $"banners/{user.Id}/{Guid.NewGuid()}";
+            var result = await s3.UploadFilesAsync(AmazonS3Service.Bucket, key, input.File);
+            var url = await s3.CreateTempURLS3(AmazonS3Service.Bucket, key);
+
+            if (!result)
+            {
+                throw new Exception("Erro ao adicionar imagem a nuvem, caso o problema persista entre em contato com o desenvolvedor");
+            }
+
+            user.Update(null, null, null, null,
+                null, null, null, bannerKey: key, bannerUrl: url, input.Position, DateTime.Now.AddDays(2).AddHours(-3), null);
 
             await _userManager.UpdateAsync(user);
             await _context.SaveChangesAsync();
@@ -146,29 +191,34 @@ namespace NewLevel.Services.UserService
 
             if (input.File != null)
             {
-                var isUploaded = await s3.UploadFilesAsync("newlevel-images", key, input.File);
+                var isUploaded = await s3.UploadFilesAsync(AmazonS3Service.Bucket, key, input.File);
 
                 if (!isUploaded)
                     throw new Exception("Erro ao adicionar imagem a nuvem, caso o problema persista entre em contato com o desenvolvedor");
 
                 if (!string.IsNullOrEmpty(user.AvatarKey))
                 {
-                    var fileDeleted = await s3.DeleteFileAsync("newlevel-images", user.AvatarKey);
+                    var fileDeleted = await s3.DeleteFileAsync(AmazonS3Service.Bucket, user.AvatarKey);
                     if (!fileDeleted)
                         throw new Exception("Erro ao deletar imagem antiga, caso o problema persista entre em contato com o desenvolvedor");
                 }
 
-                var url = await s3.CreateTempURLS3("newlevel-images", key);
-                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: input.Nickname ?? user.Nickname, activityLocation: input.ActivityLocation ?? user.ActivityLocation,
-                    avatarKey: key, publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: url, email: input.Email);
+                var url = await s3.CreateTempURLS3(AmazonS3Service.Bucket, key);
+
+                user.Update(null, nickName: input.Nickname ?? user.Nickname, key,
+                    activityLocation: input.ActivityLocation ?? null,
+                    publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: url, email: input.Email, null, null, null,
+                    null, null);
 
                 await _userManager.UpdateAsync(user);
                 await _context.SaveChangesAsync();
             }
             else
             {
-                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: input.Nickname ?? user.Nickname, activityLocation: input.ActivityLocation ?? user.ActivityLocation,
-                    avatarKey: user.AvatarUrl, publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: user.AvatarUrl, email: input.Email);
+                user.Update(null, nickName: input.Nickname ?? user.Nickname, null,
+                    activityLocation: input.ActivityLocation ?? user.ActivityLocation, 
+                    publicTimer: DateTime.Now.AddDays(2).AddHours(-3), null, null, null, null, null,
+                    null, null);
 
                 await _userManager.UpdateAsync(user);
                 await _context.SaveChangesAsync();
@@ -233,6 +283,11 @@ namespace NewLevel.Services.UserService
             return new ProfileInfoDto
             {
                 Name = searchedUser.Nickname,
+                Banner = new BannerInfos
+                {
+                    Position = searchedUser.BannerPosition,
+                    URL = searchedUser.BannerUrl
+                },
                 CityName = searchedUser.ActivityLocation.GetType()
                     .GetMember(searchedUser.ActivityLocation.ToString())[0]
                     .GetCustomAttributes(typeof(DisplayAttribute), false)
@@ -353,8 +408,12 @@ namespace NewLevel.Services.UserService
                         BandId = bandId,
                         UserId = user.Id
                     });
+
                     notification.Update(notification.Title, notification.Message, Enums.SystemNotification.ESystemNotificationType.Invite, notification.HiddenInfos, isRead: true, notification.IsDeleted);
-                    user.Update(user.IsFirstTimeLogin, user.Nickname, user.AvatarKey, user.ActivityLocation, user.PublicTimer, user.AvatarUrl, user.Email, instrument);
+
+                    user.Update(user.IsFirstTimeLogin, user.Nickname, user.AvatarKey, user.ActivityLocation, user.PublicTimerAvatar, user.AvatarUrl,
+                        user.Email, bannerKey: user.BannerKey, bannerUrl: user.BannerUrl, null, null, instrument);
+
                     await _context.SaveChangesAsync(); return true;
                 }
                 catch (Exception ex)

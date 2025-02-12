@@ -8,6 +8,8 @@ import { UserInfoResponseDto } from "../../gen/api/src/models/UserInfoResponseDt
 import Swal from "sweetalert2";
 import NewLevelLoading from "../../components/NewLevelLoading";
 import { useMobile } from "../../MobileContext";
+import PanoramaHorizontalIcon from '@mui/icons-material/PanoramaHorizontal';
+import BannerModal from "./bannerModal/BannerModal";
 
 const MyProfile = () => {
     const userService = new UserApi(ApiConfiguration);
@@ -16,6 +18,7 @@ const MyProfile = () => {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [file, setFile] = useState<File | null>(null);
     const [isHovered, setIsHovered] = useState<boolean>(false);
+    const [openBannerModal, setOpenModalBanner] = useState<boolean>(false);
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [userInfos, setUserInfos] = useState<UserInfoResponseDto>({ email: '', nickname: '', activityLocation: 1 });
     const [userLocation, setUserLocation] = useState<SelectOptionDto>({ name: '', value: 0 });
@@ -51,6 +54,10 @@ const MyProfile = () => {
 
     const handleMouseLeave = () => {
         setIsHovered(false);
+    };
+
+    const handleCloseModalBanner = () => {
+        setOpenModalBanner(false);
     };
 
     const editingPassword = () => {
@@ -134,6 +141,7 @@ const MyProfile = () => {
     return (
         <>
             <NewLevelLoading isLoading={loading} />
+            {openBannerModal && <BannerModal onClose={handleCloseModalBanner} open={openBannerModal} />}
             {!isMobile &&
                 (
                     <Box display="flex" alignItems="center" justifyContent="center" flex={1} height="92.5vh" bgcolor="#F3F3F3">
@@ -189,6 +197,16 @@ const MyProfile = () => {
                                                 <Button sx={{ color: "red" }} onClick={handleEditProfile}>{isEditing ? 'Cancelar edição' : 'Ativar edição de perfil'}</Button>
                                                 {isEditing && <Button sx={{ color: "green" }} onClick={handleUpdateChanges}>Salvar</Button>}
                                             </Box>
+                                            {!userInfos.profileBanner &&
+                                                <Box mt={2} display="flex" flexDirection="column">
+                                                    <Button variant="contained" endIcon={<PanoramaHorizontalIcon />} onClick={() => { setOpenModalBanner(true) }} color="success">Adicionar Banner ao perfil</Button>
+                                                </Box>
+                                            }
+                                            {userInfos.profileBanner &&
+                                                <Box mt={2} display="flex" flexDirection="column">
+                                                    <Button variant="contained" endIcon={<PanoramaHorizontalIcon />} onClick={() => { setOpenModalBanner(true) }} color="success">Adicionar Banner ao perfil</Button>
+                                                </Box>
+                                            }
                                         </Box>
                                     </Grid>
                                     <Grid item xs={1}>

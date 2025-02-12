@@ -134,12 +134,13 @@ namespace NewLevel.Services.Photo
 
         private async Task<string> GetOrGenerateAvatarPrivateUrl(NewLevel.Entities.Photo photo)
         {
-            if (photo.User.PublicTimer == null || photo.User.PublicTimer < DateTime.UtcNow.AddHours(-3))
+            if (photo.User.PublicTimerAvatar == null || photo.User.PublicTimerAvatar < DateTime.UtcNow.AddHours(-3))
             {
                 var s3 = new AmazonS3Service(_configuration);
-                var url = await s3.CreateTempURLS3("newlevel-images", photo.KeyS3);
-                photo.User.Update(photo.User.IsFirstTimeLogin, photo.User.Nickname, photo.User.AvatarUrl, photo.User.ActivityLocation, DateTime.Now.AddDays(2).AddHours(-3),
-                    url, email: photo.User.Email);
+                var url = await s3.CreateTempURLS3("newlevel-images", photo.KeyS3); 
+
+                photo.User.Update(null, null, null, null, DateTime.Now.AddDays(2).AddHours(-3), url, null,
+                    null, null, null, null, null);
 
                 await _context.SaveChangesAsync();
                 return url;

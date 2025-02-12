@@ -105,15 +105,14 @@ const Profile = () => {
       <NewLevelLoading isLoading={loading} />
       <Box width="100%" height="100%" display="flex" flexDirection="column" alignItems="center">
         <Paper elevation={10} sx={{ height: "45vh", width: "70%", position: "relative", mb: 2, boxShadow: 0 }}>
-          <img
-            src={Logo}
-            alt="Banner"
-            style={{
+          <Box
+            sx={{
               width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "center",
-              borderRadius: "4px",
+              height: 417,
+              backgroundImage: `url(${data.banner?.url})`,
+              backgroundSize: "cover",
+              backgroundPosition: `center ${data.banner?.position}%`,
+              borderRadius: 2,
             }}
           />
           <Box position="absolute" left="50px" bottom="-100px">

@@ -81,8 +81,10 @@ namespace NewLevel.Services.Authenticate
 
                 var tokenString = GenerateJwtToken(user, roles);
 
-                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, activityLocation: user.ActivityLocation, avatarKey: user.AvatarKey,
-                    publicTimer: user.PublicTimer, avatarUrl: user.AvatarUrl, email: user.Email);
+                user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, avatarKey: user.AvatarKey, activityLocation: user.ActivityLocation,
+                    publicTimer: user.PublicTimerAvatar, avatarUrl: user.AvatarUrl, email: user.Email, bannerKey: user.BannerKey, bannerUrl: user.BannerUrl,
+                    null, null, null);
+
 
                 var refreshToken = await _userManager.GenerateUserTokenAsync(user, tokenProvider: "local", purpose: "email");
                 await _userManager.SetAuthenticationTokenAsync(user, loginProvider: "email", tokenName: "refresh_token", tokenValue: refreshToken);
@@ -117,7 +119,7 @@ namespace NewLevel.Services.Authenticate
             };
 
             var user = new User(isFirstTimeLogin: true, nickName: input.Nickname, activityLocation: input.ActivityLocation, avatar: null, publicTimer: null,
-                avatarUrl: null);
+                avatarUrl: null, instrument: null);
 
             user.UserName = input.Email;
             user.Email = input.Email;

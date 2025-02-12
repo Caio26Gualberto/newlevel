@@ -10,11 +10,12 @@ namespace NewLevel.Entities
     {
         public User()
         {
-                
+
         }
-        public User(bool isFirstTimeLogin, string nickName, string? avatar, EActivityLocation activityLocation, DateTime? publicTimer, string avatarUrl, string? instrument = "")
+        public User(bool isFirstTimeLogin, string nickName, string? avatar, EActivityLocation activityLocation, DateTime? publicTimer, string avatarUrl, string? instrument)
         {
-            ValidateDomainEntity(isFirstTimeLogin, nickName, avatar, activityLocation, publicTimer, avatarUrl, null, instrument);
+            ValidateDomainEntity(isFirstTimeLogin, nickName, avatar, activityLocation, publicTimer, avatarUrl, null, null, null,
+                null, null, instrument);
         }
         public string Nickname { get; private set; }
         public string? AvatarKey { get; private set; }
@@ -24,7 +25,9 @@ namespace NewLevel.Entities
         public string? BannerUrl { get; private set; }
         public EActivityLocation ActivityLocation { get; private set; }
         public bool IsFirstTimeLogin { get; private set; }
-        public DateTime? PublicTimer { get; private set; }
+        public DateTime? PublicTimerAvatar { get; private set; }
+        public DateTime? PublicTimerBanner { get; private set; }
+        public int? BannerPosition { get; private set; }
         [NotMapped]
         public Dictionary<string, string>? IssuesIds { get; private set; } = new Dictionary<string, string>
         {
@@ -46,31 +49,62 @@ namespace NewLevel.Entities
 
         [InverseProperty("User")]
         public List<Photo> Photos { get; private set; }
-        public List<Comment> Comments { get; set; } 
+        public List<Comment> Comments { get; set; }
         public List<SystemNotification> SystemNotifications { get; set; }
 
 
-        public void Update(bool? isFirstTimeLogin, string nickName, string? avatarKey, EActivityLocation activityLocation, DateTime? publicTimer, string avatarUrl, string? email, string? instrument = "")
+        public void Update(bool? isFirstTimeLogin, string? nickName, string? avatarKey, EActivityLocation? activityLocation, DateTime? publicTimer,
+            string? avatarUrl, string? email, string? bannerKey, string? bannerUrl, int? bannerPosition, DateTime? publicTimerBanner, string? instrument)
         {
-            ValidateDomainEntity(isFirstTimeLogin, nickName, avatarKey, activityLocation, publicTimer, avatarUrl, email, instrument);
+            ValidateDomainEntity(isFirstTimeLogin, nickName, avatarKey, activityLocation, publicTimer, avatarUrl, email, bannerKey, bannerUrl,
+                bannerPosition, publicTimerBanner, instrument);
         }
 
-        private void ValidateDomainEntity(bool? isFirstTimeLogin, string nickName, string? avatarKey, EActivityLocation activityLocation, DateTime? publicTimer,
-            string avatarUrl, string? email, string? instrument)
+        private void ValidateDomainEntity(bool? isFirstTimeLogin, string? nickName, string? avatarKey, EActivityLocation? activityLocation, DateTime? publicTimer,
+            string? avatarUrl, string? email, string? bannerKey, string? bannerUrl, int? bannerPosition, DateTime? publicTimerBanner, string? instrument)
         {
-            DomainExceptionValidation.When(string.IsNullOrWhiteSpace(nickName), "Apelido inválido. Apelido é necessário!");  
-            DomainExceptionValidation.When(email != null && !email.Contains("@"), "Email inválido, valide o mesmo");
 
             if (isFirstTimeLogin.HasValue)
                 IsFirstTimeLogin = isFirstTimeLogin.Value;
 
-            Nickname = nickName;
-            ActivityLocation = activityLocation;
-            AvatarKey = avatarKey;
-            PublicTimer = publicTimer;
-            AvatarUrl = avatarUrl;
-            Email = email;
-            Instrument = instrument;
+            if (!string.IsNullOrEmpty(nickName))
+            {
+                DomainExceptionValidation.When(string.IsNullOrWhiteSpace(nickName), "Apelido inválido. Apelido é necessário!");
+                Nickname = nickName;
+            }
+
+            if (activityLocation != null)
+                ActivityLocation = activityLocation.Value;
+
+            if (!string.IsNullOrEmpty(avatarKey))
+                AvatarKey = avatarKey;
+
+            if (publicTimer != null)
+                PublicTimerAvatar = publicTimer;
+
+            if (!string.IsNullOrEmpty(avatarUrl))
+                AvatarUrl = avatarUrl;
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                DomainExceptionValidation.When(email != null && !email.Contains("@"), "Email inválido, valide o mesmo");
+                Email = email;
+            }
+
+            if (!string.IsNullOrEmpty(instrument))
+                Instrument = instrument;
+
+            if (!string.IsNullOrEmpty(bannerKey))
+                BannerKey = bannerKey;
+
+            if (!string.IsNullOrEmpty(bannerUrl))
+                BannerUrl = bannerUrl;
+
+            if (bannerPosition != null)
+                BannerPosition = bannerPosition.Value;
+
+            if (publicTimerBanner != null)
+                PublicTimerBanner = publicTimerBanner;
         }
     }
 }

@@ -10,5 +10,8 @@ namespace NewLevel.Dtos.User
         public string Password { get; set; }
         public EActivityLocation ActivityLocation { get; set; }
         public string? ProfilePicture { get; set; }
+        public string? ProfileBanner { get; set; }
+        public int? BannerPosition { get; set; }
+
     }
 }

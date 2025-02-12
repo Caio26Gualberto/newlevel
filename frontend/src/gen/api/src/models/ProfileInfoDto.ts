@@ -19,6 +19,12 @@ import {
     BandDtoFromJSONTyped,
     BandDtoToJSON,
 } from './BandDto';
+import type { BannerInfos } from './BannerInfos';
+import {
+    BannerInfosFromJSON,
+    BannerInfosFromJSONTyped,
+    BannerInfosToJSON,
+} from './BannerInfos';
 import type { ProfileInfoPhotoDto } from './ProfileInfoPhotoDto';
 import {
     ProfileInfoPhotoDtoFromJSON,
@@ -44,6 +50,12 @@ export interface ProfileInfoDto {
      * @memberof ProfileInfoDto
      */
     name?: string;
+    /**
+     * 
+     * @type {BannerInfos}
+     * @memberof ProfileInfoDto
+     */
+    banner?: BannerInfos;
     /**
      * 
      * @type {string}
@@ -100,6 +112,7 @@ export function ProfileInfoDtoFromJSONTyped(json: any, ignoreDiscriminator: bool
     return {
         
         'name': json['name'] == null ? undefined : json['name'],
+        'banner': json['banner'] == null ? undefined : BannerInfosFromJSON(json['banner']),
         'cityName': json['cityName'] == null ? undefined : json['cityName'],
         'avatarUrl': json['avatarUrl'] == null ? undefined : json['avatarUrl'],
         'isEnabledToEdit': json['isEnabledToEdit'] == null ? undefined : json['isEnabledToEdit'],
@@ -116,6 +129,7 @@ export function ProfileInfoDtoToJSON(value?: ProfileInfoDto | null): any {
     return {
         
         'name': value['name'],
+        'banner': BannerInfosToJSON(value['banner']),
         'cityName': value['cityName'],
         'avatarUrl': value['avatarUrl'],
         'isEnabledToEdit': value['isEnabledToEdit'],

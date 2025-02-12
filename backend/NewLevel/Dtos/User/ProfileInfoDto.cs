@@ -6,6 +6,7 @@ namespace NewLevel.Dtos.User
     public class ProfileInfoDto
     {
         public string? Name { get; set; }
+        public BannerInfos? Banner { get; set; }
         public string CityName { get; set; }
         public string? AvatarUrl { get; set; }
         public bool IsEnabledToEdit { get; set; }
@@ -47,5 +48,11 @@ namespace NewLevel.Dtos.User
         public int Id { get; set; }
         public string Title { get; set; }
         public string MediaSrc { get; set; }
+    }
+
+    public class BannerInfos
+    {
+        public string? URL { get; set; }
+        public int? Position { get; set; }
     }
 }

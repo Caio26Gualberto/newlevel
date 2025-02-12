@@ -62,6 +62,18 @@ export interface UserInfoResponseDto {
      * @memberof UserInfoResponseDto
      */
     profilePicture?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserInfoResponseDto
+     */
+    profileBanner?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof UserInfoResponseDto
+     */
+    bannerPosition?: number;
 }
 
 /**
@@ -87,6 +99,8 @@ export function UserInfoResponseDtoFromJSONTyped(json: any, ignoreDiscriminator:
         'password': json['password'] == null ? undefined : json['password'],
         'activityLocation': json['activityLocation'] == null ? undefined : EActivityLocationFromJSON(json['activityLocation']),
         'profilePicture': json['profilePicture'] == null ? undefined : json['profilePicture'],
+        'profileBanner': json['profileBanner'] == null ? undefined : json['profileBanner'],
+        'bannerPosition': json['bannerPosition'] == null ? undefined : json['bannerPosition'],
     };
 }
 
@@ -102,6 +116,8 @@ export function UserInfoResponseDtoToJSON(value?: UserInfoResponseDto | null): a
         'password': value['password'],
         'activityLocation': EActivityLocationToJSON(value['activityLocation']),
         'profilePicture': value['profilePicture'],
+        'profileBanner': value['profileBanner'],
+        'bannerPosition': value['bannerPosition'],
     };
 }
 

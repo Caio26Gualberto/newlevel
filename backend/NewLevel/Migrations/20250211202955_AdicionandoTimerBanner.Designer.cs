@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewLevel.Context;
 
@@ -11,9 +12,11 @@ using NewLevel.Context;
 namespace NewLevel.Migrations
 {
     [DbContext(typeof(NewLevelDbContext))]
-    partial class NewLevelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250211202955_AdicionandoTimerBanner")]
+    partial class AdicionandoTimerBanner
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -414,9 +417,6 @@ namespace NewLevel.Migrations
 
                     b.Property<string>("BannerKey")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("BannerPosition")
-                        .HasColumnType("int");
 
                     b.Property<string>("BannerUrl")
                         .HasColumnType("nvarchar(max)");
