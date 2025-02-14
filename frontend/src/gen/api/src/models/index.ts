@@ -1,6 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './BandDto';
+export * from './BandInfoByUser';
+export * from './BandInfoByUserNewLevelResponse';
 export * from './BannerInfos';
 export * from './BooleanNewLevelResponse';
 export * from './CommentsListDto';

@@ -15,10 +15,13 @@
 
 import * as runtime from '../runtime';
 import type {
+  BandInfoByUserNewLevelResponse,
   BooleanNewLevelResponse,
   MemberInfoDtoListNewLevelResponse,
 } from '../models/index';
 import {
+    BandInfoByUserNewLevelResponseFromJSON,
+    BandInfoByUserNewLevelResponseToJSON,
     BooleanNewLevelResponseFromJSON,
     BooleanNewLevelResponseToJSON,
     MemberInfoDtoListNewLevelResponseFromJSON,
@@ -63,6 +66,38 @@ export class BandApi extends runtime.BaseAPI {
      */
     async apiBandGetAllBandMembersGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MemberInfoDtoListNewLevelResponse> {
         const response = await this.apiBandGetAllBandMembersGetRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiBandGetBandByUserGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BandInfoByUserNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/Band/GetBandByUser`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BandInfoByUserNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiBandGetBandByUserGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BandInfoByUserNewLevelResponse> {
+        const response = await this.apiBandGetBandByUserGetRaw(initOverrides);
         return await response.value();
     }
 

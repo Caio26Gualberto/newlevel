@@ -46,6 +46,36 @@ namespace NewLevel.Services.Band
             return members;
         }
 
+        public async Task<BandInfoByUser> GetBandByUser()
+        {
+            var user = await _utils.GetUserAsync();
+            var band = await _context.BandsUsers.Include(x => x.Band).Where(x => x.UserId == user.Id).Select(x => x.Band).FirstOrDefaultAsync();
+
+            User? integrant = new User();
+
+            if (band != null)
+            {
+                integrant = await _context.BandsUsers.Include(x => x.User)
+                    .Where(x => x.BandId == band.Id)
+                    .Where(x => x.UserId == user.Id)
+                    .Select(x => x.User)
+                    .FirstOrDefaultAsync();
+
+                return new BandInfoByUser
+                {
+                    BandProfileURL = $"/profile/{band.Name}/{band.Id}",
+                    BandName = band.Name
+                };
+            }
+
+            return new BandInfoByUser
+            {
+                BandName = null,
+                BandProfileURL = null
+            };
+
+        }
+
         public async Task<bool> RemoveMemberByUserId(string userId)
         {
             var bandMember = _context.BandsUsers.FirstOrDefault(x => x.UserId == userId);

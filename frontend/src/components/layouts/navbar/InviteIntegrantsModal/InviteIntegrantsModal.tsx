@@ -3,11 +3,9 @@ import GroupAddTwoToneIcon from '@mui/icons-material/GroupAddTwoTone';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CancelScheduleSendIcon from '@mui/icons-material/CancelScheduleSend';
 import GroupRemoveIcon from '@mui/icons-material/GroupRemove';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import React from "react";
 import ApiConfiguration from "../../../../apiConfig";
 import { BandApi, MemberInfoDto, PendingInvitesDto, SearchBarUserDetailDto, SystemNotificationApi, UserApi } from "../../../../gen/api/src";
-import DeleteIcon from '@mui/icons-material/Delete';
 import * as toastr from 'toastr';
 import { useNavigate } from "react-router-dom";
 
@@ -43,7 +41,6 @@ const InviteIntegrantsModal: React.FC<SimpleDialogProps> = ({ open, title, onClo
     };
 
     async function addMember() {
-        debugger
         setLoadingRequest(true);
         const result = await userService.apiUserInviteMemberBandPost({
             inviteMemberInput: {

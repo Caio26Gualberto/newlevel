@@ -1,4 +1,4 @@
-import { Avatar, Badge, Box, Drawer, Grid, IconButton, List, ListItem, Menu, MenuItem, styled, useMediaQuery, useTheme } from "@mui/material"
+import { Avatar, Badge, Box, Drawer, Grid, IconButton, Input, List, ListItem, Menu, MenuItem, styled, useMediaQuery, useTheme } from "@mui/material"
 import { useEffect, useState } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import Logo from "../../../assets/128982_logo.png"
@@ -14,6 +14,7 @@ import InviteIntegrantsModal from "./InviteIntegrantsModal/InviteIntegrantsModal
 import PopoverNotifications from "./popoverNotifications/PopoverNotifications";
 import ViewInviteModal from "./popoverNotifications/viewInviteModal/ViewInviteModal";
 import DraftsIcon from '@mui/icons-material/Drafts';
+import UserSearchBar from "./userSearchBar/UserSearchBar";
 
 const StyledLink = styled(Link)`
   text-decoration: none;
@@ -270,7 +271,7 @@ const Navbar = () => {
                             height="50%"
                             sx={{ cursor: "pointer" }}
                         />
-                        <Box display="flex" width="95%" pr={2} pl={2}>
+                        <Box display="flex" width="80%" pr={2} pl={2}>
                             <Grid container>
                                 <Grid display="flex" justifyContent="center" item xs={1}>
                                     <Menu
@@ -305,10 +306,15 @@ const Navbar = () => {
                                 </Grid>
                             </Grid>
                         </Box>
-                        <Box sx={{ cursor: "pointer", mr: 1 }}>
-                            <Badge onClick={handleClickPop} badgeContent={notifications.totalCount} sx={{ color: "yellow" }}>
-                                {openPop ? <DraftsIcon color="primary" /> : <MailIcon color="primary" />}
-                            </Badge>
+                        <Box display="flex" alignItems="center" justifyContent="space-between" width="20%">
+                            <Box sx={{ mr: 1 }} width="100%">
+                                <UserSearchBar />
+                            </Box>
+                            <Box sx={{ cursor: "pointer", mr: 1 }}>
+                                <Badge onClick={handleClickPop} badgeContent={notifications.totalCount} sx={{ color: "yellow" }}>
+                                    {openPop ? <DraftsIcon color="primary" /> : <MailIcon color="primary" />}
+                                </Badge>
+                            </Box>
                         </Box>
                         <PopoverNotifications open={openPop}
                             anchorEl={anchorElPop}

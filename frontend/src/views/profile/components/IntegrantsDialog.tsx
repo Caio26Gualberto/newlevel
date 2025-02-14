@@ -1,5 +1,6 @@
-import { Box, Dialog, DialogTitle, Typography } from "@mui/material";
+import { Box, Dialog, DialogTitle, Link, Typography } from "@mui/material";
 import { IntegrantInfoDto } from "../../../gen/api/src";
+import LinkIcon from '@mui/icons-material/Link';
 
 
 interface SimpleDialogProps {
@@ -39,8 +40,30 @@ const IntegrantsDialog: React.FC<SimpleDialogProps> = ({ title, data, dataWithUr
                         {dataWithUrl &&
                             dataWithUrl.map((integrant, index) => (
                                 <Box display="flex" justifyContent="center" alignItems="center">
-                                    <Typography key={index} variant="body1">
-                                        <strong><a href={integrant.profileUrl}>{integrant.name}</a></strong> {integrant.instrument}
+                                    <Typography key={index} variant="body1" sx={{ display: "flex", alignItems: "center" }}>
+                                        <strong>
+                                            <Link
+                                                href={integrant.profileUrl}
+                                                underline="none"
+                                                color="primary"
+                                                sx={{
+                                                    display: "inline-flex",
+                                                    alignItems: "center",
+                                                    gap: "6px", 
+                                                    fontWeight: "bold",
+                                                    transition: "color 0.3s ease, transform 0.3s ease",
+                                                    "&:hover": {
+                                                        color: "red",
+                                                        textDecoration: "underline",
+                                                        transform: "scale(1.05)"
+                                                    }
+                                                }}
+                                            >
+                                                {integrant.name}
+                                                <LinkIcon sx={{ fontSize: 16 }} />
+                                            </Link>
+                                        </strong>
+                                        <span style={{ marginLeft: "8px" }}>{integrant.instrument}</span>
                                     </Typography>
                                 </Box>
                             ))

@@ -73,7 +73,7 @@ namespace NewLevel.Services.Authenticate
             if (result.Succeeded)
             {
                 var user = await _signInManager.UserManager.FindByEmailAsync(email);
-                var band = await _newLevelDbContext.BandsUsers.Include(bu => bu.Band).Where(bu => bu.UserId == user.Id).Select(bu => bu.Band).FirstOrDefaultAsync();
+                var band = await _newLevelDbContext.BandsUsers.Include(bu => bu.Band).Where(bu => bu.UserId == user.Id && bu.IsBand).Select(bu => bu.Band).FirstOrDefaultAsync();
                 var roles = await _userManager.GetRolesAsync(user);
 
                 if (band != null && band.IsVerified)
@@ -194,7 +194,8 @@ namespace NewLevel.Services.Authenticate
                     var bandUser = new BandsUsers
                     {
                         BandId = band.Id,
-                        UserId = user.UserId
+                        UserId = user.UserId,
+                        IsBand = true
                     };
 
                     _newLevelDbContext.BandsUsers.Add(bandUser);

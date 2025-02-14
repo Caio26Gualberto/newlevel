@@ -252,6 +252,15 @@ namespace NewLevel.Services.UserService
             var searchedUser = await _context.Users.Include(x => x.Photos)
                 .Include(x => x.Medias).FirstOrDefaultAsync(x => x.Id == userId);
 
+            if (searchedUser == null)
+            {
+                var band = await _context.Bands.FirstOrDefaultAsync(x => x.Id == Convert.ToInt32(userId));
+                var bandUserId = await _context.BandsUsers.Where(x => x.BandId == band.Id && x.IsBand).Select(x => x.UserId).FirstOrDefaultAsync();
+
+                searchedUser = await _context.Users.Include(x => x.Photos)
+                    .Include(x => x.Medias).FirstOrDefaultAsync(x => x.Id == bandUserId);
+            }
+                
             var user = await _utils.GetUserAsync();
 
             if (searchedUser == null)
@@ -267,16 +276,9 @@ namespace NewLevel.Services.UserService
             if (searchedBand != null)
             {
                 integrants = await _context.BandsUsers.Include(x => x.User)
-                    .Where(x => x.BandId == searchedBand.Id)
+                    .Where(x => x.BandId == searchedBand.Id && !x.IsBand)
                     .Select(x => x.User)
                     .ToListAsync();
-
-                var bandToRemove = await _context.BandsUsers.Include(bandUser => bandUser.User)
-                    .Where(x => x.BandId == searchedBand.Id)
-                    .Select(bandUser => bandUser.User)
-                    .FirstOrDefaultAsync();
-
-                integrants.Remove(bandToRemove);
             }
 
 

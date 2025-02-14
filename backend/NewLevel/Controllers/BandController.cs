@@ -35,6 +35,25 @@ namespace NewLevel.Controllers
             }
         }
 
+        [HttpGet("GetBandByUser")]
+        public async Task<ActionResult<NewLevelResponse<BandInfoByUser>>> GetBandByUser()
+        {
+            try
+            {
+                var result = await _bandService.GetBandByUser();
+
+                return new NewLevelResponse<BandInfoByUser>()
+                {
+                    Data = result,
+                    IsSuccess = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<BandInfoByUser> { IsSuccess = false, Message = ex.Message });
+            }
+        }
+
         [HttpDelete("RemoveMemberByUserId")]
         public async Task<ActionResult<NewLevelResponse<bool>>> RemoveMemberByUserId(string userId)
         {
