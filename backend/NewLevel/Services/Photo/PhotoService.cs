@@ -140,7 +140,7 @@ namespace NewLevel.Services.Photo
                 var url = await s3.CreateTempURLS3("newlevel-images", photo.KeyS3); 
 
                 photo.User.Update(null, null, null, null, DateTime.Now.AddDays(2).AddHours(-3), url, null,
-                    null, null, null, null, null);
+                    null, null, null, null, null, null);
 
                 await _context.SaveChangesAsync();
                 return url;

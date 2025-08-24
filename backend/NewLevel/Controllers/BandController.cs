@@ -55,7 +55,7 @@ namespace NewLevel.Controllers
         }
 
         [HttpDelete("RemoveMemberByUserId")]
-        public async Task<ActionResult<NewLevelResponse<bool>>> RemoveMemberByUserId(string userId)
+        public async Task<ActionResult<NewLevelResponse<bool>>> RemoveMemberByUserId(int userId)
         {
             try
             {

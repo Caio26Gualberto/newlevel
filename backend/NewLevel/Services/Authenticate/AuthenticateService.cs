@@ -19,10 +19,10 @@ namespace NewLevel.Services.Authenticate
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly Utils.Utils _utils;
         private readonly IConfiguration _configuration;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<Role> _roleManager;
 
         public AuthenticateService(UserManager<User> userManager, SignInManager<User> signInManager, NewLevelDbContext newLevelDbContext, IHttpContextAccessor httpContextAccessor,
-            IConfiguration configuration, RoleManager<IdentityRole> roleManager)
+            IConfiguration configuration, RoleManager<Role> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -83,7 +83,7 @@ namespace NewLevel.Services.Authenticate
 
                 user.Update(isFirstTimeLogin: user.IsFirstTimeLogin, nickName: user.Nickname, avatarKey: user.AvatarKey, activityLocation: user.ActivityLocation,
                     publicTimer: user.PublicTimerAvatar, avatarUrl: user.AvatarUrl, email: user.Email, bannerKey: user.BannerKey, bannerUrl: user.BannerUrl,
-                    null, null, null);
+                    null, null, null, null);
 
 
                 var refreshToken = await _userManager.GenerateUserTokenAsync(user, tokenProvider: "local", purpose: "email");
@@ -229,7 +229,7 @@ namespace NewLevel.Services.Authenticate
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim("userId", user.Id),
+                    new Claim("userId", user.Id.ToString()),
                     roles.Contains("Admin") ? new Claim(ClaimTypes.Role, "Admin") : null,
                     roles.Contains("Band") ? new Claim(ClaimTypes.Role, "Band") : null
                 }),

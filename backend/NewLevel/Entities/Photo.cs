@@ -5,7 +5,7 @@ namespace NewLevel.Entities
 {
     public sealed class Photo
     {
-        public Photo(string keyS3, string title, string subtitle, string description, bool isPublic, DateTime creationTime, string userId, DateTime captureDate)
+        public Photo(string keyS3, string title, string subtitle, string description, bool isPublic, DateTime creationTime, int userId, DateTime captureDate)
         {
             ValidateDomainEntity(keyS3, title, subtitle, description, isPublic, creationTime, userId, publicTimer: null, null, captureDate);
         }
@@ -22,7 +22,7 @@ namespace NewLevel.Entities
 
 
 
-        public string UserId { get; set; }
+        public int UserId { get; set; }
         [ForeignKey("UserId")]
         public User User { get; set; }
         public List<Comment> Comments { get; set; }
@@ -32,12 +32,11 @@ namespace NewLevel.Entities
             ValidateDomainEntity(keyS3, title, subtitle, description, isPublic, CreationTime, UserId, publicTimer, privateUrl, captureDate);
         }
 
-        private void ValidateDomainEntity(string keyS3, string title, string subtitle, string? description, bool isPublic, DateTime creationTime, string userId, DateTime? publicTimer, string? privateUrl, DateTime captureDate)
+        private void ValidateDomainEntity(string keyS3, string title, string subtitle, string? description, bool isPublic, DateTime creationTime, int userId, DateTime? publicTimer, string? privateUrl, DateTime captureDate)
         {
             DomainExceptionValidation.When(string.IsNullOrEmpty(keyS3), "Não foi posível criar uma chave para o S3");
             DomainExceptionValidation.When(string.IsNullOrEmpty(title) || title.Length < 6 || title.Length > 22, "Título vazio, com mais de 22 ou menos que 6 caracteres");
             DomainExceptionValidation.When(string.IsNullOrEmpty(subtitle) ||  subtitle.Length < 6 || subtitle.Length > 137, "Subtítulo vazio, com mais de 137 ou menos de 6 caracteres");
-            DomainExceptionValidation.When(string.IsNullOrEmpty(userId), "UserId nulo");
             DomainExceptionValidation.When(captureDate == null, "Data de captura vazia");
 
             KeyS3 = keyS3;

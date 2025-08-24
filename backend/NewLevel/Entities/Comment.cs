@@ -5,7 +5,7 @@ namespace NewLevel.Entities
 {
     public sealed class Comment
     {
-        public Comment(string text, string userId, int? mediaId, int? photoId, DateTime creationTime)
+        public Comment(string text, int userId, int? mediaId, int? photoId, DateTime creationTime)
         {
             ValidateDomainEntity(text, userId, mediaId, photoId, creationTime);   
         }
@@ -14,7 +14,7 @@ namespace NewLevel.Entities
         public DateTime CreationTime { get; set; }
 
 
-        public string UserId { get; set; }
+        public int UserId { get; set; }
         public User User { get; set; }
         public int? MediaId { get; set; }
         public Media Media { get; set; }
@@ -26,7 +26,7 @@ namespace NewLevel.Entities
             ValidateDomainEntity(text, UserId, MediaId, PhotoId, CreationTime);
         }
 
-        private void ValidateDomainEntity(string text, string userId, int? mediaId, int? photoId, DateTime creationTime)
+        private void ValidateDomainEntity(string text, int userId, int? mediaId, int? photoId, DateTime creationTime)
         {
             DomainExceptionValidation.When(string.IsNullOrEmpty(text), "Ops comentário vazio");
 
@@ -35,7 +35,6 @@ namespace NewLevel.Entities
             MediaId = mediaId;
             PhotoId = photoId;
             CreationTime = creationTime;
-            UserId = userId;
         }
     }
 }

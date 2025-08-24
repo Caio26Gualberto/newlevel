@@ -6,6 +6,6 @@ namespace NewLevel.Interfaces.Services.Band
     {
         Task<List<MemberInfoDto>> GetAllBandMembers();
         Task<BandInfoByUser> GetBandByUser();
-        Task<bool> RemoveMemberByUserId(string userId);
+        Task<bool> RemoveMemberByUserId(int userId);
     }
 }

@@ -39,7 +39,7 @@ namespace NewLevel
             {
                 options.TokenLifespan = TimeSpan.FromMinutes(30);
             });
-            services.AddIdentity<User, IdentityRole>(options =>
+            services.AddIdentity<User, Role>(options =>
             {
                 // Configure a política de senha aqui
                 options.Password.RequireDigit = true;

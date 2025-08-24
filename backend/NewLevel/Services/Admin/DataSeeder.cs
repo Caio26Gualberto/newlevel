@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using NewLevel.Context;
 using NewLevel.Entities;
 
 namespace NewLevel.Services.Admin
@@ -7,13 +8,13 @@ namespace NewLevel.Services.Admin
     {
         public static async Task SeedAdminUser(IServiceProvider serviceProvider, string adminEmail, string adminPassword)
         {
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<Role>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
 
             // Verificar se a role "Admin" existe, e criar se não existir
             if (!await roleManager.RoleExistsAsync("Admin"))
             {
-                await roleManager.CreateAsync(new IdentityRole("Admin"));
+                await roleManager.CreateAsync(new Role("Admin"));
             }
 
             // Verificar se o usuário admin existe

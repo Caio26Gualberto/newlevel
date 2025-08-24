@@ -181,7 +181,7 @@ namespace NewLevel.Controllers
         }
 
         [HttpGet("GetProfile")]
-        public async Task<ActionResult<NewLevelResponse<ProfileInfoDto>>> GetProfile(string nickname, string userId)
+        public async Task<ActionResult<NewLevelResponse<ProfileInfoDto>>> GetProfile(string nickname, int userId)
         {
             try
             {

@@ -5,7 +5,7 @@ namespace NewLevel.Entities
 {
     public sealed class Media
     {
-        public Media(string src, string title, string description, bool isPublic, DateTime creationTime, string userId)
+        public Media(string src, string title, string description, bool isPublic, DateTime creationTime, int userId)
         {
             ValidateDomainEntity(src, title, description, isPublic, creationTime, userId);
         }
@@ -19,7 +19,7 @@ namespace NewLevel.Entities
 
 
 
-        public string UserId { get; set; }
+        public int UserId { get; set; }
         [ForeignKey("UserId")]
         public User User { get; set; }
         public List<Comment> Comments { get; set; }
@@ -29,9 +29,8 @@ namespace NewLevel.Entities
             ValidateDomainEntity(src, title, description, isPublic, CreationTime, UserId);
         }
 
-        private void ValidateDomainEntity(string src, string title, string description, bool isPublic, DateTime creationTime, string userId)
+        private void ValidateDomainEntity(string src, string title, string description, bool isPublic, DateTime creationTime, int userId)
         {
-            DomainExceptionValidation.When(string.IsNullOrEmpty(userId), "userId nulo");
             DomainExceptionValidation.When(string.IsNullOrEmpty(description), "descrição nula");
 
             Src = src;

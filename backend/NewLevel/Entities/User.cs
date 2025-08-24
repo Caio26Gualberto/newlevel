@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NewLevel.Entities
 {
-    public class User : IdentityUser
+    public class User : IdentityUser<int>
     {
         public User()
         {
@@ -15,7 +15,7 @@ namespace NewLevel.Entities
         public User(bool isFirstTimeLogin, string nickName, string? avatar, EActivityLocation activityLocation, DateTime? publicTimer, string avatarUrl, string? instrument)
         {
             ValidateDomainEntity(isFirstTimeLogin, nickName, avatar, activityLocation, publicTimer, avatarUrl, null, null, null,
-                null, null, instrument);
+                null, null, instrument, null);
         }
         public string Nickname { get; private set; }
         public string? AvatarKey { get; private set; }
@@ -25,6 +25,7 @@ namespace NewLevel.Entities
         public string? BannerUrl { get; private set; }
         public EActivityLocation ActivityLocation { get; private set; }
         public bool IsFirstTimeLogin { get; private set; }
+        public bool IsVerified { get; private set; } =  false;
         public DateTime? PublicTimerAvatar { get; private set; }
         public DateTime? PublicTimerBanner { get; private set; }
         public int? BannerPosition { get; private set; }
@@ -54,14 +55,14 @@ namespace NewLevel.Entities
 
 
         public void Update(bool? isFirstTimeLogin, string? nickName, string? avatarKey, EActivityLocation? activityLocation, DateTime? publicTimer,
-            string? avatarUrl, string? email, string? bannerKey, string? bannerUrl, int? bannerPosition, DateTime? publicTimerBanner, string? instrument)
+            string? avatarUrl, string? email, string? bannerKey, string? bannerUrl, int? bannerPosition, DateTime? publicTimerBanner, string? instrument, bool? isVerified)
         {
             ValidateDomainEntity(isFirstTimeLogin, nickName, avatarKey, activityLocation, publicTimer, avatarUrl, email, bannerKey, bannerUrl,
-                bannerPosition, publicTimerBanner, instrument);
+                bannerPosition, publicTimerBanner, instrument, isVerified);
         }
 
         private void ValidateDomainEntity(bool? isFirstTimeLogin, string? nickName, string? avatarKey, EActivityLocation? activityLocation, DateTime? publicTimer,
-            string? avatarUrl, string? email, string? bannerKey, string? bannerUrl, int? bannerPosition, DateTime? publicTimerBanner, string? instrument)
+            string? avatarUrl, string? email, string? bannerKey, string? bannerUrl, int? bannerPosition, DateTime? publicTimerBanner, string? instrument, bool? isVerified)
         {
 
             if (isFirstTimeLogin.HasValue)
@@ -105,6 +106,9 @@ namespace NewLevel.Entities
 
             if (publicTimerBanner != null)
                 PublicTimerBanner = publicTimerBanner;
+
+            if (isVerified != null)
+                IsVerified = isVerified.Value;
         }
     }
 }

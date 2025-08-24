@@ -39,9 +39,9 @@ public class EmailService : IEmailService
         }
     }
 
-    public static (string body, string subject) MakeResetPasswordTemplate(string token, string userId)
+    public static (string body, string subject) MakeResetPasswordTemplate(string token, int userId)
     {
-        var resetUrl = "http://localhost:3000/security/resetPassword?token=" + HttpUtility.UrlEncode(token) + "&userId=" + HttpUtility.UrlEncode(userId);
+        var resetUrl = "http://localhost:3000/security/resetPassword?token=" + HttpUtility.UrlEncode(token) + "&userId=" + HttpUtility.UrlEncode(userId.ToString());
 
         var subject = "Redefinição de Senha";
         var body = $"<p>Para redefinir sua senha, clique <a href=\"{resetUrl}\">aqui</a>.</p>";

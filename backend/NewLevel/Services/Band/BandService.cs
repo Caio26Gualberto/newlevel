@@ -76,7 +76,7 @@ namespace NewLevel.Services.Band
 
         }
 
-        public async Task<bool> RemoveMemberByUserId(string userId)
+        public async Task<bool> RemoveMemberByUserId(int userId)
         {
             var bandMember = _context.BandsUsers.FirstOrDefault(x => x.UserId == userId);
 

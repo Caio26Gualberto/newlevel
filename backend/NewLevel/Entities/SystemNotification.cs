@@ -30,7 +30,7 @@ namespace NewLevel.Entities
         [Required]
         public ESystemNotificationType SystemNotificationType { get; private set; }
 
-        public string UserId { get; set; }
+        public int UserId { get; set; }
         public User User { get; set; }
 
         public void Update(string? title, string? message, ESystemNotificationType? notificationType, string? hiddenInfos, bool isRead, bool isDeleted)

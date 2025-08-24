@@ -13,7 +13,7 @@ namespace NewLevel.Interfaces.Services.User
         public Task<bool> UploadBannerImage(UploadImageInput input);
         public Task<bool> UpdateUser(UpdateUserInput input);
         Task<bool> ResetPassword(ResetPasswordInput input);
-        Task<ProfileInfoDto> GetProfile(string nickname, string userId);
+        Task<ProfileInfoDto> GetProfile(string nickname, int userId);
         Task<List<SearchBarUserDetailDto>> GetUsersForSearchBar(string nickname);
         Task<bool> InviteMemberBand(InviteMemberInput input);
         Task<bool> AddMemberToBand(int notificationId);

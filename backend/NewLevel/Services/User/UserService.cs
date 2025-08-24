@@ -109,7 +109,7 @@ namespace NewLevel.Services.UserService
                 var user = await _utils.GetUserAsync();
 
                 user.Update(false, null, null, null, null,
-                    null, null, null, null, null, null, null);
+                    null, null, null, null, null, null, null, null);
 
                 await _userManager.UpdateAsync(user);
                 await _context.SaveChangesAsync();
@@ -147,7 +147,7 @@ namespace NewLevel.Services.UserService
             }
 
             user.Update(null, null, key, null, publicTimer: DateTime.Now.AddDays(2).AddHours(-3),
-                 url, null, null, null, null, null, null);
+                 url, null, null, null, null, null, null, null);
 
             await _userManager.UpdateAsync(user);
             await _context.SaveChangesAsync();
@@ -175,7 +175,7 @@ namespace NewLevel.Services.UserService
             }
 
             user.Update(null, null, null, null,
-                null, null, null, bannerKey: key, bannerUrl: url, input.Position, DateTime.Now.AddDays(2).AddHours(-3), null);
+                null, null, null, bannerKey: key, bannerUrl: url, input.Position, DateTime.Now.AddDays(2).AddHours(-3), null, null);
 
             await _userManager.UpdateAsync(user);
             await _context.SaveChangesAsync();
@@ -208,7 +208,7 @@ namespace NewLevel.Services.UserService
                 user.Update(null, nickName: input.Nickname ?? user.Nickname, key,
                     activityLocation: input.ActivityLocation ?? null,
                     publicTimer: DateTime.Now.AddDays(2).AddHours(-3), avatarUrl: url, email: input.Email, null, null, null,
-                    null, null);
+                    null, null, null);
 
                 await _userManager.UpdateAsync(user);
                 await _context.SaveChangesAsync();
@@ -218,7 +218,7 @@ namespace NewLevel.Services.UserService
                 user.Update(null, nickName: input.Nickname ?? user.Nickname, null,
                     activityLocation: input.ActivityLocation ?? user.ActivityLocation, 
                     publicTimer: DateTime.Now.AddDays(2).AddHours(-3), null, null, null, null, null,
-                    null, null);
+                    null, null, null);
 
                 await _userManager.UpdateAsync(user);
                 await _context.SaveChangesAsync();
@@ -247,7 +247,7 @@ namespace NewLevel.Services.UserService
             return false;
         }
 
-        public async Task<ProfileInfoDto> GetProfile(string nickname, string userId)
+        public async Task<ProfileInfoDto> GetProfile(string nickname, int userId)
         {
             var searchedUser = await _context.Users.Include(x => x.Photos)
                 .Include(x => x.Medias).FirstOrDefaultAsync(x => x.Id == userId);
@@ -414,7 +414,7 @@ namespace NewLevel.Services.UserService
                     notification.Update(notification.Title, notification.Message, Enums.SystemNotification.ESystemNotificationType.Invite, notification.HiddenInfos, isRead: true, notification.IsDeleted);
 
                     user.Update(user.IsFirstTimeLogin, user.Nickname, user.AvatarKey, user.ActivityLocation, user.PublicTimerAvatar, user.AvatarUrl,
-                        user.Email, bannerKey: user.BannerKey, bannerUrl: user.BannerUrl, null, null, instrument);
+                        user.Email, bannerKey: user.BannerKey, bannerUrl: user.BannerUrl, null, null, instrument, null);
 
                     await _context.SaveChangesAsync(); return true;
                 }

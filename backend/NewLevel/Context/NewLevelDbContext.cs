@@ -2,11 +2,10 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NewLevel.Entities;
-using System.Reflection.Emit;
 
 namespace NewLevel.Context
 {
-    public class NewLevelDbContext : IdentityDbContext<User>
+    public class NewLevelDbContext : IdentityDbContext<User, Role, int>
     {
         public NewLevelDbContext(DbContextOptions<NewLevelDbContext> options) : base(options)
         { }
@@ -33,27 +32,27 @@ namespace NewLevel.Context
             {
                 entity.ToTable(name: "Roles");
             });
-            builder.Entity<IdentityUserRole<string>>(entity =>
+            builder.Entity<IdentityUserRole<int>>(entity =>
             {
                 entity.ToTable("UserRoles");
             });
 
-            builder.Entity<IdentityUserClaim<string>>(entity =>
+            builder.Entity<IdentityUserClaim<int>>(entity =>
             {
                 entity.ToTable("UserClaims");
             });
 
-            builder.Entity<IdentityUserLogin<string>>(entity =>
+            builder.Entity<IdentityUserLogin<int>>(entity =>
             {
                 entity.ToTable("UserLogins");
             });
 
-            builder.Entity<IdentityRoleClaim<string>>(entity =>
+            builder.Entity<IdentityRoleClaim<int>>(entity =>
             {
                 entity.ToTable("RoleClaims");
             });
 
-            builder.Entity<IdentityUserToken<string>>(entity =>
+            builder.Entity<IdentityUserToken<int>>(entity =>
             {
                 entity.ToTable("UserTokens");
             });
