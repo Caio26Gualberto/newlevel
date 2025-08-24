@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, FormControl, InputLabel, Input, Button, TextField } from '@mui/material';
+import { Box, FormControl, InputLabel, Input, Button, TextField, useTheme, useMediaQuery } from '@mui/material';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 
@@ -13,6 +13,9 @@ interface DynamicInputRowProps {
 const DynamicInputRow: React.FC<DynamicInputRowProps> = ({ addMembers }) => {
     const [member, setMember] = useState<string>('')
     const [instrument, setInstrument] = useState<string>('')
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const handleSave = () => {
         const memberAndInstrument: MemberAndInstrument = {};
@@ -25,7 +28,18 @@ const DynamicInputRow: React.FC<DynamicInputRowProps> = ({ addMembers }) => {
     };
 
     return (
-        <Box display="flex" width="100%" flexDirection="row" gap={2} mt={1}>
+        <Box 
+            sx={{
+                display: "flex",
+                width: "100%",
+                flexDirection: {
+                    xs: "column",
+                    sm: "row"
+                },
+                gap: 2,
+                mt: 1
+            }}
+        >
             <TextField
                 label="Integrante"
                 value={member}
@@ -33,6 +47,20 @@ const DynamicInputRow: React.FC<DynamicInputRowProps> = ({ addMembers }) => {
                 color="success"
                 fullWidth
                 variant="outlined"
+                sx={{
+                    '& .MuiInputBase-input': {
+                        fontSize: {
+                            xs: '0.75rem',
+                            sm: '0.875rem'
+                        }
+                    },
+                    '& .MuiInputLabel-root': {
+                        fontSize: {
+                            xs: '0.75rem',
+                            sm: '0.875rem'
+                        }
+                    }
+                }}
             />
             <TextField
                 label="Instrumento"
@@ -41,9 +69,43 @@ const DynamicInputRow: React.FC<DynamicInputRowProps> = ({ addMembers }) => {
                 color="success"
                 fullWidth
                 variant="outlined"
+                sx={{
+                    '& .MuiInputBase-input': {
+                        fontSize: {
+                            xs: '0.75rem',
+                            sm: '0.875rem'
+                        }
+                    },
+                    '& .MuiInputLabel-root': {
+                        fontSize: {
+                            xs: '0.75rem',
+                            sm: '0.875rem'
+                        }
+                    }
+                }}
             />
-            <Button onClick={handleSave}>
-                <CheckCircleRoundedIcon color='success' />
+            <Button 
+                onClick={handleSave}
+                sx={{
+                    minWidth: {
+                        xs: "40px",
+                        sm: "48px"
+                    },
+                    height: {
+                        xs: "40px",
+                        sm: "48px"
+                    }
+                }}
+            >
+                <CheckCircleRoundedIcon 
+                    color='success'
+                    sx={{
+                        fontSize: {
+                            xs: "1.25rem",
+                            sm: "1.5rem"
+                        }
+                    }}
+                />
             </Button>
         </Box>
     );

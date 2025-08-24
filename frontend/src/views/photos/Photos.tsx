@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import CardPhoto from "./components/CardPhoto";
-import { Box, Button, Grid, Input, TablePagination } from "@mui/material";
+import { Box, Button, Input, TablePagination, useTheme, useMediaQuery } from "@mui/material";
 import AddNewPhotoModal from "./components/modal/AddNewPhotoModal";
 import { PhotoApi, PhotoResponseDtoGenericList } from "../../gen/api/src";
 import ApiConfiguration from "../../apiConfig";
 import * as toastr from 'toastr';
 import SearchIcon from '@mui/icons-material/Search';
-import { useMobile } from "../../MobileContext";
 
 const Photos = () => {
   const photoService = new PhotoApi(ApiConfiguration);
-  const { isMobile } = useMobile()
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [photos, setPhotos] = useState<PhotoResponseDtoGenericList>({ items: [], totalCount: 0 });
   const [pagination, setPagination] = useState({ page: 0, pageSize: 12, pageCount: 0, search: '' });
@@ -63,91 +65,198 @@ const Photos = () => {
   return (
     <>
       <AddNewPhotoModal open={openModal} onClose={handleCloseModal} />
-      <Box bgcolor="#F3F3F3">
+      <Box 
+        bgcolor="#F3F3F3"
+        sx={{
+          minHeight: '100vh',
+          p: {
+            xs: 2,
+            sm: 3,
+            md: 4
+          }
+        }}
+      >
+        {/* Header Section */}
         <Box
-          display="flex"
-          flexDirection={isMobile ? 'column' : 'row'}
-          alignItems="center"
-          justifyContent="space-between"
-          padding={isMobile ? 2 : 3}
+          sx={{
+            display: "flex",
+            flexDirection: {
+              xs: "column",
+              md: "row"
+            },
+            alignItems: {
+              xs: "stretch",
+              md: "center"
+            },
+            justifyContent: "space-between",
+            gap: {
+              xs: 2,
+              md: 0
+            },
+            mb: {
+              xs: 3,
+              md: 4
+            }
+          }}
         >
+          {/* Search Section */}
           <Box
-            width={isMobile ? '100%' : 'auto'}
-            display="flex"
-            alignItems="center"
-            justifyContent={isMobile ? 'space-between' : 'flex-start'}
-            mb={isMobile ? 2 : 0}
+            sx={{
+              display: "flex",
+              flexDirection: {
+                xs: "column",
+                sm: "row"
+              },
+              alignItems: {
+                xs: "stretch",
+                sm: "center"
+              },
+              gap: {
+                xs: 1,
+                sm: 1
+              },
+              flex: 1,
+              maxWidth: {
+                xs: "100%",
+                md: "400px"
+              }
+            }}
           >
             <Input
               value={pagination.search}
               placeholder="Pesquisa por título"
               size="small"
               sx={{
-                width: isMobile ? '100%' : '400px',
-                marginTop: isMobile ? 1 : 2,
+                flex: 1,
+                minWidth: 0
               }}
               onChange={(e) => setPagination({ ...pagination, search: e.target.value })}
             />
             <Button
               className="btn btn-primary"
               onClick={search}
-              sx={{ ml: isMobile ? 0 : 1, mt: isMobile ? 1 : 0 }}
+              sx={{
+                minWidth: "fit-content",
+                alignSelf: {
+                  xs: "stretch",
+                  sm: "center"
+                }
+              }}
             >
               <SearchIcon fontSize="medium" />
             </Button>
           </Box>
-          <Button
+
+          {/* Add Photo Button */}
+          <Box
             sx={{
-              width: isMobile ? '100%' : 'auto',
-              mt: isMobile ? 1 : 2,
+              display: "flex",
+              justifyContent: {
+                xs: "stretch",
+                md: "flex-end"
+              }
             }}
-            className="btn btn-primary"
-            onClick={handleOpenModal}
           >
-            Adicionar foto
-          </Button>
+            <Button
+              sx={{
+                width: {
+                  xs: "100%",
+                  md: "auto"
+                }
+              }}
+              className="btn btn-primary"
+              onClick={handleOpenModal}
+            >
+              Adicionar foto
+            </Button>
+          </Box>
         </Box>
-        <Box m={isMobile ? 1 : 2}>
-          <Grid container spacing={isMobile ? 1 : 2}>
-            {photos.items?.map((photo, index) => (
-              <Grid
-                key={index}
-                item
-                xs={12}
-                sm={6} 
-                md={4} 
-                lg={2} 
-              >
-                <CardPhoto
-                  title={photo.title!}
-                  subtitle={photo.subtitle!}
-                  srcPhotoS3={photo.src!}
-                  date={photo.captureDate!}
-                  description={photo.description}
-                  srcUserPhotoProfile={photo.avatarSrc}
-                  userId={photo.userId!}
-                  nickname={photo.nickname!}
-                  photoId={photo.id!}
-                />
-              </Grid>
-            ))}
-          </Grid>
+
+        {/* Photos Grid */}
+        <Box 
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: {
+              xs: 1,
+              sm: 2,
+              md: 3
+            },
+            justifyContent: {
+              xs: "center",
+              sm: "flex-start"
+            },
+            mb: 3
+          }}
+        >
+          {photos.items?.map((photo, index) => (
+            <Box
+              key={index}
+              sx={{
+                flex: {
+                  xs: "1 1 100%",
+                  sm: "1 1 calc(50% - 8px)",
+                  md: "1 1 calc(33.333% - 16px)",
+                  lg: "1 1 calc(25% - 24px)",
+                  xl: "1 1 calc(20% - 24px)"
+                },
+                minWidth: {
+                  xs: "100%",
+                  sm: "280px",
+                  md: "300px"
+                },
+                maxWidth: {
+                  xs: "100%",
+                  sm: "400px",
+                  md: "500px"
+                }
+              }}
+            >
+              <CardPhoto
+                title={photo.title!}
+                subtitle={photo.subtitle!}
+                srcPhotoS3={photo.src!}
+                date={photo.captureDate!}
+                description={photo.description}
+                srcUserPhotoProfile={photo.avatarSrc}
+                userId={photo.userId!}
+                nickname={photo.nickname!}
+                photoId={photo.id!}
+              />
+            </Box>
+          ))}
         </Box>
-        <TablePagination
-          sx={{ display: 'flex', justifyContent: 'center' }}
-          rowsPerPageOptions={[12, 24, 48]}
-          component="div"
-          count={photos.totalCount!}
-          labelRowsPerPage="Fotos por página"
-          rowsPerPage={pagination.pageSize}
-          page={pagination.page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+
+        {/* Pagination */}
+        <Box 
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            width: "100%"
+          }}
+        >
+          <TablePagination
+            rowsPerPageOptions={[12, 24, 48]}
+            component="div"
+            count={photos.totalCount!}
+            labelRowsPerPage="Fotos por página"
+            rowsPerPage={pagination.pageSize}
+            page={pagination.page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            sx={{
+              '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                fontSize: {
+                  xs: '0.75rem',
+                  sm: '0.875rem'
+                }
+              }
+            }}
+          />
+        </Box>
       </Box>
     </>
   );
-
 }
 
 export default Photos

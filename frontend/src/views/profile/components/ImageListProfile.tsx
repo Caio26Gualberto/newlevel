@@ -1,4 +1,4 @@
-import { ImageListItem, Tooltip, ImageListItemBar, Typography, Box } from '@mui/material'
+import { ImageListItem, Tooltip, ImageListItemBar, Typography, Box, useTheme, useMediaQuery } from '@mui/material'
 import React from 'react'
 
 interface MediaListProfileProps {
@@ -10,6 +10,10 @@ interface MediaListProfileProps {
 const MediaListProfile: React.FC<MediaListProfileProps> = ({ src, title, isVideo }) => {
     const [showTooltip, setShowTooltip] = React.useState(false);
     let timer: NodeJS.Timeout;
+    
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const handleMouseEnter = () => {
         timer = setTimeout(() => {
@@ -24,7 +28,15 @@ const MediaListProfile: React.FC<MediaListProfileProps> = ({ src, title, isVideo
     return (
         <ImageListItem
             key={src}
-            sx={{ borderRadius: '8px', overflow: 'hidden' }}
+            sx={{ 
+                borderRadius: '8px', 
+                overflow: 'hidden',
+                height: {
+                    xs: '120px',
+                    sm: '140px',
+                    md: '164px'
+                }
+            }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
@@ -38,7 +50,17 @@ const MediaListProfile: React.FC<MediaListProfileProps> = ({ src, title, isVideo
             >
                 <>
                     {isVideo ? (
-                        <Box sx={{ position: "relative", width: "100%", height: "164px" }}>
+                        <Box 
+                            sx={{ 
+                                position: "relative", 
+                                width: "100%", 
+                                height: {
+                                    xs: '120px',
+                                    sm: '140px',
+                                    md: '164px'
+                                }
+                            }}
+                        >
                             <iframe
                                 src={src}
                                 style={{
@@ -69,7 +91,7 @@ const MediaListProfile: React.FC<MediaListProfileProps> = ({ src, title, isVideo
                             loading="lazy"
                             style={{
                                 width: '100%',
-                                height: '164px',
+                                height: isSmallMobile ? '120px' : isMobile ? '140px' : '164px',
                                 objectFit: 'cover',
                                 borderRadius: '8px',
                                 border: '2px solid #E0E0E0',
@@ -89,7 +111,19 @@ const MediaListProfile: React.FC<MediaListProfileProps> = ({ src, title, isVideo
                         'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, ' +
                         'rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
                 }}
-                title={<Typography variant="subtitle2">{title}</Typography>}
+                title={
+                    <Typography 
+                        variant="subtitle2"
+                        sx={{
+                            fontSize: {
+                                xs: "0.75rem",
+                                sm: "0.875rem"
+                            }
+                        }}
+                    >
+                        {title}
+                    </Typography>
+                }
                 position="top"
                 actionPosition="left"
             />

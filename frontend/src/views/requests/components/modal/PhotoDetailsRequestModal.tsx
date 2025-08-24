@@ -1,7 +1,7 @@
 import NewLevelModalHeader from "../../../../components/NewLevelModalHeader";
 import NewLevelModal from "../../../../components/NewLevelModal";
 import { PhotoResponseDto } from "../../../../gen/api/src";
-import { Box, Divider, TextField, ThemeProvider, Typography, createTheme } from "@mui/material";
+import { Box, Divider, TextField, ThemeProvider, Typography, createTheme, useTheme, useMediaQuery } from "@mui/material";
 
 interface PhotoDetailsRequestModalProps {
     open: boolean;
@@ -36,23 +36,76 @@ const styles = {
 };
 
 const PhotoDetailsRequestModal: React.FC<PhotoDetailsRequestModalProps> = ({ open, onClose, photoData }) => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    
     return (
-        <NewLevelModal height="50vh" width={1000} open={open}>
+        <NewLevelModal 
+            height="50vh" 
+            width={isSmallMobile ? 350 : isMobile ? 600 : 1000} 
+            open={open}
+        >
             <>
                 <NewLevelModalHeader closeModal={onClose} title="Detalhes da foto" />
                 <Divider />
-                <Box display="flex" justifyContent="center">
-                    <Typography variant="h6" component="h6" mr={4} mt={1} mb={2}>{photoData.nickname}</Typography>
+                <Box 
+                    sx={{
+                        display: "flex",
+                        justifyContent: "center"
+                    }}
+                >
+                    <Typography 
+                        variant="h6" 
+                        component="h6" 
+                        sx={{
+                            mr: {
+                                xs: 1,
+                                sm: 2,
+                                md: 4
+                            },
+                            mt: 1,
+                            mb: 2,
+                            fontSize: {
+                                xs: "1rem",
+                                sm: "1.25rem"
+                            }
+                        }}
+                    >
+                        {photoData.nickname}
+                    </Typography>
                 </Box>
-                <Box display="flex" alignItems="center" ml={5} width="90%">
+                <Box 
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        ml: {
+                            xs: 1,
+                            sm: 2,
+                            md: 5
+                        },
+                        width: {
+                            xs: "95%",
+                            sm: "90%"
+                        }
+                    }}
+                >
                     <ThemeProvider theme={theme}>
                         <TextField
                             value={photoData.description}
                             fullWidth
                             multiline
-                            rows={6}
+                            rows={isSmallMobile ? 4 : 6}
                             inputProps={{ readOnly: true }}
                             style={styles.textField}
+                            sx={{
+                                '& .MuiInputBase-input': {
+                                    fontSize: {
+                                        xs: '0.75rem',
+                                        sm: '0.875rem'
+                                    }
+                                }
+                            }}
                         />
                     </ThemeProvider>
                 </Box>

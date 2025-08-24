@@ -15,7 +15,6 @@ import { AuthProvider } from '../AuthContext';
 import Request from '../views/requests/Request';
 import MyPhotos from '../views/myPhotos/MyPhotos';
 import PartnerStore from '../views/partnerStore/PartnerStore';
-import { MobileProvider } from '../MobileContext';
 import IssueReport from '../views/issueReport/IssueReport';
 import BandRegister from '../views/loginAndRegister/BandRegister';
 import NotFound from '../views/notFound/NotFound';
@@ -24,7 +23,6 @@ import Profile from '../views/profile/Profile';
 const Rotas = () => {
   return (
     <AuthProvider>
-      <MobileProvider>
         <Router>
           <Navbar />
           <Switch>
@@ -48,7 +46,6 @@ const Rotas = () => {
             <Route path="*" element={<NotFound />} />
           </Switch>
         </Router>
-      </MobileProvider>
     </AuthProvider>
   )
 }

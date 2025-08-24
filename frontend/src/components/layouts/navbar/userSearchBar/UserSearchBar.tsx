@@ -1,4 +1,4 @@
-import { Box, Autocomplete, TextField, CircularProgress, Avatar } from "@mui/material";
+import { Box, Autocomplete, TextField, CircularProgress, Avatar, useTheme, useMediaQuery } from "@mui/material";
 import { SearchBarUserDetailDto, UserApi } from "../../../../gen/api/src";
 import React from "react";
 import ApiConfiguration from "../../../../apiConfig";
@@ -7,6 +7,10 @@ import { useNavigate } from "react-router-dom";
 const UserSearchBar = () => {
     const userService = new UserApi(ApiConfiguration);
     const navigate = useNavigate()
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    
     const [member, setMember] = React.useState<SearchBarUserDetailDto[]>([]);
     const [selectedMember, setSelectedMember] = React.useState<SearchBarUserDetailDto>({ avatarUrl: "", nickName: "", userId: "" });
     const [loading, setLoading] = React.useState<boolean>(false);
@@ -37,7 +41,16 @@ const UserSearchBar = () => {
     }, [searchTerm]);
 
     return (
-        <Box width="100%" sx={{ maxWidth: 300 }}>
+        <Box 
+            sx={{
+                width: "100%",
+                maxWidth: {
+                    xs: "200px",
+                    sm: "250px",
+                    md: "300px"
+                }
+            }}
+        >
             <Autocomplete
                 id="user-autocomplete"
                 options={member}
@@ -68,6 +81,10 @@ const UserSearchBar = () => {
                     },
                     "& .MuiInputLabel-root": {
                         color: "#aaa",
+                        fontSize: {
+                            xs: "0.75rem",
+                            sm: "0.875rem"
+                        }
                     },
                     "& .MuiInputLabel-root.Mui-focused": {
                         color: "#fff",
@@ -82,8 +99,20 @@ const UserSearchBar = () => {
                         variant="filled"
                         label="Pesquisar usuário"
                         sx={{
-                            input: { color: "white" },
-                            label: { color: "rgba(255, 255, 255, 0.7)" },
+                            input: { 
+                                color: "white",
+                                fontSize: {
+                                    xs: "0.75rem",
+                                    sm: "0.875rem"
+                                }
+                            },
+                            label: { 
+                                color: "rgba(255, 255, 255, 0.7)",
+                                fontSize: {
+                                    xs: "0.75rem",
+                                    sm: "0.875rem"
+                                }
+                            },
                             "& .MuiFilledInput-root": {
                                 backgroundColor: "#1e1e1e",
                                 "&:hover": { backgroundColor: "#333" },
@@ -94,7 +123,22 @@ const UserSearchBar = () => {
                             ...params.InputProps,
                             endAdornment: (
                                 <>
-                                    {loading ? <CircularProgress color="primary" sx={{ marginBottom: "10px" }} size={24} /> : null}
+                                    {loading ? (
+                                        <CircularProgress 
+                                            color="primary" 
+                                            sx={{ 
+                                                marginBottom: "10px",
+                                                width: {
+                                                    xs: "20px",
+                                                    sm: "24px"
+                                                },
+                                                height: {
+                                                    xs: "20px",
+                                                    sm: "24px"
+                                                }
+                                            }} 
+                                        />
+                                    ) : null}
                                 </>
                             ),
                         }}
@@ -106,18 +150,45 @@ const UserSearchBar = () => {
                         key={option.userId}
                         component="li"
                         {...props}
-                        display="flex"
-                        alignItems="center"
                         sx={{
+                            display: "flex",
+                            alignItems: "center",
                             backgroundColor: "#1e1e1e",
                             color: "#fff",
                             "&:hover": {
                                 backgroundColor: "#333",
                             },
+                            fontSize: {
+                                xs: "0.75rem",
+                                sm: "0.875rem"
+                            }
                         }}
                     >
-                        <Avatar src={option.avatarUrl} alt={option.nickName} />
-                        <Box ml={1}>{option.nickName}</Box>
+                        <Avatar 
+                            src={option.avatarUrl} 
+                            alt={option.nickName}
+                            sx={{
+                                width: {
+                                    xs: "24px",
+                                    sm: "32px"
+                                },
+                                height: {
+                                    xs: "24px",
+                                    sm: "32px"
+                                }
+                            }}
+                        />
+                        <Box 
+                            sx={{
+                                ml: 1,
+                                fontSize: {
+                                    xs: "0.75rem",
+                                    sm: "0.875rem"
+                                }
+                            }}
+                        >
+                            {option.nickName}
+                        </Box>
                     </Box>
                 )}
                 isOptionEqualToValue={(option, value) => option.userId === value.userId}
@@ -127,6 +198,10 @@ const UserSearchBar = () => {
                             backgroundColor: "#1e1e1e",
                             color: "#fff",
                             borderRadius: "8px",
+                            maxHeight: {
+                                xs: "200px",
+                                sm: "300px"
+                            }
                         },
                     },
                 }}

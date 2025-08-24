@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, IconButton, Paper, Typography } from '@mui/material';
+import { Box, IconButton, Paper, Typography, useTheme, useMediaQuery } from '@mui/material';
 import { Block as BlockIcon, CheckCircle as CheckCircleIcon } from '@mui/icons-material'
 import PhotoDetailsRequestModal from './modal/PhotoDetailsRequestModal';
 import { PhotoApi, PhotoResponseDto } from '../../../gen/api/src';
@@ -16,6 +16,10 @@ const PhotoListItem: React.FC<PhotoListItemProps> = ({ item, triggerUpdate }) =>
   const photoService = new PhotoApi(ApiConfiguration);
   const [loading, setLoading] = useState(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
+  
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleCloseModal = () => {
     setIsOpenModal(false);
@@ -41,8 +45,14 @@ const PhotoListItem: React.FC<PhotoListItemProps> = ({ item, triggerUpdate }) =>
         elevation={3}
         sx={{
           height: 'auto',
-          padding: '16px',
-          margin: '16px',
+          padding: {
+            xs: '12px',
+            sm: '16px'
+          },
+          margin: {
+            xs: '8px',
+            sm: '16px'
+          },
           boxSizing: 'border-box',
           display: 'flex',
           flexDirection: 'column',
@@ -56,22 +66,103 @@ const PhotoListItem: React.FC<PhotoListItemProps> = ({ item, triggerUpdate }) =>
           sx={{
             display: 'block',
             borderRadius: '4px',
-            height: '250px',
+            height: {
+              xs: '180px',
+              sm: '220px',
+              md: '250px'
+            },
             objectFit: 'cover',
             width: '100%',
             cursor: 'pointer',
           }}
         />
-        <Box mt={1} display="flex" justifyContent="center" alignItems="center" flexDirection="column">
-          <Typography fontWeight="bold" textAlign="center">{item.title}</Typography>
-          <Typography textAlign="center">{item.subtitle}</Typography>
+        <Box 
+          sx={{
+            mt: 1,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexDirection: "column"
+          }}
+        >
+          <Typography 
+            fontWeight="bold" 
+            textAlign="center"
+            sx={{
+              fontSize: {
+                xs: "0.875rem",
+                sm: "1rem"
+              }
+            }}
+          >
+            {item.title}
+          </Typography>
+          <Typography 
+            textAlign="center"
+            sx={{
+              fontSize: {
+                xs: "0.75rem",
+                sm: "0.875rem"
+              }
+            }}
+          >
+            {item.subtitle}
+          </Typography>
         </Box>
-        <Box display="flex" justifyContent="space-around" alignItems="center" mt={2}>
-          <IconButton>
-            <BlockIcon color="error" fontSize="large" />
+        <Box 
+          sx={{
+            display: "flex",
+            justifyContent: "space-around",
+            alignItems: "center",
+            mt: 2
+          }}
+        >
+          <IconButton
+            sx={{
+              width: {
+                xs: "40px",
+                sm: "48px"
+              },
+              height: {
+                xs: "40px",
+                sm: "48px"
+              }
+            }}
+          >
+            <BlockIcon 
+              color="error" 
+              fontSize="large"
+              sx={{
+                fontSize: {
+                    xs: "1.5rem",
+                    sm: "2rem"
+                }
+            }}
+            />
           </IconButton>
-          <IconButton onClick={approvePhoto}>
-            <CheckCircleIcon color="success" fontSize="large" />
+          <IconButton 
+            onClick={approvePhoto}
+            sx={{
+                width: {
+                    xs: "40px",
+                    sm: "48px"
+                },
+                height: {
+                    xs: "40px",
+                    sm: "48px"
+                }
+            }}
+          >
+            <CheckCircleIcon 
+              color="success" 
+              fontSize="large"
+              sx={{
+                fontSize: {
+                    xs: "1.5rem",
+                    sm: "2rem"
+                }
+            }}
+            />
           </IconButton>
         </Box>
       </Paper>

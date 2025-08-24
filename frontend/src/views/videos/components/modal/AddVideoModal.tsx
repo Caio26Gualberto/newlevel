@@ -1,11 +1,10 @@
-import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, Box } from "@mui/material";
+import { TextField, Button, Box, useTheme, useMediaQuery } from "@mui/material";
 import NewLevelModal from "../../../../components/NewLevelModal";
 import NewLevelModalHeader from "../../../../components/NewLevelModalHeader";
 import { ChangeEvent, useState } from "react";
 import { MediaApi } from "../../../../gen/api/src";
 import * as toastr from 'toastr';
 import ApiConfiguration from "../../../../apiConfig";
-import { useMobile } from "../../../../MobileContext";
 
 interface AddVideoModalProps {
     open: boolean;
@@ -14,7 +13,10 @@ interface AddVideoModalProps {
 
 const AddVideoModal: React.FC<AddVideoModalProps> = ({ open, onClose }) => {
     const mediaService = new MediaApi(ApiConfiguration);
-    const { isMobile } = useMobile()
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    
     const [tituloVideo, setTituloVideo] = useState<string>('');
     const [urlVideo, setUrlVideo] = useState<string>('');
     const [descricaoVideo, setDescricaoVideo] = useState<string>('');
@@ -53,70 +55,138 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({ open, onClose }) => {
 
     return (
         <NewLevelModal
-            width={isMobile ? '100%' : 900}  // Full width em mobile, 900px em telas maiores
-            height={isMobile ? '100%' : '40%'} // Full height em mobile, 40% em telas maiores
+            width={isMobile ? '100%' : 900}
+            height={isMobile ? '100%' : '40%'}
             open={open}
             onClose={onClose}
         >
-            <>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                    p: {
+                        xs: 2,
+                        sm: 2,
+                        md: 3
+                    }
+                }}
+            >
                 <NewLevelModalHeader closeModal={onClose} title="Adicione um vídeo" />
-                <Box>
-                    <Box width="100%">
-                        <DialogContent
+                
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        flex: 1,
+                        gap: 2,
+                        mt: 2
+                    }}
+                >
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="titulo"
+                        label="Título do vídeo"
+                        type="text"
+                        fullWidth
+                        value={tituloVideo}
+                        onChange={handleTituloChange}
+                        sx={{
+                            '& .MuiInputLabel-root': {
+                                fontSize: {
+                                    xs: '0.875rem',
+                                    sm: '1rem'
+                                }
+                            },
+                            '& .MuiInputBase-input': {
+                                fontSize: {
+                                    xs: '0.875rem',
+                                    sm: '1rem'
+                                }
+                            }
+                        }}
+                    />
+                    <TextField
+                        margin="dense"
+                        id="url"
+                        label="URL do vídeo"
+                        type="text"
+                        fullWidth
+                        value={urlVideo}
+                        onChange={handleUrlChange}
+                        sx={{
+                            '& .MuiInputLabel-root': {
+                                fontSize: {
+                                    xs: '0.875rem',
+                                    sm: '1rem'
+                                }
+                            },
+                            '& .MuiInputBase-input': {
+                                fontSize: {
+                                    xs: '0.875rem',
+                                    sm: '1rem'
+                                }
+                            }
+                        }}
+                    />
+                    <TextField
+                        margin="dense"
+                        id="descricao"
+                        label="Descrição do vídeo"
+                        type="text"
+                        fullWidth
+                        multiline
+                        rows={isSmallMobile ? 3 : 4}
+                        value={descricaoVideo}
+                        onChange={handleDescricaoChange}
+                        sx={{
+                            '& .MuiInputLabel-root': {
+                                fontSize: {
+                                    xs: '0.875rem',
+                                    sm: '1rem'
+                                }
+                            },
+                            '& .MuiInputBase-input': {
+                                fontSize: {
+                                    xs: '0.875rem',
+                                    sm: '1rem'
+                                }
+                            }
+                        }}
+                    />
+                    
+                    <Box 
+                        sx={{
+                            width: "100%",
+                            mt: 'auto',
+                            pt: 2
+                        }}
+                    >
+                        <Button
+                            fullWidth
                             sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'space-between',
-                                padding: isMobile ? 2 : 3, // Padding menor para mobile
+                                backgroundColor: '#b81414',
+                                fontSize: {
+                                    xs: '0.875rem',
+                                    sm: '1rem'
+                                },
+                                py: {
+                                    xs: 1,
+                                    sm: 1.5
+                                },
+                                '&:hover': {
+                                    backgroundColor: 'white',
+                                },
+                                color: 'black',
                             }}
+                            onClick={handleSubmit}
                         >
-                            <TextField
-                                autoFocus
-                                margin="dense"
-                                id="titulo"
-                                label="Título do vídeo"
-                                type="text"
-                                fullWidth
-                                value={tituloVideo}
-                                onChange={handleTituloChange}
-                            />
-                            <TextField
-                                margin="dense"
-                                id="url"
-                                label="URL do vídeo"
-                                type="text"
-                                fullWidth
-                                value={urlVideo}
-                                onChange={handleUrlChange}
-                            />
-                            <TextField
-                                margin="dense"
-                                id="descricao"
-                                label="Descrição do vídeo"
-                                type="text"
-                                fullWidth
-                                value={descricaoVideo}
-                                onChange={handleDescricaoChange}
-                            />
-                            <Box mt={1} width="100%">
-                                <Button
-                                    fullWidth
-                                    sx={{
-                                        backgroundColor: '#b81414',
-                                        '&:hover': {
-                                            backgroundColor: 'white',
-                                        },
-                                        color: 'black',
-                                    }}
-                                    onClick={handleSubmit}
-                                >
-                                    Enviar
-                                </Button>
-                            </Box>
-                        </DialogContent>
+                            Enviar
+                        </Button>
                     </Box>
                 </Box>
-            </>
+            </Box>
         </NewLevelModal>
     );
 }

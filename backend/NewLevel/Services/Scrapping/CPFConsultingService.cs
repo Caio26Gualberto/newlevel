@@ -9,10 +9,16 @@ namespace NewLevel.Services.Scrapping
         private HttpClientHandler _handler;
         private HttpClient _client;
         private HttpResponseMessage _currentResponse;
+        private IConfiguration _configuration;
         private string _currentResponseString => _currentResponse.Content.ReadAsStringAsync().Result;
 
+        public CPFConsultingService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
 
-        public async Task<string> CreateBillingPixAsync(string cpf, DateTime birthday)
+
+        public async Task<string?> CreateBillingPixAsync(string cpf, DateTime birthday)
         {
             using (_handler = new HttpClientHandler())
             {
@@ -50,7 +56,7 @@ namespace NewLevel.Services.Scrapping
 
         public class PixResponse
         {
-            public string pixCopiaECola { get; set; }
+            public string? pixCopiaECola { get; set; }
         }
     }
 }

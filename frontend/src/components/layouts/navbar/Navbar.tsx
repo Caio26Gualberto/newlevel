@@ -8,7 +8,6 @@ import { AuthenticateApi, GeneralNotificationInfoDto, NotificationDto, SystemNot
 import ApiConfiguration from "../../../apiConfig";
 import * as toastr from 'toastr';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useMobile } from "../../../MobileContext";
 import MailIcon from '@mui/icons-material/Mail';
 import InviteIntegrantsModal from "./InviteIntegrantsModal/InviteIntegrantsModal";
 import PopoverNotifications from "./popoverNotifications/PopoverNotifications";
@@ -52,7 +51,10 @@ const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation()
     const { isAdmin, isBand } = useAuth()
-    const { isMobile } = useMobile()
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    
     const [showNavbar, setShowNavbar] = useState<boolean>(false)
     const [openIntegrantsInvite, setOpenIntegrantsInvite] = useState<boolean>(false)
     const [openIntegrantsAccept, setOpenIntegrantsAccept] = useState<boolean>(false)
@@ -159,9 +161,47 @@ const Navbar = () => {
 
     const rederizeAvatar = () => {
         if (profileSrc.profilePicture) {
-            return <Avatar component="a" sx={{ width: 50, height: 50 }} src={profileSrc.profilePicture} onClick={handleClickAvatar}></Avatar>
+            return (
+                <Avatar 
+                    component="a" 
+                    sx={{ 
+                        width: {
+                            xs: 40,
+                            sm: 45,
+                            md: 50
+                        }, 
+                        height: {
+                            xs: 40,
+                            sm: 45,
+                            md: 50
+                        }
+                    }} 
+                    src={profileSrc.profilePicture} 
+                    onClick={handleClickAvatar}
+                />
+            )
         } else {
-            return <Avatar component="a" onClick={handleClickAvatar} sx={{ width: 50, height: 50, backgroundColor: randomColor }}>{(profileSrc as { nickname: string }).nickname.charAt(0)}</Avatar>
+            return (
+                <Avatar 
+                    component="a" 
+                    onClick={handleClickAvatar} 
+                    sx={{ 
+                        width: {
+                            xs: 40,
+                            sm: 45,
+                            md: 50
+                        }, 
+                        height: {
+                            xs: 40,
+                            sm: 45,
+                            md: 50
+                        }, 
+                        backgroundColor: randomColor 
+                    }}
+                >
+                    {(profileSrc as { nickname: string }).nickname.charAt(0)}
+                </Avatar>
+            )
         }
     }
 
@@ -203,50 +243,190 @@ const Navbar = () => {
                 {isMobile ? (
                     <>
                         <Box
-                            display="flex"
-                            justifyContent="space-between"
-                            alignItems="center"
-                            bgcolor="black"
-                            zIndex={2}
-                            position="fixed"
-                            width="100%"
-                            height="70px"
-                            p={2}
+                            sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                bgcolor: "black",
+                                zIndex: 2,
+                                position: "fixed",
+                                width: "100%",
+                                height: {
+                                    xs: "60px",
+                                    sm: "70px"
+                                },
+                                p: {
+                                    xs: 1,
+                                    sm: 2
+                                }
+                            }}
                         >
                             <Box
                                 component="img"
                                 onClick={() => navigate('/welcome')}
                                 src={Logo}
-                                height="40px"
-                                sx={{ cursor: "pointer" }}
+                                sx={{ 
+                                    cursor: "pointer",
+                                    height: {
+                                        xs: "30px",
+                                        sm: "40px"
+                                    }
+                                }}
                             />
                             <IconButton
                                 edge="start"
                                 color="inherit"
                                 aria-label="menu"
                                 onClick={toggleDrawer(true)}
+                                sx={{
+                                    color: "white"
+                                }}
                             >
                                 <MenuIcon color="primary" />
                             </IconButton>
                         </Box>
-                        <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
+                        <Drawer 
+                            anchor="right" 
+                            open={drawerOpen} 
+                            onClose={toggleDrawer(false)}
+                            sx={{
+                                '& .MuiDrawer-paper': {
+                                    width: {
+                                        xs: 250,
+                                        sm: 280
+                                    }
+                                }
+                            }}
+                        >
                             <Box
-                                sx={{ width: 250 }}
+                                sx={{ 
+                                    width: "100%",
+                                    height: "100%"
+                                }}
                                 role="presentation"
                                 onClick={toggleDrawer(false)}
                                 onKeyDown={toggleDrawer(false)}
                                 bgcolor="black"
                             >
                                 <List>
-                                    <StyledLink to="/videos"><ListItem button>Vídeos</ListItem></StyledLink>
-                                    <StyledLink to="/photos"><ListItem button>Fotos</ListItem></StyledLink>
-                                    <StyledLink to="/podcasts"><ListItem button>Podcasts</ListItem></StyledLink>
-                                    <StyledLink to="/aboutMe"><ListItem button>Sobre mim</ListItem></StyledLink>
-                                    <StyledLink to="/myAccount"><ListItem>Minha Conta</ListItem></StyledLink>
-                                    <StyledLink to={`/profile/${profileSrc.nickname}/${profileSrc.userId}`}><ListItem>Meu Perfil</ListItem></StyledLink>
-                                    <StyledLink to="/partnerStore"><ListItem>Loja Parceira</ListItem></StyledLink>
-                                    {isAdmin() && <StyledLinkForAdmin sx={{ color: "white" }} onClick={handleCloseAvatar} to="/acceptContent"><MenuItem>Pedidos (Admin)</MenuItem></StyledLinkForAdmin>}
-                                    <StyledLink to="/" onClick={() => { handleCloseAvatar(); logout(); }}><ListItem>Sair</ListItem></StyledLink>
+                                    <StyledLink to="/videos">
+                                        <ListItem 
+                                            button
+                                            sx={{
+                                                fontSize: {
+                                                    xs: "0.875rem",
+                                                    sm: "1rem"
+                                                }
+                                            }}
+                                        >
+                                            Vídeos
+                                        </ListItem>
+                                    </StyledLink>
+                                    <StyledLink to="/photos">
+                                        <ListItem 
+                                            button
+                                            sx={{
+                                                fontSize: {
+                                                    xs: "0.875rem",
+                                                    sm: "1rem"
+                                                }
+                                            }}
+                                        >
+                                            Fotos
+                                        </ListItem>
+                                    </StyledLink>
+                                    <StyledLink to="/podcasts">
+                                        <ListItem 
+                                            button
+                                            sx={{
+                                                fontSize: {
+                                                    xs: "0.875rem",
+                                                    sm: "1rem"
+                                                }
+                                            }}
+                                        >
+                                            Podcasts
+                                        </ListItem>
+                                    </StyledLink>
+                                    <StyledLink to="/aboutMe">
+                                        <ListItem 
+                                            button
+                                            sx={{
+                                                fontSize: {
+                                                    xs: "0.875rem",
+                                                    sm: "1rem"
+                                                }
+                                            }}
+                                        >
+                                            Sobre mim
+                                        </ListItem>
+                                    </StyledLink>
+                                    <StyledLink to="/myAccount">
+                                        <ListItem
+                                            sx={{
+                                                fontSize: {
+                                                    xs: "0.875rem",
+                                                    sm: "1rem"
+                                                }
+                                            }}
+                                        >
+                                            Minha Conta
+                                        </ListItem>
+                                    </StyledLink>
+                                    <StyledLink to={`/profile/${profileSrc.nickname}/${profileSrc.userId}`}>
+                                        <ListItem
+                                            sx={{
+                                                fontSize: {
+                                                    xs: "0.875rem",
+                                                    sm: "1rem"
+                                                }
+                                            }}
+                                        >
+                                            Meu Perfil
+                                        </ListItem>
+                                    </StyledLink>
+                                    <StyledLink to="/partnerStore">
+                                        <ListItem
+                                            sx={{
+                                                fontSize: {
+                                                    xs: "0.875rem",
+                                                    sm: "1rem"
+                                                }
+                                            }}
+                                        >
+                                            Loja Parceira
+                                        </ListItem>
+                                    </StyledLink>
+                                    {isAdmin() && (
+                                        <StyledLinkForAdmin 
+                                            sx={{ color: "white" }} 
+                                            onClick={handleCloseAvatar} 
+                                            to="/acceptContent"
+                                        >
+                                            <MenuItem
+                                                sx={{
+                                                    fontSize: {
+                                                        xs: "0.875rem",
+                                                        sm: "1rem"
+                                                    }
+                                                }}
+                                            >
+                                                Pedidos (Admin)
+                                            </MenuItem>
+                                        </StyledLinkForAdmin>
+                                    )}
+                                    <StyledLink to="/" onClick={() => { handleCloseAvatar(); logout(); }}>
+                                        <ListItem
+                                            sx={{
+                                                fontSize: {
+                                                    xs: "0.875rem",
+                                                    sm: "1rem"
+                                                }
+                                            }}
+                                        >
+                                            Sair
+                                        </ListItem>
+                                    </StyledLink>
                                 </List>
                             </Box>
                         </Drawer>
@@ -254,26 +434,44 @@ const Navbar = () => {
                 ) : (
                     // Layout para telas maiores
                     <Box
-                        display="flex"
-                        justifyContent="space-between"
-                        alignItems="center"
-                        bgcolor="black"
-                        zIndex={2}
-                        position="fixed"
-                        width="100%"
-                        height="70px"
-                        p={2}
+                        sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            bgcolor: "black",
+                            zIndex: 2,
+                            position: "fixed",
+                            width: "100%",
+                            height: "70px",
+                            p: 2
+                        }}
                     >
                         <Box
                             component="img"
                             onClick={() => navigate('/welcome')}
                             src={Logo}
-                            height="50%"
-                            sx={{ cursor: "pointer" }}
+                            sx={{ 
+                                cursor: "pointer",
+                                height: "50%"
+                            }}
                         />
-                        <Box display="flex" width="80%" pr={2} pl={2}>
+                        <Box 
+                            sx={{
+                                display: "flex",
+                                width: "80%",
+                                pr: 2,
+                                pl: 2
+                            }}
+                        >
                             <Grid container>
-                                <Grid display="flex" justifyContent="center" item xs={1}>
+                                <Grid 
+                                    sx={{
+                                        display: "flex",
+                                        justifyContent: "center"
+                                    }}
+                                    item 
+                                    xs={1}
+                                >
                                     <Menu
                                         id="basic-menu"
                                         anchorEl={anchorEl}
@@ -283,50 +481,104 @@ const Navbar = () => {
                                             'aria-labelledby': 'basic-button',
                                         }}
                                     >
-                                        <StyledLink sx={{ color: "black" }} onClick={handleClose} to="/videos"><MenuItem>Vídeos</MenuItem></StyledLink>
-                                        <StyledLink sx={{ color: "black" }} onClick={handleClose} to="/photos"><MenuItem>Fotos</MenuItem></StyledLink>
+                                        <StyledLink sx={{ color: "black" }} onClick={handleClose} to="/videos">
+                                            <MenuItem>Vídeos</MenuItem>
+                                        </StyledLink>
+                                        <StyledLink sx={{ color: "black" }} onClick={handleClose} to="/photos">
+                                            <MenuItem>Fotos</MenuItem>
+                                        </StyledLink>
                                     </Menu>
                                     <a
                                         onClick={handleClick}
                                         onMouseEnter={(e) => (e.target as HTMLAnchorElement).style.color = "red"}
                                         onMouseLeave={(e) => (e.target as HTMLAnchorElement).style.color = "white"}
-                                        style={{ textDecoration: "none", color: "white", transition: "color 0.3s ease", cursor: "pointer" }}
+                                        style={{ 
+                                            textDecoration: "none", 
+                                            color: "white", 
+                                            transition: "color 0.3s ease", 
+                                            cursor: "pointer",
+                                            fontSize: "1rem"
+                                        }}
                                     >
                                         Álbuns
                                     </a>
                                 </Grid>
-                                <Grid display="flex" justifyContent="center" item xs={1}>
+                                <Grid 
+                                    sx={{
+                                        display: "flex",
+                                        justifyContent: "center"
+                                    }}
+                                    item 
+                                    xs={1}
+                                >
                                     <StyledLink to="/podcasts">Podcasts</StyledLink>
                                 </Grid>
-                                <Grid display="flex" justifyContent="center" item xs={1}>
+                                <Grid 
+                                    sx={{
+                                        display: "flex",
+                                        justifyContent: "center"
+                                    }}
+                                    item 
+                                    xs={1}
+                                >
                                     <StyledLink to="/partnerStore">Loja Parceira</StyledLink>
                                 </Grid>
-                                <Grid display="flex" justifyContent="center" item xs={1}>
+                                <Grid 
+                                    sx={{
+                                        display: "flex",
+                                        justifyContent: "center"
+                                    }}
+                                    item 
+                                    xs={1}
+                                >
                                     <StyledLink to="/aboutMe">Sobre mim</StyledLink>
                                 </Grid>
                             </Grid>
                         </Box>
-                        <Box display="flex" alignItems="center" justifyContent="space-between" width="20%">
+                        <Box 
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                width: "20%"
+                            }}
+                        >
                             <Box sx={{ mr: 1 }} width="100%">
                                 <UserSearchBar />
                             </Box>
                             <Box sx={{ cursor: "pointer", mr: 1 }}>
-                                <Badge onClick={handleClickPop} badgeContent={notifications.totalCount} sx={{ color: "yellow" }}>
+                                <Badge 
+                                    onClick={handleClickPop} 
+                                    badgeContent={notifications.totalCount} 
+                                    sx={{ color: "yellow" }}
+                                >
                                     {openPop ? <DraftsIcon color="primary" /> : <MailIcon color="primary" />}
                                 </Badge>
                             </Box>
                         </Box>
-                        <PopoverNotifications open={openPop}
+                        <PopoverNotifications 
+                            open={openPop}
                             anchorEl={anchorElPop}
                             onClose={handleClosePop}
                             notificationList={notifications.notifications}
                             updateNotifications={getNotifications}
                             onOpenInviteModal={handleOpenAcceptModal}
-                            getNotification={handleGetNotification} />
+                            getNotification={handleGetNotification} 
+                        />
 
-                        <ViewInviteModal open={openIntegrantsAccept} onClose={handleCloseAcceptModal} notification={selectedInviteInfos} />
+                        <ViewInviteModal 
+                            open={openIntegrantsAccept} 
+                            onClose={handleCloseAcceptModal} 
+                            notification={selectedInviteInfos} 
+                        />
 
-                        <Box pr={2} pl={2} sx={{ cursor: "pointer" }}>
+                        <Box 
+                            sx={{
+                                pr: 2,
+                                pl: 2,
+                                cursor: "pointer"
+                            }}
+                        >
                             {rederizeAvatar()}
                             <Menu
                                 id="basic-menu"
@@ -337,19 +589,46 @@ const Navbar = () => {
                                     'aria-labelledby': 'basic-button',
                                 }}
                             >
-                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myAccount"><MenuItem>Minha Conta</MenuItem></StyledLink>
-                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to={`/profile/${profileSrc.nickname}/${profileSrc.userId}`}><MenuItem>Meu Perfil</MenuItem></StyledLink>
-                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myVideos"><MenuItem>Meus Vídeos</MenuItem></StyledLink>
-                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myPhotos"><MenuItem>Minhas Fotos</MenuItem></StyledLink>
-                                {isBand() && <StyledMenu onClick={() => { handleCloseAvatar(); handleClickOpen(); }}>Integrantes</StyledMenu>}
-                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/issueReport"><MenuItem>Reportar Problema</MenuItem></StyledLink>
-                                {isAdmin() && <StyledLinkForAdmin sx={{ color: "pink" }} onClick={handleCloseAvatar} to="/acceptContent"><MenuItem>Pedidos (Admin)</MenuItem></StyledLinkForAdmin>}
-                                <StyledMenu onClick={() => { handleCloseAvatar(); logout(); }}>Sair</StyledMenu>
+                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myAccount">
+                                    <MenuItem>Minha Conta</MenuItem>
+                                </StyledLink>
+                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to={`/profile/${profileSrc.nickname}/${profileSrc.userId}`}>
+                                    <MenuItem>Meu Perfil</MenuItem>
+                                </StyledLink>
+                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myVideos">
+                                    <MenuItem>Meus Vídeos</MenuItem>
+                                </StyledLink>
+                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/myPhotos">
+                                    <MenuItem>Minhas Fotos</MenuItem>
+                                </StyledLink>
+                                {isBand() && (
+                                    <StyledMenu onClick={() => { handleCloseAvatar(); handleClickOpen(); }}>
+                                        Integrantes
+                                    </StyledMenu>
+                                )}
+                                <StyledLink sx={{ color: "black" }} onClick={handleCloseAvatar} to="/issueReport">
+                                    <MenuItem>Reportar Problema</MenuItem>
+                                </StyledLink>
+                                {isAdmin() && (
+                                    <StyledLinkForAdmin sx={{ color: "pink" }} onClick={handleCloseAvatar} to="/acceptContent">
+                                        <MenuItem>Pedidos (Admin)</MenuItem>
+                                    </StyledLinkForAdmin>
+                                )}
+                                <StyledMenu onClick={() => { handleCloseAvatar(); logout(); }}>
+                                    Sair
+                                </StyledMenu>
                             </Menu>
                         </Box>
                     </Box>
                 )}
-                <Box height="70px" />
+                <Box 
+                    sx={{
+                        height: {
+                            xs: "60px",
+                            sm: "70px"
+                        }
+                    }} 
+                />
             </>
         }
         </>

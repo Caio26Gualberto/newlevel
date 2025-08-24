@@ -1,123 +1,401 @@
-import { Alert, Box, Button, Dialog, Input, Modal, Typography } from "@mui/material"
+import { 
+  Box, 
+  Button, 
+  Typography, 
+  TextField, 
+  CircularProgress,
+  Alert,
+  IconButton,
+  InputAdornment,
+  Paper,
+  useTheme,
+  useMediaQuery
+} from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { AuthenticateApi } from "../../gen/api/src";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ApiConfiguration from "../../apiConfig";
 import { Link, useNavigate } from "react-router-dom";
 import * as toastr from 'toastr';
 import ModalPassword from "./modalResetPassword/ModalPassword";
 import { useAuth } from "../../AuthContext";
-import { useMobile } from "../../MobileContext";
 import ChoiceTypeUserModal from "./choiceTypeUserModal/ChoiceTypeUserModal";
 
-const style = {
-  transform: 'translate(-50%, -50%)',
-};
-
-interface IFormLogin {
-  login: string
-  password: string
+// Types
+interface LoginForm {
+  email: string;
+  password: string;
 }
 
-const Login = () => {
-  const { isMobile } = useMobile()
-  const { setToken } = useAuth();
-  const [formLogin, setFormLogin] = useState<IFormLogin>({
-    login: '',
-    password: ''
-  });
-  const [openModal, setOpenModal] = useState<boolean>(false);
-  const [openChoiceModal, setOpenChoiceModal] = useState<boolean>(false);
+interface LoginFormErrors {
+  email?: string;
+  password?: string;
+}
 
+// Constants
+const TOASTR_CONFIG = {
+  timeOut: 3000,
+  progressBar: true,
+  positionClass: "toast-bottom-right"
+} as const;
+
+const INITIAL_FORM: LoginForm = {
+  email: '',
+  password: ''
+};
+
+const INITIAL_ERRORS: LoginFormErrors = {};
+
+// Custom hook for form validation
+const useFormValidation = () => {
+  const [errors, setErrors] = useState<LoginFormErrors>(INITIAL_ERRORS);
+
+  const validateForm = (form: LoginForm): boolean => {
+    const newErrors: LoginFormErrors = {};
+
+    // Email validation
+    if (!form.email.trim()) {
+      newErrors.email = 'Email é obrigatório';
+    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
+      newErrors.email = 'Email inválido';
+    }
+
+    // Password validation
+    if (!form.password.trim()) {
+      newErrors.password = 'Senha é obrigatória';
+    } else if (form.password.length < 6) {
+      newErrors.password = 'Senha deve ter pelo menos 6 caracteres';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const clearErrors = () => setErrors(INITIAL_ERRORS);
+
+  return { errors, validateForm, clearErrors };
+};
+
+// Custom hook for login logic
+const useLogin = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { setToken } = useAuth();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
 
-  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormLogin({ ...formLogin, login: e.target.value });
-  };
+  const handleLogin = async (form: LoginForm) => {
+    setIsLoading(true);
+    setError(null);
 
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormLogin({ ...formLogin, password: e.target.value });
-  };
-
-  const handleSetModal = () => {
-    setOpenModal(!openModal);
-  }
-
-  const handleSetChoiceModal = () => {
-    setOpenChoiceModal(!openChoiceModal);
-  }
-
-  const login = async () => {
     try {
-      const api = new AuthenticateApi(ApiConfiguration)
+      const api = new AuthenticateApi(ApiConfiguration);
+      const result = await api.apiAuthenticateLoginPost({ 
+        loginInputDto: { 
+          email: form.email, 
+          password: form.password 
+        } 
+      });
 
-      if (formLogin.login === '' || formLogin.password === '') {
-        toastr.warning('Preencha todos os campos', 'Atenção!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" })
-        return
-      }
-      const result = await api.apiAuthenticateLoginPost({ loginInputDto: { email: formLogin.login, password: formLogin.password } })
+      if (result.isSuccess && result.data?.tokens) {
+        // Store tokens
+        window.localStorage.setItem('accessToken', result.data.tokens.token!);
+        window.localStorage.setItem('refreshToken', result.data.tokens.refreshToken!);
+        setToken(result.data.tokens.token!);
 
-      if (result.isSuccess) {
-        window.localStorage.setItem('accessToken', result.data?.tokens?.token!)
-        window.localStorage.setItem('refreshToken', result.data?.tokens?.refreshToken!)
-        setToken(result.data?.tokens?.token!)
-        toastr.success('Login efetuado com sucesso', 'Sucesso!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
-        if (!result.data?.tokens?.skipIntroduction) {
-          if (isMobile) {
-            navigate('/welcome')
-          }
-          navigate('/newAvatar')
+        // Show success message
+        toastr.success('Login efetuado com sucesso', 'Sucesso!', TOASTR_CONFIG);
+
+        // Navigate based on user state
+        if (!result.data.tokens.skipIntroduction) {
+          navigate(isMobile ? '/welcome' : '/newAvatar');
         } else {
-          navigate('/videos')
+          navigate('/videos');
         }
       } else {
-        toastr.error(result.message!, 'Erro!', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" });
+        const errorMessage = result.message || 'Erro ao fazer login';
+        setError(errorMessage);
+        toastr.error(errorMessage, 'Erro!', TOASTR_CONFIG);
       }
     } catch (error) {
-
+      const errorMessage = 'Erro de conexão. Tente novamente.';
+      setError(errorMessage);
+      toastr.error(errorMessage, 'Erro!', TOASTR_CONFIG);
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
+  return { isLoading, error, handleLogin };
+};
+
+// Main component
+const Login = () => {
+  const [form, setForm] = useState<LoginForm>(INITIAL_FORM);
+  const [showPassword, setShowPassword] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [openChoiceModal, setOpenChoiceModal] = useState(false);
+
+  const { errors, validateForm, clearErrors } = useFormValidation();
+  const { isLoading, error, handleLogin } = useLogin();
+
+  // Form handlers
+  const handleInputChange = (field: keyof LoginForm) => (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setForm(prev => ({ ...prev, [field]: e.target.value }));
+    // Clear error when user starts typing
+    if (errors[field]) {
+      clearErrors();
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (validateForm(form)) {
+      await handleLogin(form);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSubmit(e);
+    }
+  };
+
+  // Modal handlers
+  const togglePasswordModal = () => setOpenModal(prev => !prev);
+  const toggleChoiceModal = () => setOpenChoiceModal(prev => !prev);
+
+  // Background effect
   useEffect(() => {
     const rootElement = document.getElementById('root');
-    if (rootElement) {
-      if (window.location.pathname === '/') {
-        rootElement.classList.add('image-with-opacity');
-      }
-      return () => {
-        rootElement.classList.remove('image-with-opacity');
-      };
+    if (rootElement && window.location.pathname === '/') {
+      rootElement.classList.add('image-with-opacity');
+      return () => rootElement.classList.remove('image-with-opacity');
     }
-  }, [])
+  }, []);
 
   return (
     <>
-      <ChoiceTypeUserModal open={openChoiceModal} onClose={handleSetChoiceModal} />
-      <ModalPassword open={openModal} onClose={handleSetModal} />
-      <Box>
-        <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center"
-          position="absolute" top="50%" left="50%" width="768px" minHeight="480px" borderRadius="10px"
-          boxShadow="0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22)" bgcolor="#3c140c" maxWidth="100%" sx={style}>
-          <Box display="flex" flexDirection="column" alignItems="center">
-            <Typography color="white" fontWeight="bold" variant="h4">Bem-vindo!</Typography>
-            <Typography color="white" fontSize={15}>Entre com a sua conta</Typography>
+      <ChoiceTypeUserModal open={openChoiceModal} onClose={toggleChoiceModal} />
+      <ModalPassword open={openModal} onClose={togglePasswordModal} />
+      
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+          p: {
+            xs: 2,
+            sm: 3,
+            md: 4
+          }
+        }}
+      >
+        <Paper
+          elevation={8}
+          sx={{
+            width: {
+              xs: '100%',
+              sm: '400px',
+              md: '450px'
+            },
+            maxWidth: '90vw',
+            p: {
+              xs: 3,
+              sm: 4,
+              md: 5
+            },
+            borderRadius: 2,
+            backgroundColor: '#3c140c',
+            color: 'white'
+          }}
+        >
+          <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+            {/* Header */}
+            <Box textAlign="center" mb={4}>
+              <Typography 
+                variant="h4" 
+                fontWeight="bold" 
+                gutterBottom
+                sx={{
+                  fontSize: {
+                    xs: '1.75rem',
+                    sm: '2rem',
+                    md: '2.125rem'
+                  }
+                }}
+              >
+                Bem-vindo!
+              </Typography>
+              <Typography 
+                variant="body1" 
+                color="rgba(255,255,255,0.8)"
+                sx={{
+                  fontSize: {
+                    xs: '0.875rem',
+                    sm: '1rem'
+                  }
+                }}
+              >
+                Entre com a sua conta
+              </Typography>
+            </Box>
+
+            {/* Error Alert */}
+            {error && (
+              <Alert severity="error" sx={{ mb: 2, backgroundColor: 'rgba(211, 47, 47, 0.1)' }}>
+                {error}
+              </Alert>
+            )}
+
+            {/* Form Fields */}
+            <Box sx={{ mb: 3 }}>
+              <TextField
+                fullWidth
+                label="Email"
+                type="email"
+                value={form.email}
+                onChange={handleInputChange('email')}
+                onKeyPress={handleKeyPress}
+                error={!!errors.email}
+                helperText={errors.email}
+                disabled={isLoading}
+                sx={{
+                  mb: 2,
+                  '& .MuiOutlinedInput-root': {
+                    color: 'white',
+                    '& fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
+                    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.5)' },
+                    '&.Mui-focused fieldset': { borderColor: 'white' }
+                  },
+                  '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
+                  '& .MuiFormHelperText-root': { color: '#ff6b6b' }
+                }}
+              />
+
+              <TextField
+                fullWidth
+                label="Senha"
+                type={showPassword ? 'text' : 'password'}
+                value={form.password}
+                onChange={handleInputChange('password')}
+                onKeyPress={handleKeyPress}
+                error={!!errors.password}
+                helperText={errors.password}
+                disabled={isLoading}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                        sx={{ color: 'rgba(255,255,255,0.7)' }}
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    color: 'white',
+                    '& fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
+                    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.5)' },
+                    '&.Mui-focused fieldset': { borderColor: 'white' }
+                  },
+                  '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
+                  '& .MuiFormHelperText-root': { color: '#ff6b6b' }
+                }}
+              />
+            </Box>
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              disabled={isLoading}
+              sx={{
+                mb: 3,
+                py: {
+                  xs: 1.5,
+                  sm: 1.75,
+                  md: 2
+                },
+                fontSize: {
+                  xs: '0.875rem',
+                  sm: '1rem'
+                },
+                backgroundColor: '#d32f2f',
+                '&:hover': { backgroundColor: '#b71c1c' },
+                '&:disabled': { backgroundColor: 'rgba(255,255,255,0.12)' }
+              }}
+            >
+              {isLoading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                'Entrar'
+              )}
+            </Button>
+
+            {/* Links */}
+            <Box textAlign="center" sx={{ '& > *': { mb: 1 } }}>
+              <Typography 
+                variant="body2"
+                sx={{
+                  fontSize: {
+                    xs: '0.75rem',
+                    sm: '0.875rem'
+                  }
+                }}
+              >
+                Não tem uma conta?{' '}
+                <Link 
+                  to="#" 
+                  onClick={toggleChoiceModal}
+                  style={{ 
+                    color: '#ff6b6b', 
+                    textDecoration: 'none',
+                    fontWeight: 500
+                  }}
+                >
+                  Registre-se
+                </Link>
+              </Typography>
+              
+              <Typography 
+                variant="body2"
+                sx={{
+                  fontSize: {
+                    xs: '0.75rem',
+                    sm: '0.875rem'
+                  }
+                }}
+              >
+                Esqueceu sua senha?{' '}
+                <Link 
+                  to="#" 
+                  onClick={togglePasswordModal}
+                  style={{ 
+                    color: '#ff6b6b', 
+                    textDecoration: 'none',
+                    fontWeight: 500
+                  }}
+                >
+                  Clique aqui!
+                </Link>
+              </Typography>
+            </Box>
           </Box>
-          <Box display="flex" width="40%" flexDirection="column" alignItems="center">
-            <Input fullWidth value={formLogin.login} onChange={handleLoginChange} placeholder="Login" sx={{ color: "white" }}></Input>
-            <Input fullWidth value={formLogin.password} onChange={handlePasswordChange} placeholder="Senha" sx={{ color: "white" }}></Input>
-          </Box>
-          <Box display="flex" mt={1}>
-            <Button onClick={login} sx={{ color: "white" }}>Entrar</Button>
-          </Box>
-          <Box>
-            <Typography color="white" fontSize={15}>Não tem uma conta? <Link to="" onClick={handleSetChoiceModal} style={{ color: "white" }}>Registre-se</Link></Typography>
-          </Box>
-          <Box>
-            <Typography color="white" fontSize={15}>Esqueceu sua senha? <Link to="" onClick={handleSetModal} style={{ color: "white" }}>Clique aqui!</Link></Typography>
-          </Box>
-        </Box>
+        </Paper>
       </Box>
     </>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

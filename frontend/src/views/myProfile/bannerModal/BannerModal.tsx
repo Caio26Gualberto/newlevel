@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Slider, Typography } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Slider, Typography, useTheme, useMediaQuery } from "@mui/material";
 import { UserApi, UserInfoResponseDto } from "../../../gen/api/src";
 import ApiConfiguration from "../../../apiConfig";
+import * as toastr from 'toastr';
 
 interface BannerModalProps {
     open: boolean;
@@ -15,6 +16,10 @@ const BannerModal: React.FC<BannerModalProps> = ({ open, onClose }) => {
     const startYRef = React.useRef(0);
     const startPositionRef = React.useRef(50);
     const [selectedImage, setSelectedImage] = useState<string | null | undefined>();
+    
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
@@ -103,16 +108,58 @@ const BannerModal: React.FC<BannerModalProps> = ({ open, onClose }) => {
             maxWidth="xl"
             fullWidth
             sx={{
-                "& .MuiDialog-paper": { width: "1337px", maxWidth: "100%", borderRadius: 3 }
+                "& .MuiDialog-paper": { 
+                    width: {
+                        xs: "95%",
+                        sm: "90%",
+                        md: "80%",
+                        lg: "1337px"
+                    },
+                    maxWidth: "100%", 
+                    borderRadius: 3 
+                }
             }}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
         >
-            <DialogTitle>Posicionar Banner</DialogTitle>
+            <DialogTitle
+                sx={{
+                    fontSize: {
+                        xs: "1.25rem",
+                        sm: "1.5rem"
+                    }
+                }}
+            >
+                Posicionar Banner
+            </DialogTitle>
             <DialogContent>
-                <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
-                    <Button variant="contained" component="label">
+                <Box 
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 2
+                    }}
+                >
+                    <Button 
+                        variant="contained" 
+                        component="label"
+                        sx={{
+                            fontSize: {
+                                xs: "0.875rem",
+                                sm: "1rem"
+                            },
+                            py: {
+                                xs: 0.75,
+                                sm: 1
+                            },
+                            px: {
+                                xs: 2,
+                                sm: 3
+                            }
+                        }}
+                    >
                         Selecionar Imagem
                         <input type="file" hidden accept="image/*" onChange={handleFileChange} />
                     </Button>
@@ -122,7 +169,11 @@ const BannerModal: React.FC<BannerModalProps> = ({ open, onClose }) => {
                             <Box
                                 sx={{
                                     width: "100%",
-                                    height: 417,
+                                    height: {
+                                        xs: 200,
+                                        sm: 300,
+                                        md: 417
+                                    },
                                     backgroundImage: `url(${selectedImage})`,
                                     backgroundSize: "cover",
                                     backgroundPosition: `center ${position}%`,
@@ -131,14 +182,53 @@ const BannerModal: React.FC<BannerModalProps> = ({ open, onClose }) => {
                                 }}
                                 onMouseDown={handleMouseDown}
                             />
-                            <Typography variant="body2">Ajustar posição com o cursor </Typography>
+                            <Typography 
+                                variant="body2"
+                                sx={{
+                                    fontSize: {
+                                        xs: "0.75rem",
+                                        sm: "0.875rem"
+                                    },
+                                    textAlign: "center"
+                                }}
+                            >
+                                Ajustar posição com o cursor
+                            </Typography>
                         </>
                     )}
                 </Box>
             </DialogContent>
-            <DialogActions>
-                <Button onClick={handleClose} color="error">Cancelar</Button>
-                <Button disabled={selectedImage == null} onClick={() => { uploadBanner(); handleClose(); }} color="primary">
+            <DialogActions
+                sx={{
+                    p: {
+                        xs: 1,
+                        sm: 2
+                    }
+                }}
+            >
+                <Button 
+                    onClick={handleClose} 
+                    color="error"
+                    sx={{
+                        fontSize: {
+                            xs: "0.875rem",
+                            sm: "1rem"
+                        }
+                    }}
+                >
+                    Cancelar
+                </Button>
+                <Button 
+                    disabled={selectedImage == null} 
+                    onClick={() => { uploadBanner(); handleClose(); }} 
+                    color="primary"
+                    sx={{
+                        fontSize: {
+                            xs: "0.875rem",
+                            sm: "1rem"
+                        }
+                    }}
+                >
                     Salvar
                 </Button>
             </DialogActions>

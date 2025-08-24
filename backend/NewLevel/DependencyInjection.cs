@@ -52,7 +52,7 @@ namespace NewLevel
             .AddDefaultTokenProviders()
             .AddTokenProvider<DataProtectorTokenProvider<User>>("local");
 
-            var key = Encoding.ASCII.GetBytes(configuration["jwtkey"]!);
+            var key = Encoding.ASCII.GetBytes(configuration["Jwt:Key"]!);
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

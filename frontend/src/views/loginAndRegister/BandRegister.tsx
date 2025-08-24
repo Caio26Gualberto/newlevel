@@ -1,10 +1,9 @@
-import { Box, Button, Checkbox, Chip, Divider, FormControl, Icon, InputLabel, MenuItem, OutlinedInput, Paper, Popover, Select, SelectChangeEvent, TextField, Tooltip, Typography, Zoom } from '@mui/material';
+import { Box, Button, Checkbox, Chip, Divider, FormControl, Icon, InputLabel, MenuItem, OutlinedInput, Paper, Popover, Select, SelectChangeEvent, TextField, Tooltip, Typography, Zoom, useTheme, useMediaQuery } from '@mui/material';
 import ApiConfiguration from '../../apiConfig';
 import { AuthenticateApi, CommonApi, EActivityLocation, EMusicGenres, SelectOptionDto } from '../../gen/api/src';
 import React, { useState } from 'react'
 import { IBandRegister, IMember } from '../../interfaces/newLevelInterfaces';
 import NewLevelButton from '../../components/NewLevelButton';
-import { useMobile } from '../../MobileContext';
 import NewLevelLoading from '../../components/NewLevelLoading';
 import HelpIcon from '@mui/icons-material/Help';
 import * as toastr from 'toastr';
@@ -12,7 +11,10 @@ import AddMembersModal from './addMembersModal/AddMembersModal';
 import { useNavigate } from 'react-router-dom';
 
 const BandRegister = () => {
-  const { isMobile } = useMobile()
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
   const navigate = useNavigate()
   const commonService = new CommonApi(ApiConfiguration)
   const authenticateService = new AuthenticateApi(ApiConfiguration)
@@ -199,12 +201,17 @@ const BandRegister = () => {
     <>
       <AddMembersModal onClose={handleCloseModal} open={isOpenModal} onSaveMembers={handleSaveMembers} />
       <Box
-        display="flex"
-        alignItems="flex-start"
-        justifyContent="center"
-        width="100%"
-        height="100%"
-        p={isMobile ? 1 : 2}
+        sx={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "center",
+          width: "100%",
+          minHeight: "100vh",
+          p: {
+            xs: 1,
+            sm: 2
+          }
+        }}
       >
         {step === 1 ?
           (
@@ -212,27 +219,83 @@ const BandRegister = () => {
               <Paper
                 elevation={10}
                 sx={{
-                  padding: isMobile ? 1 : 2,
+                  padding: {
+                    xs: 1,
+                    sm: 2
+                  },
                   display: "flex",
                   flexDirection: "column",
-                  width: isMobile ? '90%' : '50%',
-                  maxWidth: isMobile ? '100%' : 'auto',
+                  width: {
+                    xs: '95%',
+                    sm: '80%',
+                    md: '60%',
+                    lg: '50%'
+                  },
+                  maxWidth: "800px"
                 }}
               >
                 <NewLevelLoading isLoading={loading} />
-                <Box mb={1} display="flex" flexDirection="column" alignItems="center" justifyContent="center">
-                  <Typography variant={isMobile ? "h6" : "h5"} fontWeight="bold" component="h5">
+                <Box 
+                  sx={{
+                    mb: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  <Typography 
+                    variant={isSmallMobile ? "h6" : "h5"} 
+                    fontWeight="bold" 
+                    component="h5"
+                    sx={{
+                      fontSize: {
+                        xs: "1.25rem",
+                        sm: "1.5rem"
+                      }
+                    }}
+                  >
                     Informações
                   </Typography>
                 </Box>
 
                 <Divider />
 
-                <Box display="flex" flexDirection="column" alignItems="flex-start" marginTop={2}>
-                  <Box display="flex" justifyContent="center" alignItems="center" width="100%">
-                    <Typography variant={isMobile ? "h6" : "h6"}>
+                <Box 
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    marginTop: 2
+                  }}
+                >
+                  <Box 
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: "100%"
+                    }}
+                  >
+                    <Typography 
+                      variant={isSmallMobile ? "h6" : "h6"}
+                      sx={{
+                        fontSize: {
+                          xs: "1rem",
+                          sm: "1.25rem"
+                        }
+                      }}
+                    >
                       Primeiro crie um usuário
-                      <Box ml={1} onClick={handleClick} component="span" sx={{ cursor: "pointer", verticalAlign: "-5px" }}>
+                      <Box 
+                        ml={1} 
+                        onClick={handleClick} 
+                        component="span" 
+                        sx={{ 
+                          cursor: "pointer", 
+                          verticalAlign: "-5px" 
+                        }}
+                      >
                         <HelpIcon color='action' />
                       </Box>
                     </Typography>
@@ -252,8 +315,25 @@ const BandRegister = () => {
                       horizontal: 'center',
                     }}
                   >
-                    <Box p={2} sx={{ maxWidth: 300, wordWrap: 'break-word' }}>
-                      <Typography variant="body2">
+                    <Box 
+                      sx={{
+                        p: 2,
+                        maxWidth: {
+                          xs: 250,
+                          sm: 300
+                        },
+                        wordWrap: 'break-word'
+                      }}
+                    >
+                      <Typography 
+                        variant="body2"
+                        sx={{
+                          fontSize: {
+                            xs: "0.75rem",
+                            sm: "0.875rem"
+                          }
+                        }}
+                      >
                         Para criar sua banda, é necessário primeiro criar um usuário padrão. Isso acontece porque uma "banda" é um tipo especial de usuário no sistema, com algumas funcionalidades a mais voltadas para artistas e grupos. No entanto, como qualquer outro usuário, a banda ainda precisa de informações básicas de conta, como nome de usuário e senha, que todos os usuários possuem.
 
                         Não se preocupe, esse cadastro de usuário não interfere com seu perfil pessoal. É apenas uma etapa para garantir que a banda tenha acesso às mesmas funcionalidades básicas que qualquer outro usuário, com a adição de recursos específicos para artistas.
@@ -261,24 +341,106 @@ const BandRegister = () => {
                     </Box>
                   </Popover>
 
-                  <Box display="flex" flexDirection="column" width="100%">
+                  <Box 
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      width: "100%",
+                      gap: 2
+                    }}
+                  >
                     <Box>
-                      <Tooltip TransitionComponent={Zoom} title={<Typography>Seu email será usado como forma de login, posteriormente será utilizado para entrar no site</Typography>}>
-                        <InputLabel variant="standard"><Typography fontWeight="bold">Email:</Typography></InputLabel>
+                      <Tooltip 
+                        TransitionComponent={Zoom} 
+                        title={
+                          <Typography
+                            sx={{
+                              fontSize: {
+                                xs: "0.75rem",
+                                sm: "0.875rem"
+                              }
+                            }}
+                          >
+                            Seu email será usado como forma de login, posteriormente será utilizado para entrar no site
+                          </Typography>
+                        }
+                      >
+                        <InputLabel variant="standard">
+                          <Typography fontWeight="bold">Email:</Typography>
+                        </InputLabel>
                       </Tooltip>
-                      <TextField fullWidth type="email" placeholder="Email" onChange={(event) => setUserForm({ ...userForm, email: event.target.value })}></TextField>
+                      <TextField 
+                        fullWidth 
+                        type="email" 
+                        placeholder="Email" 
+                        onChange={(event) => setUserForm({ ...userForm, email: event.target.value })}
+                        sx={{
+                          '& .MuiInputBase-input': {
+                            fontSize: {
+                              xs: '0.875rem',
+                              sm: '1rem'
+                            }
+                          }
+                        }}
+                      />
                     </Box>
                     <Box>
-                      <InputLabel variant="standard"><Typography fontWeight="bold">Senha:</Typography></InputLabel>
-                      <TextField fullWidth type="password" placeholder="Senha" onChange={(event) => setUserForm({ ...userForm, password: event.target.value })}></TextField>
+                      <InputLabel variant="standard">
+                        <Typography fontWeight="bold">Senha:</Typography>
+                      </InputLabel>
+                      <TextField 
+                        fullWidth 
+                        type="password" 
+                        placeholder="Senha" 
+                        onChange={(event) => setUserForm({ ...userForm, password: event.target.value })}
+                        sx={{
+                          '& .MuiInputBase-input': {
+                            fontSize: {
+                              xs: '0.875rem',
+                              sm: '1rem'
+                            }
+                          }
+                        }}
+                      />
                     </Box>
                     <Box>
-                      <InputLabel variant="standard"><Typography fontWeight="bold">Confirme a senha:</Typography></InputLabel>
-                      <TextField fullWidth type="password" placeholder="Confirme a senha" onChange={(event) => setUserForm({ ...userForm, confirmPassword: event.target.value })}></TextField>
+                      <InputLabel variant="standard">
+                        <Typography fontWeight="bold">Confirme a senha:</Typography>
+                      </InputLabel>
+                      <TextField 
+                        fullWidth 
+                        type="password" 
+                        placeholder="Confirme a senha" 
+                        onChange={(event) => setUserForm({ ...userForm, confirmPassword: event.target.value })}
+                        sx={{
+                          '& .MuiInputBase-input': {
+                            fontSize: {
+                              xs: '0.875rem',
+                              sm: '1rem'
+                            }
+                          }
+                        }}
+                      />
                     </Box>
                     <Box>
-                      <Tooltip TransitionComponent={Zoom} title={<Typography>Cidade da banda, onde foi fundada, ou maior atuação</Typography>}>
-                        <InputLabel id="demo-simple-select-label"><Typography fontWeight="bold">Cidade:</Typography></InputLabel>
+                      <Tooltip 
+                        TransitionComponent={Zoom} 
+                        title={
+                          <Typography
+                            sx={{
+                              fontSize: {
+                                xs: "0.75rem",
+                                sm: "0.875rem"
+                              }
+                            }}
+                          >
+                            Cidade da banda, onde foi fundada, ou maior atuação
+                          </Typography>
+                        }
+                      >
+                        <InputLabel id="demo-simple-select-label">
+                          <Typography fontWeight="bold">Cidade:</Typography>
+                        </InputLabel>
                       </Tooltip>
                       <FormControl fullWidth>
                         <Select
@@ -286,14 +448,35 @@ const BandRegister = () => {
                           id="demo-simple-select"
                           value={selectedCity.value}
                           onChange={handleCityChange}
+                          sx={{
+                            '& .MuiSelect-select': {
+                              fontSize: {
+                                xs: '0.875rem',
+                                sm: '1rem'
+                              }
+                            }
+                          }}
                         >
-                          {cities.map((city) => {
-                            return <MenuItem key={city.value} value={city.value}>{city.name}</MenuItem>
-                          })}
+                          {cities.map((city) => (
+                            <MenuItem key={city.value} value={city.value}>
+                              {city.name}
+                            </MenuItem>
+                          ))}
                         </Select>
                       </FormControl>
                     </Box>
-                    <Box mt={2} display="flex" justifyContent="space-between">
+                    <Box 
+                      sx={{
+                        mt: 2,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        flexDirection: {
+                          xs: "column",
+                          sm: "row"
+                        },
+                        gap: 1
+                      }}
+                    >
                       <NewLevelButton onClick={() => navigate('/')} title='Voltar' width='30%' />
                       <NewLevelButton onClick={nextStep} title='Próximo' width='30%' />
                     </Box>
@@ -306,28 +489,86 @@ const BandRegister = () => {
               <Paper
                 elevation={10}
                 sx={{
-                  padding: isMobile ? 1 : 2,
+                  padding: {
+                    xs: 1,
+                    sm: 2
+                  },
                   display: "flex",
                   flexDirection: "column",
-                  width: isMobile ? '90%' : '50%',
-                  maxWidth: isMobile ? '100%' : 'auto',
+                  width: {
+                    xs: '95%',
+                    sm: '80%',
+                    md: '60%',
+                    lg: '50%'
+                  },
+                  maxWidth: "800px"
                 }}
               >
                 <NewLevelLoading isLoading={loading} />
-                <Box mb={1} display="flex" flexDirection="column" alignItems="center" justifyContent="center">
-                  <Typography variant={isMobile ? "h6" : "h5"} fontWeight="bold" component="h5">
+                <Box 
+                  sx={{
+                    mb: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  <Typography 
+                    variant={isSmallMobile ? "h6" : "h5"} 
+                    fontWeight="bold" 
+                    component="h5"
+                    sx={{
+                      fontSize: {
+                        xs: "1.25rem",
+                        sm: "1.5rem"
+                      }
+                    }}
+                  >
                     Informações
                   </Typography>
                 </Box>
 
                 <Divider />
 
-                <Box display="flex" flexDirection="column" alignItems="flex-start" marginTop={2}>
-                  <Box display="flex" justifyContent="center" alignItems="center" textAlign="center" width="100%">
-                    <Typography variant={isMobile ? "h6" : "h6"}>Registre sua banda</Typography>
+                <Box 
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    marginTop: 2
+                  }}
+                >
+                  <Box 
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      textAlign: "center",
+                      width: "100%"
+                    }}
+                  >
+                    <Typography 
+                      variant={isSmallMobile ? "h6" : "h6"}
+                      sx={{
+                        fontSize: {
+                          xs: "1rem",
+                          sm: "1.25rem"
+                        }
+                      }}
+                    >
+                      Registre sua banda
+                    </Typography>
                   </Box>
 
-                  <Box display="flex" flexDirection="column" width="100%">
+                  <Box 
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      width: "100%",
+                      gap: 2
+                    }}
+                  >
                     <TextField
                       name="bandName"
                       label="Nome da Banda"
@@ -335,6 +576,14 @@ const BandRegister = () => {
                       onChange={(e) => setUserForm(prevState => ({ ...prevState, bandName: e.target.value }))}
                       fullWidth
                       margin="normal"
+                      sx={{
+                        '& .MuiInputBase-input': {
+                          fontSize: {
+                            xs: '0.875rem',
+                            sm: '1rem'
+                          }
+                        }
+                      }}
                     />
 
                     <TextField
@@ -345,10 +594,29 @@ const BandRegister = () => {
                       fullWidth
                       margin="normal"
                       multiline
-                      rows={isMobile ? 5 : 10}
+                      rows={isSmallMobile ? 5 : 10}
+                      sx={{
+                        '& .MuiInputBase-input': {
+                          fontSize: {
+                            xs: '0.875rem',
+                            sm: '1rem'
+                          }
+                        }
+                      }}
                     />
 
-                    <FormControl fullWidth style={{ marginTop: 16 }}>
+                    <FormControl 
+                      fullWidth 
+                      sx={{ 
+                        marginTop: 2,
+                        '& .MuiInputLabel-root': {
+                          fontSize: {
+                            xs: '0.875rem',
+                            sm: '1rem'
+                          }
+                        }
+                      }}
+                    >
                       <InputLabel>Estilo musical</InputLabel>
                       <Select
                         multiple
@@ -356,11 +624,15 @@ const BandRegister = () => {
                         value={userForm.musicGenres}
                         onChange={handleGenreChange}
                         renderValue={(selected) => (
-                          <div>
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                             {selected.map((value) => (
-                              <Chip key={value} label={musicGenres.find(option => option.value === value)?.name} />
+                              <Chip 
+                                key={value} 
+                                label={musicGenres.find(option => option.value === value)?.name}
+                                size={isSmallMobile ? "small" : "medium"}
+                              />
                             ))}
-                          </div>
+                          </Box>
                         )}
                         MenuProps={{
                           PaperProps: {
@@ -370,31 +642,124 @@ const BandRegister = () => {
                             }
                           }
                         }}
+                        sx={{
+                          '& .MuiSelect-select': {
+                            fontSize: {
+                              xs: '0.875rem',
+                              sm: '1rem'
+                            }
+                          }
+                        }}
                       >
                         {musicGenres.map((option) => (
                           <MenuItem key={option.value} value={option.value}>
                             <Checkbox checked={userForm.musicGenres.includes(option.value!)} />
-                            {option.name}
+                            <Typography
+                              sx={{
+                                fontSize: {
+                                  xs: '0.875rem',
+                                  sm: '1rem'
+                                }
+                              }}
+                            >
+                              {option.name}
+                            </Typography>
                           </MenuItem>
                         ))}
                       </Select>
                     </FormControl>
 
-                    <Box display="flex" justifyContent="flex-start" alignItems="center" mb={1}>
+                    <Box 
+                      sx={{
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        alignItems: "center",
+                        mb: 1
+                      }}
+                    >
                       <TextField
                         margin="dense"
                         id="date"
                         label="Data do Inicio da Banda (Aproximadamente)"
                         type="text"
-                        sx={{ width: isMobile ? '100%' : '40%' }}
+                        sx={{ 
+                          width: {
+                            xs: '100%',
+                            sm: '40%'
+                          },
+                          '& .MuiInputBase-input': {
+                            fontSize: {
+                              xs: '0.875rem',
+                              sm: '1rem'
+                            }
+                          }
+                        }}
                         value={userForm.createdAt}
                         onChange={handleDateChange}
                       />
                     </Box>
-                    <Box mt={2} display="flex" justifyContent="space-between">
-                      <Button variant='outlined' onClick={backStep} sx={{ width: '30%' }} >Voltar</Button>
-                      <Button variant='contained' onClick={handleOpenModal} color='success' sx={{ width: '30%' }}>Adicionar Membros</Button>
-                      <Button variant='contained' onClick={registerBand} color='primary' sx={{ width: '30%' }}>Registrar</Button>
+                    <Box 
+                      sx={{
+                        mt: 2,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        flexDirection: {
+                          xs: "column",
+                          sm: "row"
+                        },
+                        gap: 1
+                      }}
+                    >
+                      <Button 
+                        variant='outlined' 
+                        onClick={backStep} 
+                        sx={{ 
+                          width: {
+                            xs: '100%',
+                            sm: '30%'
+                          },
+                          fontSize: {
+                            xs: "0.875rem",
+                            sm: "1rem"
+                          }
+                        }}
+                      >
+                        Voltar
+                      </Button>
+                      <Button 
+                        variant='contained' 
+                        onClick={handleOpenModal} 
+                        color='success' 
+                        sx={{ 
+                          width: {
+                            xs: '100%',
+                            sm: '30%'
+                          },
+                          fontSize: {
+                            xs: "0.875rem",
+                            sm: "1rem"
+                          }
+                        }}
+                      >
+                        Adicionar Membros
+                      </Button>
+                      <Button 
+                        variant='contained' 
+                        onClick={registerBand} 
+                        color='primary' 
+                        sx={{ 
+                          width: {
+                            xs: '100%',
+                            sm: '30%'
+                          },
+                          fontSize: {
+                            xs: "0.875rem",
+                            sm: "1rem"
+                          }
+                        }}
+                      >
+                        Registrar
+                      </Button>
                     </Box>
                   </Box>
                 </Box>

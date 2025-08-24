@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Container, Typography, Box, Checkbox, Chip, FormControl, InputLabel, MenuItem, Select, OutlinedInput, LinearProgress } from '@mui/material';
+import { TextField, Button, Container, Typography, Box, Checkbox, Chip, FormControl, InputLabel, MenuItem, Select, OutlinedInput, LinearProgress, useTheme, useMediaQuery } from '@mui/material';
 import ApiConfiguration from '../../apiConfig';
 import { CommonApi, EGitLabels, SelectOptionDto } from '../../gen/api/src';
 import NewLevelButton from '../../components/NewLevelButton';
@@ -9,6 +9,10 @@ import * as toastr from 'toastr';
 
 const IssueReport = () => {
     const commonApi = new CommonApi(ApiConfiguration);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    
     const [loading, setLoading] = useState<boolean>(false);
     const [issueCreated, setIssueCreated] = useState<string>('');
     const [progress, setProgress] = useState(0);
@@ -112,7 +116,17 @@ const IssueReport = () => {
     }, []);
 
     return (
-        <Container component="main" maxWidth="md">
+        <Container 
+            component="main" 
+            maxWidth="md"
+            sx={{
+                p: {
+                    xs: 2,
+                    sm: 3,
+                    md: 4
+                }
+            }}
+        >
             <NewLevelLoading isLoading={loading} />
             <Box
                 sx={{
@@ -122,12 +136,32 @@ const IssueReport = () => {
                     bgcolor: '#fff',
                     borderRadius: 1,
                     boxShadow: 3,
-                    p: 3,
-                    mt: 5,
+                    p: {
+                        xs: 2,
+                        sm: 3
+                    },
+                    mt: {
+                        xs: 3,
+                        sm: 4,
+                        md: 5
+                    },
                     width: '100%'
                 }}
             >
-                <Typography variant="h4" component="h1" gutterBottom>
+                <Typography 
+                    variant={isSmallMobile ? "h5" : "h4"} 
+                    component="h1" 
+                    gutterBottom
+                    sx={{
+                        fontSize: {
+                            xs: "1.5rem",
+                            sm: "2rem",
+                            md: "2.125rem"
+                        },
+                        fontWeight: "bold",
+                        textAlign: "center"
+                    }}
+                >
                     Reportar um Problema
                 </Typography>
                 <form noValidate style={{ width: "100%" }}>
@@ -140,6 +174,20 @@ const IssueReport = () => {
                         value={formData.title}
                         onChange={handleChange}
                         required
+                        sx={{
+                            '& .MuiInputBase-input': {
+                                fontSize: {
+                                    xs: '0.875rem',
+                                    sm: '1rem'
+                                }
+                            },
+                            '& .MuiInputLabel-root': {
+                                fontSize: {
+                                    xs: '0.875rem',
+                                    sm: '1rem'
+                                }
+                            }
+                        }}
                     />
                     <TextField
                         label="Descrição"
@@ -150,10 +198,35 @@ const IssueReport = () => {
                         value={formData.description}
                         onChange={handleChange}
                         multiline
-                        rows={4}
+                        rows={isSmallMobile ? 3 : 4}
                         required
+                        sx={{
+                            '& .MuiInputBase-input': {
+                                fontSize: {
+                                    xs: '0.875rem',
+                                    sm: '1rem'
+                                }
+                            },
+                            '& .MuiInputLabel-root': {
+                                fontSize: {
+                                    xs: '0.875rem',
+                                    sm: '1rem'
+                                }
+                            }
+                        }}
                     />
-                    <FormControl fullWidth style={{ marginTop: 16 }}>
+                    <FormControl 
+                        fullWidth 
+                        sx={{ 
+                            mt: 2,
+                            '& .MuiInputLabel-root': {
+                                fontSize: {
+                                    xs: '0.875rem',
+                                    sm: '1rem'
+                                }
+                            }
+                        }}
+                    >
                         <InputLabel>Problema/Sugestão</InputLabel>
                         <Select
                             multiple
@@ -161,26 +234,57 @@ const IssueReport = () => {
                             value={selectedProblemTypes}
                             onChange={handleProblemTypeChange}
                             renderValue={(selected) => (
-                                <div>
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                     {selected.map((value) => (
-                                        <Chip key={value} label={problemTypes.find(option => option.value === value)?.name} />
+                                        <Chip 
+                                            key={value} 
+                                            label={problemTypes.find(option => option.value === value)?.name}
+                                            size={isSmallMobile ? "small" : "medium"}
+                                        />
                                     ))}
-                                </div>
+                                </Box>
                             )}
                             sx={{
                                 maxHeight: 200,
+                                '& .MuiSelect-select': {
+                                    fontSize: {
+                                        xs: '0.875rem',
+                                        sm: '1rem'
+                                    }
+                                }
                             }}
                         >
                             {problemTypes.map((option) => (
                                 <MenuItem key={option.value} value={option.value}>
                                     <Checkbox checked={selectedProblemTypes.includes(option.value!)} />
-                                    {option.name}
+                                    <Typography
+                                        sx={{
+                                            fontSize: {
+                                                xs: '0.875rem',
+                                                sm: '1rem'
+                                            }
+                                        }}
+                                    >
+                                        {option.name}
+                                    </Typography>
                                 </MenuItem>
                             ))}
                         </Select>
                     </FormControl>
 
-                    <FormControl fullWidth style={{ marginTop: 16, marginBottom: 16 }}>
+                    <FormControl 
+                        fullWidth 
+                        sx={{ 
+                            mt: 2,
+                            mb: 2,
+                            '& .MuiInputLabel-root': {
+                                fontSize: {
+                                    xs: '0.875rem',
+                                    sm: '1rem'
+                                }
+                            }
+                        }}
+                    >
                         <InputLabel>Dispositivos</InputLabel>
                         <Select
                             multiple
@@ -188,31 +292,70 @@ const IssueReport = () => {
                             value={selectedDevices}
                             onChange={handleDeviceChange}
                             renderValue={(selected) => (
-                                <div>
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                     {selected.map((value) => (
-                                        <Chip key={value} label={devices.find(option => option.value === value)?.name} />
+                                        <Chip 
+                                            key={value} 
+                                            label={devices.find(option => option.value === value)?.name}
+                                            size={isSmallMobile ? "small" : "medium"}
+                                        />
                                     ))}
-                                </div>
+                                </Box>
                             )}
                             sx={{
-                                maxHeight: 200
+                                maxHeight: 200,
+                                '& .MuiSelect-select': {
+                                    fontSize: {
+                                        xs: '0.875rem',
+                                        sm: '1rem'
+                                    }
+                                }
                             }}
                         >
                             {devices.map((option) => (
                                 <MenuItem key={option.value} value={option.value}>
                                     <Checkbox checked={selectedDevices.includes(option.value!)} />
-                                    {option.name}
+                                    <Typography
+                                        sx={{
+                                            fontSize: {
+                                                xs: '0.875rem',
+                                                sm: '1rem'
+                                            }
+                                        }}
+                                    >
+                                        {option.name}
+                                    </Typography>
                                 </MenuItem>
                             ))}
                         </Select>
                     </FormControl>
-                    {issueCreated &&
-                        <Box mb={1}>
-                            <Typography fontWeight="bold">Report criado, caso queira visualizar veja <a href={issueCreated} target='_blank'>aqui</a></Typography>
+                    
+                    {issueCreated && (
+                        <Box mb={2} sx={{ width: '100%' }}>
+                            <Typography 
+                                fontWeight="bold"
+                                sx={{
+                                    fontSize: {
+                                        xs: "0.875rem",
+                                        sm: "1rem"
+                                    },
+                                    mb: 1
+                                }}
+                            >
+                                Report criado, caso queira visualizar veja{' '}
+                                <a href={issueCreated} target='_blank' rel="noopener noreferrer">
+                                    aqui
+                                </a>
+                            </Typography>
                             <LinearProgress variant="determinate" value={progress} />
                         </Box>
-                    }
-                    <NewLevelButton onClick={(e: any) => { e.preventDefault(); handleSubmit(e); }} title='Enviar' maxWidth />
+                    )}
+                    
+                    <NewLevelButton 
+                        onClick={(e: any) => { e.preventDefault(); handleSubmit(e); }} 
+                        title='Enviar' 
+                        maxWidth 
+                    />
                 </form>
             </Box>
         </Container>

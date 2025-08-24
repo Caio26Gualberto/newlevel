@@ -1,4 +1,4 @@
-import { Autocomplete, Avatar, Box, Button, CircularProgress, Dialog, DialogTitle, Icon, IconButton, ListItemText, MenuItem, Select, TextField, Tooltip, Typography } from "@mui/material";
+import { Autocomplete, Avatar, Box, Button, CircularProgress, Dialog, DialogTitle, Icon, IconButton, ListItemText, MenuItem, Select, TextField, Tooltip, Typography, useTheme, useMediaQuery } from "@mui/material";
 import GroupAddTwoToneIcon from '@mui/icons-material/GroupAddTwoTone';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CancelScheduleSendIcon from '@mui/icons-material/CancelScheduleSend';
@@ -20,6 +20,10 @@ const InviteIntegrantsModal: React.FC<SimpleDialogProps> = ({ open, title, onClo
     const bandService = new BandApi(ApiConfiguration);
     const systemNotificationService = new SystemNotificationApi(ApiConfiguration);
     const navigate = useNavigate();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    
     const [noMemberToggle, setNoMemberToggle] = React.useState<boolean>(false);
     const [isFieldFilled, setIsFieldFilled] = React.useState<boolean>(false);
     const [instrument, setInstrument] = React.useState<string>('');
@@ -118,19 +122,88 @@ const InviteIntegrantsModal: React.FC<SimpleDialogProps> = ({ open, title, onClo
     }, [searchTerm, instrument]);
 
     return (
-        <Dialog maxWidth="md" fullWidth onClose={handleClose} open={open}>
-            <Box m={1} mb={3}>
-                <Box display="flex" justifyContent="center" alignItems="center">
-                    <DialogTitle>{title}</DialogTitle>
+        <Dialog 
+            maxWidth="md" 
+            fullWidth 
+            onClose={handleClose} 
+            open={open}
+            sx={{
+                '& .MuiDialog-paper': {
+                    width: {
+                        xs: '95%',
+                        sm: '90%',
+                        md: '80%'
+                    },
+                    maxWidth: '800px'
+                }
+            }}
+        >
+            <Box 
+                sx={{
+                    m: {
+                        xs: 0.5,
+                        sm: 1
+                    },
+                    mb: 3
+                }}
+            >
+                <Box 
+                    sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center"
+                    }}
+                >
+                    <DialogTitle
+                        sx={{
+                            fontSize: {
+                                xs: "1.25rem",
+                                sm: "1.5rem"
+                            }
+                        }}
+                    >
+                        {title}
+                    </DialogTitle>
                 </Box>
-                <Box display="flex" justifyContent="center" flexDirection="column" alignItems="center" width="100%">
+                <Box 
+                    sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        width: "100%"
+                    }}
+                >
                     {
                         existingBandMembers.length > 0 &&
                         (
-                            <Box width="100%" mb={2}>
+                            <Box 
+                                sx={{
+                                    width: "100%",
+                                    mb: 2
+                                }}
+                            >
                                 {existingBandMembers.map((member, index) => (
-                                    <Box key={index} display="flex" alignItems="center" justifyContent="space-evenly" width="100%" gap={2}>
-                                        <Box width="100%">
+                                    <Box 
+                                        key={index} 
+                                        sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "space-evenly",
+                                            width: "100%",
+                                            gap: 2,
+                                            flexDirection: {
+                                                xs: "column",
+                                                sm: "row"
+                                            },
+                                            mb: 2
+                                        }}
+                                    >
+                                        <Box 
+                                            sx={{
+                                                width: "100%"
+                                            }}
+                                        >
                                             <Autocomplete
                                                 disabled
                                                 value={member}
@@ -138,9 +211,40 @@ const InviteIntegrantsModal: React.FC<SimpleDialogProps> = ({ open, title, onClo
                                                 options={existingBandMembers}
                                                 getOptionLabel={(option) => option.name!}
                                                 renderOption={(props, option) => (
-                                                    <Box key={option.name} component="li" {...props} display="flex" alignItems="center">
-                                                        <Avatar src={option.avatarURL} alt={option.name} />
-                                                        <Box ml={1}>{option.name}</Box>
+                                                    <Box 
+                                                        key={option.name} 
+                                                        component="li" 
+                                                        {...props} 
+                                                        sx={{
+                                                            display: "flex",
+                                                            alignItems: "center"
+                                                        }}
+                                                    >
+                                                        <Avatar 
+                                                            src={option.avatarURL} 
+                                                            alt={option.name}
+                                                            sx={{
+                                                                width: {
+                                                                    xs: "24px",
+                                                                    sm: "32px"
+                                                                },
+                                                                height: {
+                                                                    xs: "24px",
+                                                                    sm: "32px"
+                                                                }
+                                                            }}
+                                                        />
+                                                        <Box 
+                                                            sx={{
+                                                                ml: 1,
+                                                                fontSize: {
+                                                                    xs: "0.75rem",
+                                                                    sm: "0.875rem"
+                                                                }
+                                                            }}
+                                                        >
+                                                            {option.name}
+                                                        </Box>
                                                     </Box>
                                                 )}
                                                 renderInput={(params) => (
@@ -148,11 +252,32 @@ const InviteIntegrantsModal: React.FC<SimpleDialogProps> = ({ open, title, onClo
                                                         {...params}
                                                         variant="outlined"
                                                         disabled
+                                                        sx={{
+                                                            '& .MuiInputBase-input': {
+                                                                fontSize: {
+                                                                    xs: '0.75rem',
+                                                                    sm: '0.875rem'
+                                                                }
+                                                            }
+                                                        }}
                                                         InputProps={{
                                                             ...params.InputProps,
                                                             startAdornment: (
                                                                 <>
-                                                                    <Avatar src={member.avatarURL} alt={member.name} />
+                                                                    <Avatar 
+                                                                        src={member.avatarURL} 
+                                                                        alt={member.name}
+                                                                        sx={{
+                                                                            width: {
+                                                                                xs: "24px",
+                                                                                sm: "32px"
+                                                                            },
+                                                                            height: {
+                                                                                xs: "24px",
+                                                                                sm: "32px"
+                                                                            }
+                                                                        }}
+                                                                    />
                                                                     {params.InputProps.startAdornment}
                                                                 </>
                                                             ),
@@ -162,9 +287,26 @@ const InviteIntegrantsModal: React.FC<SimpleDialogProps> = ({ open, title, onClo
                                                 )}
                                             />
                                         </Box>
-                                        <Box width="100%" display="flex">
+                                        <Box 
+                                            sx={{
+                                                width: "100%",
+                                                display: "flex",
+                                                alignItems: "center"
+                                            }}
+                                        >
                                             <TextField
-                                                sx={{ width: "70%" }}
+                                                sx={{ 
+                                                    width: {
+                                                        xs: "80%",
+                                                        sm: "70%"
+                                                    },
+                                                    '& .MuiInputBase-input': {
+                                                        fontSize: {
+                                                            xs: '0.75rem',
+                                                            sm: '0.875rem'
+                                                        }
+                                                    }
+                                                }}
                                                 value={member.instrument}
                                                 disabled
                                                 variant="outlined"
@@ -173,9 +315,26 @@ const InviteIntegrantsModal: React.FC<SimpleDialogProps> = ({ open, title, onClo
                                                 onClick={() => removeBandMember(member.userId!)}
                                                 color="error"
                                                 disableRipple
+                                                sx={{
+                                                    width: {
+                                                        xs: "32px",
+                                                        sm: "40px"
+                                                    },
+                                                    height: {
+                                                        xs: "32px",
+                                                        sm: "40px"
+                                                    }
+                                                }}
                                             >
                                                 <Tooltip title="Remover membro" placement="top">
-                                                    <GroupRemoveIcon />
+                                                    <GroupRemoveIcon 
+                                                        sx={{
+                                                            fontSize: {
+                                                                xs: "1rem",
+                                                                sm: "1.25rem"
+                                                            }
+                                                        }}
+                                                    />
                                                 </Tooltip>
                                             </IconButton>
                                         </Box>
@@ -187,10 +346,33 @@ const InviteIntegrantsModal: React.FC<SimpleDialogProps> = ({ open, title, onClo
                     {
                         pendingInvites.length > 0 &&
                         (
-                            <Box width="100%" mb={2}>
+                            <Box 
+                                sx={{
+                                    width: "100%",
+                                    mb: 2
+                                }}
+                            >
                                 {pendingInvites.map((member, index) => (
-                                    <Box key={index} display="flex" alignItems="center" justifyContent="space-evenly" width="100%" gap={2}>
-                                        <Box width="100%">
+                                    <Box 
+                                        key={index} 
+                                        sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "space-evenly",
+                                            width: "100%",
+                                            gap: 2,
+                                            flexDirection: {
+                                                xs: "column",
+                                                sm: "row"
+                                            },
+                                            mb: 2
+                                        }}
+                                    >
+                                        <Box 
+                                            sx={{
+                                                width: "100%"
+                                            }}
+                                        >
                                             <Autocomplete
                                                 disabled
                                                 value={member}
@@ -198,9 +380,40 @@ const InviteIntegrantsModal: React.FC<SimpleDialogProps> = ({ open, title, onClo
                                                 options={pendingInvites}
                                                 getOptionLabel={(option) => option.name!}
                                                 renderOption={(props, option) => (
-                                                    <Box key={option.name} component="li" {...props} display="flex" alignItems="center">
-                                                        <Avatar src={option.avatarURL} alt={option.name} />
-                                                        <Box ml={1}>{option.name}</Box>
+                                                    <Box 
+                                                        key={option.name} 
+                                                        component="li" 
+                                                        {...props} 
+                                                        sx={{
+                                                            display: "flex",
+                                                            alignItems: "center"
+                                                        }}
+                                                    >
+                                                        <Avatar 
+                                                            src={option.avatarURL} 
+                                                            alt={option.name}
+                                                            sx={{
+                                                                width: {
+                                                                    xs: "24px",
+                                                                    sm: "32px"
+                                                                },
+                                                                height: {
+                                                                    xs: "24px",
+                                                                    sm: "32px"
+                                                                }
+                                                            }}
+                                                        />
+                                                        <Box 
+                                                            sx={{
+                                                                ml: 1,
+                                                                fontSize: {
+                                                                    xs: "0.75rem",
+                                                                    sm: "0.875rem"
+                                                                }
+                                                            }}
+                                                        >
+                                                            {option.name}
+                                                        </Box>
                                                     </Box>
                                                 )}
                                                 renderInput={(params) => (
@@ -208,11 +421,32 @@ const InviteIntegrantsModal: React.FC<SimpleDialogProps> = ({ open, title, onClo
                                                         {...params}
                                                         variant="outlined"
                                                         disabled
+                                                        sx={{
+                                                            '& .MuiInputBase-input': {
+                                                                fontSize: {
+                                                                    xs: '0.75rem',
+                                                                    sm: '0.875rem'
+                                                                }
+                                                            }
+                                                        }}
                                                         InputProps={{
                                                             ...params.InputProps,
                                                             startAdornment: (
                                                                 <>
-                                                                    <Avatar src={member.avatarURL} alt={member.name} />
+                                                                    <Avatar 
+                                                                        src={member.avatarURL} 
+                                                                        alt={member.name}
+                                                                        sx={{
+                                                                            width: {
+                                                                                xs: "24px",
+                                                                                sm: "32px"
+                                                                            },
+                                                                            height: {
+                                                                                xs: "24px",
+                                                                                sm: "32px"
+                                                                            }
+                                                                        }}
+                                                                    />
                                                                     {params.InputProps.startAdornment}
                                                                 </>
                                                             ),
@@ -222,9 +456,26 @@ const InviteIntegrantsModal: React.FC<SimpleDialogProps> = ({ open, title, onClo
                                                 )}
                                             />
                                         </Box>
-                                        <Box width="100%" display="flex">
+                                        <Box 
+                                            sx={{
+                                                width: "100%",
+                                                display: "flex",
+                                                alignItems: "center"
+                                            }}
+                                        >
                                             <TextField
-                                                sx={{ width: "70%" }}
+                                                sx={{ 
+                                                    width: {
+                                                        xs: "80%",
+                                                        sm: "70%"
+                                                    },
+                                                    '& .MuiInputBase-input': {
+                                                        fontSize: {
+                                                            xs: '0.75rem',
+                                                            sm: '0.875rem'
+                                                        }
+                                                    }
+                                                }}
                                                 value={member.instrument}
                                                 disabled
                                                 variant="outlined"
@@ -233,9 +484,26 @@ const InviteIntegrantsModal: React.FC<SimpleDialogProps> = ({ open, title, onClo
                                                 onClick={() => removePendingInvite(member.name!)}
                                                 color="error"
                                                 disableRipple
+                                                sx={{
+                                                    width: {
+                                                        xs: "32px",
+                                                        sm: "40px"
+                                                    },
+                                                    height: {
+                                                        xs: "32px",
+                                                        sm: "40px"
+                                                    }
+                                                }}
                                             >
                                                 <Tooltip title="Cancelar convite" placement="top">
-                                                    <CancelScheduleSendIcon />
+                                                    <CancelScheduleSendIcon 
+                                                        sx={{
+                                                            fontSize: {
+                                                                xs: "1rem",
+                                                                sm: "1.25rem"
+                                                            }
+                                                        }}
+                                                    />
                                                 </Tooltip>
                                             </IconButton>
                                         </Box>
@@ -247,8 +515,28 @@ const InviteIntegrantsModal: React.FC<SimpleDialogProps> = ({ open, title, onClo
                     {
                         members.length <= 0 && !noMemberToggle && existingBandMembers.length == 0 &&
                         (
-                            <Typography variant="subtitle1">Ainda não há integrantes
-                                <Icon onClick={() => setNoMemberToggle(true)} color="success" sx={{ cursor: "pointer", ml: 1 }}>
+                            <Typography 
+                                variant="subtitle1"
+                                sx={{
+                                    fontSize: {
+                                        xs: "0.875rem",
+                                        sm: "1rem"
+                                    }
+                                }}
+                            >
+                                Ainda não há integrantes
+                                <Icon 
+                                    onClick={() => setNoMemberToggle(true)} 
+                                    color="success" 
+                                    sx={{ 
+                                        cursor: "pointer", 
+                                        ml: 1,
+                                        fontSize: {
+                                            xs: "1.25rem",
+                                            sm: "1.5rem"
+                                        }
+                                    }}
+                                >
                                     <GroupAddTwoToneIcon />
                                 </Icon>
                             </Typography>
@@ -257,8 +545,24 @@ const InviteIntegrantsModal: React.FC<SimpleDialogProps> = ({ open, title, onClo
                     {
                         selectedMember && noMemberToggle &&
                         (
-                            <Box display="flex" alignItems="center" justifyContent="space-evenly" width="100%" gap={2}>
-                                <Box width="100%">
+                            <Box 
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-evenly",
+                                    width: "100%",
+                                    gap: 2,
+                                    flexDirection: {
+                                        xs: "column",
+                                        sm: "row"
+                                    }
+                                }}
+                            >
+                                <Box 
+                                    sx={{
+                                        width: "100%"
+                                    }}
+                                >
                                     <Autocomplete
                                         id="user-autocomplete"
                                         options={members}
@@ -275,11 +579,39 @@ const InviteIntegrantsModal: React.FC<SimpleDialogProps> = ({ open, title, onClo
                                                 {...params}
                                                 variant="outlined"
                                                 label="Pesquisar usuário"
+                                                sx={{
+                                                    '& .MuiInputBase-input': {
+                                                        fontSize: {
+                                                            xs: '0.75rem',
+                                                            sm: '0.875rem'
+                                                        }
+                                                    },
+                                                    '& .MuiInputLabel-root': {
+                                                        fontSize: {
+                                                            xs: '0.75rem',
+                                                            sm: '0.875rem'
+                                                        }
+                                                    }
+                                                }}
                                                 InputProps={{
                                                     ...params.InputProps,
                                                     endAdornment: (
                                                         <>
-                                                            {loading ? <CircularProgress color="inherit" size={24} /> : null}
+                                                            {loading ? (
+                                                                <CircularProgress 
+                                                                    color="inherit" 
+                                                                    sx={{
+                                                                        width: {
+                                                                            xs: "20px",
+                                                                            sm: "24px"
+                                                                        },
+                                                                        height: {
+                                                                            xs: "20px",
+                                                                            sm: "24px"
+                                                                        }
+                                                                    }}
+                                                                />
+                                                            ) : null}
                                                             {params.InputProps.endAdornment}
                                                         </>
                                                     ),
@@ -287,26 +619,93 @@ const InviteIntegrantsModal: React.FC<SimpleDialogProps> = ({ open, title, onClo
                                             />
                                         )}
                                         renderOption={(props, option) => (
-                                            <Box key={option.userId} component="li" {...props} display="flex" alignItems="center">
-                                                <Avatar src={option.avatarUrl} alt={option.nickName} />
-                                                <Box ml={1}>{option.nickName}</Box>
+                                            <Box 
+                                                key={option.userId} 
+                                                component="li" 
+                                                {...props} 
+                                                sx={{
+                                                    display: "flex",
+                                                    alignItems: "center"
+                                                }}
+                                            >
+                                                <Avatar 
+                                                    src={option.avatarUrl} 
+                                                    alt={option.nickName}
+                                                    sx={{
+                                                        width: {
+                                                            xs: "24px",
+                                                            sm: "32px"
+                                                        },
+                                                        height: {
+                                                            xs: "24px",
+                                                            sm: "32px"
+                                                        }
+                                                    }}
+                                                />
+                                                <Box 
+                                                    sx={{
+                                                        ml: 1,
+                                                        fontSize: {
+                                                            xs: "0.75rem",
+                                                            sm: "0.875rem"
+                                                        }
+                                                    }}
+                                                >
+                                                    {option.nickName}
+                                                </Box>
                                             </Box>
                                         )}
                                         isOptionEqualToValue={(option, value) => option.userId === value.userId}
                                     />
                                 </Box>
-                                <Box width="100%" display="flex">
+                                <Box 
+                                    sx={{
+                                        width: "100%",
+                                        display: "flex",
+                                        alignItems: "center"
+                                    }}
+                                >
                                     <TextField
-                                        sx={{ width: "70%" }}
-                                        onChange={(e) => setInstrument(e.target.value)} />
+                                        sx={{ 
+                                            width: {
+                                                xs: "80%",
+                                                sm: "70%"
+                                            },
+                                            '& .MuiInputBase-input': {
+                                                fontSize: {
+                                                    xs: '0.75rem',
+                                                    sm: '0.875rem'
+                                                }
+                                            }
+                                        }}
+                                        onChange={(e) => setInstrument(e.target.value)}
+                                        placeholder="Instrumento"
+                                    />
                                     <IconButton
                                         color="success"
                                         disableRipple
                                         disabled={!isFieldFilled}
                                         onClick={addMember}
+                                        sx={{
+                                            width: {
+                                                xs: "32px",
+                                                sm: "40px"
+                                            },
+                                            height: {
+                                                xs: "32px",
+                                                sm: "40px"
+                                            }
+                                        }}
                                     >
                                         <Tooltip title="Convidar usuário" placement="top">
-                                            <AddCircleOutlineOutlinedIcon />
+                                            <AddCircleOutlineOutlinedIcon 
+                                                sx={{
+                                                    fontSize: {
+                                                        xs: "1rem",
+                                                        sm: "1.25rem"
+                                                    }
+                                                }}
+                                            />
                                         </Tooltip>
                                     </IconButton>
                                 </Box>
@@ -317,14 +716,31 @@ const InviteIntegrantsModal: React.FC<SimpleDialogProps> = ({ open, title, onClo
                         existingBandMembers.length > 0 && !noMemberToggle &&
                         (
                             <IconButton
-                            onClick={() => setNoMemberToggle(true)}
-                            color="success"
-                            disableRipple
-                        >
-                            <Tooltip title="Convidar membro" placement="top">
-                                <GroupAddTwoToneIcon />
-                            </Tooltip>
-                        </IconButton> 
+                                onClick={() => setNoMemberToggle(true)}
+                                color="success"
+                                disableRipple
+                                sx={{
+                                    width: {
+                                        xs: "40px",
+                                        sm: "48px"
+                                    },
+                                    height: {
+                                        xs: "40px",
+                                        sm: "48px"
+                                    }
+                                }}
+                            >
+                                <Tooltip title="Convidar membro" placement="top">
+                                    <GroupAddTwoToneIcon 
+                                        sx={{
+                                            fontSize: {
+                                                xs: "1.5rem",
+                                                sm: "2rem"
+                                            }
+                                        }}
+                                    />
+                                </Tooltip>
+                            </IconButton> 
                         )
                     }
                 </Box>

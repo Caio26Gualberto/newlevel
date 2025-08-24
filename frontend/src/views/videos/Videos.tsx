@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Input, TablePagination, useMediaQuery, useTheme } from "@mui/material"
+import { Box, Button, Input, TablePagination, useTheme, useMediaQuery } from "@mui/material"
 import Media from "./components/Media";
 import { useEffect, useState } from "react";
 import SearchIcon from '@mui/icons-material/Search';
@@ -7,7 +7,6 @@ import { MediaApi, MediaDtoGenericListNewLevelResponse } from "../../gen/api/src
 import ApiConfiguration from "../../apiConfig";
 import Swal from "sweetalert2";
 import NewLevelLoading from "../../components/NewLevelLoading";
-import { useMobile } from "../../MobileContext";
 
 const Videos = () => {
   const mediaService = new MediaApi(ApiConfiguration);
@@ -17,7 +16,10 @@ const Videos = () => {
   const [data, setData] = useState<MediaDtoGenericListNewLevelResponse>({ data: { items: [], totalCount: 0 }, isSuccess: false, message: "" });
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(12);
-  const { isMobile } = useMobile()
+  
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
@@ -88,54 +90,193 @@ const Videos = () => {
     <>
       <NewLevelLoading isLoading={loading} />
       <AddVideoModal open={openModal} onClose={handleCloseModal} />
-      <Box height="100%" flex={1} bgcolor="#F3F3F3" p={isMobile ? 1 : 3}>
-        <Box display="flex" flexDirection={isMobile ? 'column' : 'row'} justifyContent="space-between" alignItems={isMobile ? 'flex-start' : 'center'} mb={isMobile ? 2 : 0}>
-          <Box display="flex" flexDirection={'row'} alignItems={'center'}>
+      <Box 
+        sx={{
+          height: "100%",
+          flex: 1,
+          bgcolor: "#F3F3F3",
+          p: {
+            xs: 1,
+            sm: 2,
+            md: 3
+          }
+        }}
+      >
+        {/* Header Section */}
+        <Box 
+          sx={{
+            display: "flex",
+            flexDirection: {
+              xs: "column",
+              md: "row"
+            },
+            justifyContent: "space-between",
+            alignItems: {
+              xs: "stretch",
+              md: "center"
+            },
+            gap: {
+              xs: 2,
+              md: 0
+            },
+            mb: {
+              xs: 2,
+              md: 3
+            }
+          }}
+        >
+          {/* Search Section */}
+          <Box 
+            sx={{
+              display: "flex",
+              flexDirection: {
+                xs: "column",
+                sm: "row"
+              },
+              alignItems: {
+                xs: "stretch",
+                sm: "center"
+              },
+              gap: {
+                xs: 1,
+                sm: 1
+              },
+              flex: 1,
+              maxWidth: {
+                xs: "100%",
+                md: "460px"
+              }
+            }}
+          >
             <Input
               value={searchTerm}
               placeholder="Pesquisa por título"
-              sx={{ width: isMobile ? '100%' : 460, mb: isMobile ? 1 : 0 }}
+              sx={{ 
+                flex: 1,
+                minWidth: 0
+              }}
               onChange={handleInputChange}
             />
             <Button
               className="btn btn-primary"
               onClick={search}
-              sx={{ mt: isMobile ? 1 : 0, ml: isMobile ? 4 : 1 }}
+              sx={{
+                minWidth: "fit-content",
+                alignSelf: {
+                  xs: "stretch",
+                  sm: "center"
+                }
+              }}
             >
               <SearchIcon fontSize="medium" />
             </Button>
           </Box>
-          <Box>
-            <Button className="btn btn-primary" onClick={handleOpenModal} sx={{ mt: isMobile ? 1 : 0 }}>
+
+          {/* Add Video Button */}
+          <Box 
+            sx={{
+              display: "flex",
+              justifyContent: {
+                xs: "stretch",
+                md: "flex-end"
+              }
+            }}
+          >
+            <Button 
+              className="btn btn-primary" 
+              onClick={handleOpenModal}
+              sx={{
+                width: {
+                  xs: "100%",
+                  md: "auto"
+                }
+              }}
+            >
               Adicionar vídeo
             </Button>
           </Box>
         </Box>
-        <Grid mt={isMobile ? 0 : 3} ml={0} container spacing={isMobile ? 1 : 3}>
+
+        {/* Videos Grid */}
+        <Box 
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: {
+              xs: 1,
+              sm: 2,
+              md: 3
+            },
+            justifyContent: {
+              xs: "center",
+              sm: "flex-start"
+            },
+            mb: 3
+          }}
+        >
           {data.data?.items!.map((item, index) => (
-            <Media
+            <Box
               key={index}
-              id={item.id!}
-              src={item.src!}
-              title={item.title!}
-              description={item.description!}
-              nickname={item.nickname!}
-              createdAt={new Date(item.creationTime!)}
-              loading={loading}
-            />
+              sx={{
+                flex: {
+                  xs: "1 1 100%",
+                  sm: "1 1 calc(50% - 8px)",
+                  md: "1 1 calc(33.333% - 16px)",
+                  lg: "1 1 calc(25% - 24px)",
+                  xl: "1 1 calc(20% - 24px)"
+                },
+                minWidth: {
+                  xs: "100%",
+                  sm: "280px",
+                  md: "300px"
+                },
+                maxWidth: {
+                  xs: "100%",
+                  sm: "400px",
+                  md: "460px"
+                }
+              }}
+            >
+              <Media
+                id={item.id!}
+                src={item.src!}
+                title={item.title!}
+                description={item.description!}
+                nickname={item.nickname!}
+                createdAt={new Date(item.creationTime!)}
+                loading={loading}
+              />
+            </Box>
           ))}
-        </Grid>
-        <TablePagination
-          sx={{ display: 'flex', justifyContent: 'center' }}
-          rowsPerPageOptions={[12, 24, 48]}
-          component="div"
-          count={data.data!.totalCount!}
-          labelRowsPerPage="Vídeos por página"
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+        </Box>
+
+        {/* Pagination */}
+        <Box 
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            width: "100%"
+          }}
+        >
+          <TablePagination
+            rowsPerPageOptions={[12, 24, 48]}
+            component="div"
+            count={data.data!.totalCount!}
+            labelRowsPerPage="Vídeos por página"
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            sx={{
+              '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                fontSize: {
+                  xs: '0.75rem',
+                  sm: '0.875rem'
+                }
+              }
+            }}
+          />
+        </Box>
       </Box>
     </>
   );

@@ -151,7 +151,7 @@ namespace NewLevel.Services.Media
 
                 object templateObj = new { Title = media.Title };
 
-                await _emailService.SendEmail(media.User.Email!, "Música aprovada", "Sua música foi aprovada com sucesso!", "d-d5d5e7ddb40143fa927cf11dbef70783", templateObj);
+                //await _emailService.SendEmail(media.User.Email!, "Música aprovada", "Sua música foi aprovada com sucesso!", "d-d5d5e7ddb40143fa927cf11dbef70783", templateObj);
 
                 await _context.SaveChangesAsync();
 
@@ -164,7 +164,7 @@ namespace NewLevel.Services.Media
                     return false;
 
                 object templateObj = new { Title = media.Title };
-                await _emailService.SendEmail(media.User.Email!, "Música aprovada", "Sua música foi aprovada com sucesso!", "d-7fc323d4b3b547dcadc728e1c6a06f5f ", templateObj);
+                //await _emailService.SendEmail(media.User.Email!, "Música aprovada", "Sua música foi aprovada com sucesso!", "d-7fc323d4b3b547dcadc728e1c6a06f5f ", templateObj);
 
                 return false;
             }

@@ -223,7 +223,7 @@ namespace NewLevel.Services.Authenticate
         private string GenerateJwtToken(User user, IList<string> roles)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["jwtkey"]!);
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]!);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

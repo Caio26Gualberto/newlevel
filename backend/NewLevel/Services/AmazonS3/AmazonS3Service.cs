@@ -16,8 +16,8 @@ namespace NewLevel.Services.AmazonS3
 
         public AmazonS3Service(IConfiguration configuration)
         {
-            AwsKeyId = configuration["Amazon:AwsKeyId"]!;
-            AwsKeySecret = configuration["Amazon:AwsKeySecret"]!; ;
+            AwsKeyId = configuration["Aws:AccessKeyId"]!;
+            AwsKeySecret = configuration["Aws:SecretAccessKey"]!; ;
             AwsCredentials = new BasicAWSCredentials(AwsKeyId, AwsKeySecret);
             var config = new AmazonS3Config
             {

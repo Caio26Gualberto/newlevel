@@ -17,7 +17,7 @@ namespace NewLevel.Tests.UnitTests
         {
             var cpfConsulting = new CPFConsultingService(_configuration);
             DateTime birthdayDt = Convert.ToDateTime(birthday);
-            var result = await cpfConsulting.ConsultCPF(cpf, birthdayDt);
+            var result = await cpfConsulting.CreateBillingPixAsync(cpf, birthdayDt);
 
             Assert.NotEmpty(result);
         }

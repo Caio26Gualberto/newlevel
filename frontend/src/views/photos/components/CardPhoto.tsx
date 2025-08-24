@@ -11,12 +11,10 @@ import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ForumIcon from '@mui/icons-material/Forum';
-import { Box } from '@mui/material';
+import { Box, useTheme, useMediaQuery } from '@mui/material';
 import PictureProfileModal from './modal/PictureProfileModal';
 import CommentsModal from './modal/CommentsModal';
-import { useMobile } from '../../../MobileContext';
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -47,7 +45,10 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 
 const CardPhoto: React.FC<CardPhotoProps> = ({ title, srcPhotoS3, srcUserPhotoProfile, date, subtitle, description, userId, nickname, photoId }) => {
   const haveDescription = description ? true : false;
-  const { isMobile } = useMobile()
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
   const [expanded, setExpanded] = React.useState(false);
   const [openAvatar, setOpenAvatar] = React.useState(false);
   const [openComments, setOpenComments] = React.useState(false);
@@ -94,51 +95,133 @@ const CardPhoto: React.FC<CardPhotoProps> = ({ title, srcPhotoS3, srcUserPhotoPr
       <PictureProfileModal onClose={handleCloseAvatar} open={openAvatar} avatarUrl={srcUserPhotoProfile!} nickname={nickname!} />
       <Card
         sx={{
-          maxWidth: isMobile ? '100%' : 345, 
-          minHeight: '100%',
-          margin: isMobile ? '0 auto' : 'initial', 
-          padding: isMobile ? 1 : 2, 
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          p: {
+            xs: 1,
+            sm: 1.5,
+            md: 2
+          }
         }}
       >
         <CardHeader
           avatar={renderizeAvatar()}
-          title={<Typography fontWeight="bold">{title}</Typography>}
-          subheader={date.toLocaleDateString()}
+          title={
+            <Typography 
+              fontWeight="bold"
+              sx={{
+                fontSize: {
+                  xs: "0.875rem",
+                  sm: "1rem",
+                  md: "1.125rem"
+                }
+              }}
+            >
+              {title}
+            </Typography>
+          }
+          subheader={
+            <Typography
+              sx={{
+                fontSize: {
+                  xs: "0.75rem",
+                  sm: "0.875rem"
+                }
+              }}
+            >
+              {date.toLocaleDateString()}
+            </Typography>
+          }
+          sx={{
+            p: {
+              xs: 1,
+              sm: 1.5,
+              md: 2
+            }
+          }}
         />
         <CardMedia
           onClick={openImage}
           sx={{
             cursor: 'pointer',
-            height: isMobile ? '200px' : '250px', // Altura menor em mobile
-            objectFit: 'cover',  // Garante que a imagem cubra a área sem distorção
+            height: {
+              xs: '180px',
+              sm: '220px',
+              md: '250px',
+              lg: '280px'
+            },
+            objectFit: 'cover',
+            borderRadius: 1
           }}
           component="img"
           src={srcPhotoS3}
         />
         <CardContent
           sx={{
-            height: isMobile ? 'auto' : '109px', // Ajusta a altura para mobile
-            overflow: 'hidden', // Esconde o excesso de texto se a altura for menor
+            flex: 1,
+            p: {
+              xs: 1,
+              sm: 1.5,
+              md: 2
+            },
+            minHeight: {
+              xs: 'auto',
+              sm: '80px',
+              md: '109px'
+            }
           }}
         >
-          <Typography paragraph style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }} variant="body2" color="text.secondary">
+          <Typography 
+            paragraph 
+            style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }} 
+            variant="body2" 
+            color="text.secondary"
+            sx={{
+              fontSize: {
+                xs: "0.75rem",
+                sm: "0.875rem"
+              },
+              lineHeight: 1.4
+            }}
+          >
             {subtitle}
           </Typography>
         </CardContent>
         <Box
-          display="flex"
-          flexDirection="column"
-          justifyContent="end"
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "end",
+            mt: "auto"
+          }}
         >
           <CardActions
             sx={{
               display: 'flex',
-              justifyContent: isMobile ? 'space-between' : 'end', // Ajusta a justificativa para mobile
-              padding: isMobile ? 1 : 2,  // Menor padding em mobile
+              justifyContent: {
+                xs: 'space-between',
+                sm: 'flex-end'
+              },
+              p: {
+                xs: 1,
+                sm: 1.5,
+                md: 2
+              }
             }}
             disableSpacing
           >
-            <IconButton onClick={handleOpenComments} aria-label="add to favorites">
+            <IconButton 
+              onClick={handleOpenComments} 
+              aria-label="add to favorites"
+              sx={{
+                fontSize: {
+                  xs: "1.25rem",
+                  sm: "1.5rem"
+                }
+              }}
+            >
               <ForumIcon />
             </IconButton>
             {haveDescription && (
@@ -147,6 +230,12 @@ const CardPhoto: React.FC<CardPhotoProps> = ({ title, srcPhotoS3, srcUserPhotoPr
                 onClick={handleExpandClick}
                 aria-expanded={expanded}
                 aria-label="show more"
+                sx={{
+                  fontSize: {
+                    xs: "1.25rem",
+                    sm: "1.5rem"
+                  }
+                }}
               >
                 <ExpandMoreIcon />
               </ExpandMore>
@@ -154,8 +243,28 @@ const CardPhoto: React.FC<CardPhotoProps> = ({ title, srcPhotoS3, srcUserPhotoPr
           </CardActions>
         </Box>
         <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <CardContent>
-            <Typography paragraph style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>{description}</Typography>
+          <CardContent
+            sx={{
+              p: {
+                xs: 1,
+                sm: 1.5,
+                md: 2
+              }
+            }}
+          >
+            <Typography 
+              paragraph 
+              style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}
+              sx={{
+                fontSize: {
+                  xs: "0.75rem",
+                  sm: "0.875rem"
+                },
+                lineHeight: 1.4
+              }}
+            >
+              {description}
+            </Typography>
           </CardContent>
         </Collapse>
       </Card>

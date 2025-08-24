@@ -38,7 +38,7 @@ namespace NewLevel.Services.UserService
 
             var (body, subject) = EmailService.MakeResetPasswordTemplate(token, user.Id);
 
-            await _emailService.SendEmail(user.Email!, subject, body);
+            //await _emailService.SendEmail(user.Email!, subject, body);
         }
 
         public async Task<UserInfoResponseDto> GetUserInfo()
@@ -129,7 +129,7 @@ namespace NewLevel.Services.UserService
 
             var (body, subject) = EmailService.MakeResetPasswordTemplate(token, user.Id);
 
-            await _emailService.SendEmail(user.Email!, subject, body);
+            //await _emailService.SendEmail(user.Email!, subject, body);
         }
 
         public async Task<bool> UploadAvatarImage(UploadImageInput input)

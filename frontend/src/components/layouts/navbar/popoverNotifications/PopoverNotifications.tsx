@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Popover, styled, Typography } from '@mui/material';
+import { Box, Button, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Popover, styled, Typography, useTheme, useMediaQuery } from '@mui/material';
 import { ESystemNotificationType, NotificationDto, SystemNotificationApi } from '../../../../gen/api/src';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
@@ -22,6 +22,9 @@ interface PopoverNotificationsProps {
 const PopoverNotifications: React.FC<PopoverNotificationsProps> = ({ anchorEl, notificationList, open, onClose, onOpenInviteModal, getNotification, updateNotifications }) => {
     const systemNotificationService = new SystemNotificationApi(ApiConfiguration);
     const [isButtonHovered, setIsButtonHovered] = React.useState<boolean>(false);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const handleOpenInviteMessage = (notificationId: number) => {
         getNotification(notificationList?.find(notification => notification.id === notificationId)!);
@@ -55,8 +58,27 @@ const PopoverNotifications: React.FC<PopoverNotificationsProps> = ({ anchorEl, n
                 vertical: 'top',
                 horizontal: 'right',
             }}
+            sx={{
+                '& .MuiPopover-paper': {
+                    width: {
+                        xs: '280px',
+                        sm: '350px',
+                        md: '400px'
+                    },
+                    maxHeight: {
+                        xs: '400px',
+                        sm: '450px',
+                        md: '500px'
+                    }
+                }
+            }}
         >
-            <Box width="400px" maxHeight="500px">
+            <Box 
+                sx={{
+                    width: "100%",
+                    maxHeight: "100%"
+                }}
+            >
                 <List>
                     {notificationList?.map((notification) => (
                         <ListItem key={notification.title} disablePadding>
@@ -76,11 +98,39 @@ const PopoverNotifications: React.FC<PopoverNotificationsProps> = ({ anchorEl, n
                                     {renderizeIconForMessageType(notification.notificationType as number)}
                                 </ListItemIcon>
                                 <ListItemText
-                                    primary={notification.message}
+                                    primary={
+                                        <Typography
+                                            sx={{
+                                                fontSize: {
+                                                    xs: "0.75rem",
+                                                    sm: "0.875rem"
+                                                }
+                                            }}
+                                        >
+                                            {notification.message}
+                                        </Typography>
+                                    }
                                     secondary={
                                         <Box>
-                                            <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between">
-                                                <Typography variant="body2">{notification.createdDate?.toLocaleDateString()}</Typography>
+                                            <Box 
+                                                sx={{
+                                                    display: "flex",
+                                                    flexDirection: "row",
+                                                    alignItems: "center",
+                                                    justifyContent: "space-between"
+                                                }}
+                                            >
+                                                <Typography 
+                                                    variant="body2"
+                                                    sx={{
+                                                        fontSize: {
+                                                            xs: "0.625rem",
+                                                            sm: "0.75rem"
+                                                        }
+                                                    }}
+                                                >
+                                                    {notification.createdDate?.toLocaleDateString()}
+                                                </Typography>
                                                 <Box>
                                                     <IconButton
                                                         color='error'
@@ -93,10 +143,25 @@ const PopoverNotifications: React.FC<PopoverNotificationsProps> = ({ anchorEl, n
                                                         sx={{
                                                             '&:hover': {
                                                                 backgroundColor: 'rgba(0, 0, 0, 0.08)'
+                                                            },
+                                                            width: {
+                                                                xs: "32px",
+                                                                sm: "40px"
+                                                            },
+                                                            height: {
+                                                                xs: "32px",
+                                                                sm: "40px"
                                                             }
                                                         }}
                                                     >
-                                                        <DeleteIcon />
+                                                        <DeleteIcon 
+                                                            sx={{
+                                                                fontSize: {
+                                                                    xs: "1rem",
+                                                                    sm: "1.25rem"
+                                                                }
+                                                            }}
+                                                        />
                                                     </IconButton>
                                                 </Box>
                                             </Box>
@@ -108,8 +173,27 @@ const PopoverNotifications: React.FC<PopoverNotificationsProps> = ({ anchorEl, n
                     ))}
                     {notificationList?.length === 0 &&
                         (
-                            <Box height="100%">
-                                <Typography variant="body2" align="center">Nenhuma notificação</Typography>
+                            <Box 
+                                sx={{
+                                    height: "100%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    p: 2
+                                }}
+                            >
+                                <Typography 
+                                    variant="body2" 
+                                    align="center"
+                                    sx={{
+                                        fontSize: {
+                                            xs: "0.75rem",
+                                            sm: "0.875rem"
+                                        }
+                                    }}
+                                >
+                                    Nenhuma notificação
+                                </Typography>
                             </Box>
                         )
                     }

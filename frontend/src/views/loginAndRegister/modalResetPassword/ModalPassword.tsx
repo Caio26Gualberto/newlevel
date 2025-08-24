@@ -1,11 +1,10 @@
 import NewLevelModalHeader from "../../../components/NewLevelModalHeader";
 import NewLevelModal from "../../../components/NewLevelModal"
-import { Box, Button, Input } from "@mui/material";
+import { Box, Button, Input, useTheme, useMediaQuery } from "@mui/material";
 import { useState } from "react";
 import { UserApi } from "../../../gen/api/src";
 import ApiConfiguration from "../../../apiConfig";
 import * as toastr from 'toastr';
-import { useMobile } from "../../../MobileContext";
 
 interface ResetPasswordProps {
     open: boolean;
@@ -14,7 +13,10 @@ interface ResetPasswordProps {
 
 const ModalPassword: React.FC<ResetPasswordProps> = ({ open, onClose }) => {
     const userService = new UserApi(ApiConfiguration)
-    const { isMobile } = useMobile()
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    
     const [email, setEmail] = useState<string>("")
 
     const sendEmail = async () => {
@@ -33,22 +35,41 @@ const ModalPassword: React.FC<ResetPasswordProps> = ({ open, onClose }) => {
         <NewLevelModal
             open={open}
             onClose={onClose}
-            width={isMobile ? '90%' : 500}
-            height={isMobile ? 'auto' : '15%'}
+            width={isSmallMobile ? '95%' : isMobile ? '90%' : 500}
+            height={isSmallMobile ? 'auto' : isMobile ? 'auto' : '15%'}
         >
             <>
                 <NewLevelModalHeader title="Confirme o email" closeModal={onClose} />
                 <Box
-                    height={isMobile ? 'auto' : '60%'}
-                    width="100%"
-                    display="flex"
-                    flexDirection="column"
-                    justifyContent="center"
-                    alignItems="center"
-                    p={2}
+                    sx={{
+                        height: {
+                            xs: 'auto',
+                            sm: '60%'
+                        },
+                        width: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        p: {
+                            xs: 1,
+                            sm: 2
+                        }
+                    }}
                 >
                     <Input
-                        sx={{ width: isMobile ? '90%' : '70%' }}
+                        sx={{ 
+                            width: {
+                                xs: '90%',
+                                sm: '70%'
+                            },
+                            '& .MuiInputBase-input': {
+                                fontSize: {
+                                    xs: '0.875rem',
+                                    sm: '1rem'
+                                }
+                            }
+                        }}
                         placeholder="Digite seu email"
                         onChange={(event) => setEmail(event.target.value)}
                     />
@@ -58,8 +79,19 @@ const ModalPassword: React.FC<ResetPasswordProps> = ({ open, onClose }) => {
                             backgroundColor: "#b81414",
                             "&:hover": { backgroundColor: "white" },
                             color: "black",
-                            width: isMobile ? '90%' : '70%',
+                            width: {
+                                xs: '90%',
+                                sm: '70%'
+                            },
                             mt: 2,
+                            fontSize: {
+                                xs: "0.75rem",
+                                sm: "0.875rem"
+                            },
+                            py: {
+                                xs: 0.75,
+                                sm: 1
+                            }
                         }}
                     >
                         Enviar email com redefinição de senha

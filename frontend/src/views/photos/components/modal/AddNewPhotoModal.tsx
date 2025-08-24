@@ -3,12 +3,11 @@ import ApiConfiguration from "../../../../apiConfig";
 import { useState } from "react";
 import NewLevelModal from "../../../../components/NewLevelModal"
 import NewLevelModalHeader from "../../../../components/NewLevelModalHeader";
-import { Box, Button, DialogContent, TextField, Typography } from "@mui/material";
+import { Box, Button, DialogContent, TextField, Typography, useTheme, useMediaQuery } from "@mui/material";
 import NewLevelButton from "../../../../components/NewLevelButton";
 import * as toastr from 'toastr';
 import { PhotoApi } from "../../../../gen/api/src/apis/PhotoApi";
 import NewLevelLoading from "../../../../components/NewLevelLoading";
-import { useMobile } from "../../../../MobileContext";
 
 interface AddNewPhotoModalProps {
     open: boolean;
@@ -17,7 +16,8 @@ interface AddNewPhotoModalProps {
 
 const AddNewPhotoModal: React.FC<AddNewPhotoModalProps> = ({ open, onClose }) => {
     const photoService = new PhotoApi(ApiConfiguration);
-    const { isMobile } = useMobile()
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [form, setForm] = useState({
@@ -103,7 +103,7 @@ const AddNewPhotoModal: React.FC<AddNewPhotoModalProps> = ({ open, onClose }) =>
         <NewLevelModal
             open={open}
             onClose={onClose}
-            width={isMobile ? '90%' : 1000} // Ajusta a largura para dispositivos móveis
+            width={isMobile ? '90%' : 1000}
             height="auto"
         >
             <>
@@ -115,7 +115,7 @@ const AddNewPhotoModal: React.FC<AddNewPhotoModalProps> = ({ open, onClose }) =>
                             display: "flex",
                             flexDirection: "column",
                             justifyContent: "space-between",
-                            gap: isMobile ? 1 : 2 // Adiciona espaçamento entre os elementos
+                            gap: isMobile ? 1 : 2
                         }}
                     >
                         <TextField
@@ -144,7 +144,7 @@ const AddNewPhotoModal: React.FC<AddNewPhotoModalProps> = ({ open, onClose }) =>
                             autoFocus
                             fullWidth
                             multiline
-                            rows={isMobile ? 4 : 6} // Ajusta a altura para dispositivos móveis
+                            rows={isMobile ? 4 : 6}
                             value={form.description}
                             onChange={(e) => setForm({ ...form, description: e.target.value })}
                         />
@@ -154,7 +154,7 @@ const AddNewPhotoModal: React.FC<AddNewPhotoModalProps> = ({ open, onClose }) =>
                                 id="date"
                                 label="Data da foto (Aproximadamente)"
                                 type="text"
-                                sx={{ width: isMobile ? '100%' : '30%' }} // Ajusta a largura para dispositivos móveis
+                                sx={{ width: isMobile ? '100%' : '30%' }}
                                 value={form.date}
                                 onChange={handleDateChange}
                             />

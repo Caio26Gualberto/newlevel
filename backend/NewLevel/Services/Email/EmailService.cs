@@ -9,7 +9,7 @@ public class EmailService : IEmailService
 
     public EmailService(IConfiguration configuration)
     {
-        _sendGridApiKey = configuration["SendgridApiKey"] ?? throw new ArgumentNullException("SendGrid ApiKey não configurada!");
+        _sendGridApiKey = configuration["EmailSettings:SendGrid"] ?? throw new ArgumentNullException("SendGrid ApiKey não configurada!");
     }
 
     public async Task SendEmail(string recipient, string subject, string body, string templateId = "", object templateObj = null)

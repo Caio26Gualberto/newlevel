@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Tabs, Tab, Typography, Paper } from '@mui/material';
+import { Box, Tabs, Tab, Typography, Paper, useTheme, useMediaQuery } from '@mui/material';
 import VideoRequest from './components/VideoRequest';
 import PhotoRequest from './components/PhotoRequest';
 
@@ -21,7 +21,14 @@ function TabPanel(props: TabPanelProps) {
             {...other}
         >
             {value === index && (
-                <Box p={3}>
+                <Box 
+                    sx={{
+                        p: {
+                            xs: 2,
+                            sm: 3
+                        }
+                    }}
+                >
                     <Typography>{children}</Typography>
                 </Box>
             )}
@@ -37,6 +44,10 @@ function a11yProps(index: number) {
 }
 
 const Request: React.FC = () => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    
     const [value, setValue] = React.useState(0);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -44,18 +55,61 @@ const Request: React.FC = () => {
     };
 
     return (
-        <Box height="92.5vh" bgcolor="#F3F3F3">
-            <Box display="flex" pt={10} justifyContent="center" alignItems="center">
-                <Box flex={1} maxWidth="1200px">
-                    <Paper elevation={3}>
+        <Box 
+            sx={{
+                minHeight: "92.5vh",
+                bgcolor: "#F3F3F3",
+                p: {
+                    xs: 2,
+                    sm: 3,
+                    md: 4
+                }
+            }}
+        >
+            <Box 
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    pt: {
+                        xs: 8,
+                        sm: 10
+                    }
+                }}
+            >
+                <Box 
+                    sx={{
+                        flex: 1,
+                        maxWidth: "1200px",
+                        width: "100%"
+                    }}
+                >
+                    <Paper 
+                        elevation={3}
+                        sx={{
+                            overflow: "hidden"
+                        }}
+                    >
                         <Tabs
                             value={value}
                             onChange={handleChange}
                             aria-label="basic tabs example"
-                            variant="fullWidth"
+                            variant={isSmallMobile ? "fullWidth" : "standard"}
                             indicatorColor="primary"
                             textColor="primary"
-                            centered
+                            centered={!isSmallMobile}
+                            sx={{
+                                '& .MuiTab-root': {
+                                    fontSize: {
+                                        xs: '0.875rem',
+                                        sm: '1rem'
+                                    },
+                                    minHeight: {
+                                        xs: '48px',
+                                        sm: '56px'
+                                    }
+                                }
+                            }}
                         >
                             <Tab label="Vídeos" {...a11yProps(0)} />
                             <Tab label="Fotos" {...a11yProps(1)} />

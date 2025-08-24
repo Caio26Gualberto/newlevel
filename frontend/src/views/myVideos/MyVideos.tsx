@@ -1,4 +1,4 @@
-import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Divider, Input, Paper, TablePagination, TextField, Typography } from "@mui/material"
+import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Divider, Input, Paper, TablePagination, TextField, Typography, useTheme, useMediaQuery } from "@mui/material"
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import React, { useEffect } from "react";
 import { MediaApi, MediaByUserIdDto, MediaByUserIdDtoGenericListNewLevelResponse } from "../../gen/api/src";
@@ -10,6 +10,10 @@ import Swal from "sweetalert2";
 
 const MyVideos = () => {
   const mediaApi = new MediaApi(ApiConfiguration);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
   const [loading, setLoading] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [descriptionEdit, setDescriptionEdit] = React.useState("");
@@ -150,72 +154,317 @@ const MyVideos = () => {
   return (
     <>
       <NewLevelLoading isLoading={loading} />
-      <Box height="100vh" display="flex" justifyContent="center" alignItems="center">
+      <Box 
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          p: {
+            xs: 2,
+            sm: 3,
+            md: 4
+          }
+        }}
+      >
         {userVideosData.data?.items?.length! > 0 && (
-          <Paper elevation={4} sx={{ width: "80%" }}>
-            <Box display="flex" justifyContent="end" m={1}>
-              <Input value={searchTerm} placeholder="Pesquisa por título" sx={{ width: 460 }} onChange={handleInputChange} />
-              <Button className="btn btn-primary" onClick={search}>
+          <Paper 
+            elevation={4} 
+            sx={{ 
+              width: {
+                xs: "100%",
+                sm: "90%",
+                md: "80%"
+              },
+              maxWidth: "1200px"
+            }}
+          >
+            {/* Search Section */}
+            <Box 
+              sx={{
+                display: "flex",
+                flexDirection: {
+                  xs: "column",
+                  sm: "row"
+                },
+                justifyContent: "end",
+                alignItems: {
+                  xs: "stretch",
+                  sm: "center"
+                },
+                gap: 1,
+                m: 1
+              }}
+            >
+              <Input 
+                value={searchTerm} 
+                placeholder="Pesquisa por título" 
+                sx={{ 
+                  width: {
+                    xs: "100%",
+                    sm: "460px"
+                  }
+                }} 
+                onChange={handleInputChange} 
+              />
+              <Button 
+                className="btn btn-primary" 
+                onClick={search}
+                sx={{
+                  minWidth: "fit-content",
+                  alignSelf: {
+                    xs: "stretch",
+                    sm: "center"
+                  }
+                }}
+              >
                 <SearchIcon fontSize="medium" />
               </Button>
             </Box>
+
+            {/* Videos List */}
             {userVideosData.data?.items!.map((data) => (
-              <Accordion expanded={expanded === `panel${data.id}`} onChange={handleChange(`panel${data.id}`)}>
+              <Accordion 
+                key={data.id}
+                expanded={expanded === `panel${data.id}`} 
+                onChange={handleChange(`panel${data.id}`)}
+                sx={{
+                  mb: 1
+                }}
+              >
                 <AccordionSummary
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls={`panel${data.id}bh-content`}
                   id={`panel${data.id}bh-header`}
                 >
-                  <Typography fontWeight="bold" sx={{ width: '33%', flexShrink: 0 }}>
+                  <Typography 
+                    fontWeight="bold" 
+                    sx={{ 
+                      width: {
+                        xs: '100%',
+                        sm: '50%',
+                        md: '33%'
+                      },
+                      flexShrink: 0,
+                      fontSize: {
+                        xs: "0.875rem",
+                        sm: "1rem"
+                      }
+                    }}
+                  >
                     {data.title}
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Box display="flex">
-                      <iframe width="360" height="200" src={data.url} title={data.title}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerPolicy="strict-origin-when-cross-origin" allowFullScreen style={{ border: "0px", borderRadius: "10px" }}></iframe>
-                      <Divider orientation="vertical" flexItem sx={{ marginLeft: "16px" }} />
-                      <Box display="flex" alignItems="center" ml={5} width="100vh">
+                  <Box 
+                    sx={{
+                      display: "flex",
+                      flexDirection: {
+                        xs: "column",
+                        md: "row"
+                      },
+                      justifyContent: "space-between",
+                      alignItems: {
+                        xs: "stretch",
+                        md: "center"
+                      },
+                      gap: {
+                        xs: 2,
+                        md: 3
+                      }
+                    }}
+                  >
+                    {/* Video and Description */}
+                    <Box 
+                      sx={{
+                        display: "flex",
+                        flexDirection: {
+                          xs: "column",
+                          lg: "row"
+                        },
+                        flex: 1,
+                        gap: {
+                          xs: 2,
+                          lg: 3
+                        }
+                      }}
+                    >
+                      {/* Video Iframe */}
+                      <Box
+                        sx={{
+                          width: "100%",
+                          position: "relative",
+                          paddingTop: "56.25%", // 16:9 aspect ratio
+                          borderRadius: "10px",
+                          overflow: "hidden"
+                        }}
+                      >
+                        <iframe 
+                          src={data.url} 
+                          title={data.title}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          referrerPolicy="strict-origin-when-cross-origin" 
+                          allowFullScreen 
+                          style={{ 
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            border: "0px", 
+                            borderRadius: "10px" 
+                          }}
+                        />
+                      </Box>
+
+                      {/* Divider */}
+                      <Box
+                        sx={{
+                          display: {
+                            xs: "none",
+                            lg: "block"
+                          }
+                        }}
+                      >
+                        <Divider orientation="vertical" flexItem />
+                      </Box>
+
+                      {/* Description TextField */}
+                      <Box 
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          flex: 1,
+                          minWidth: 0
+                        }}
+                      >
                         <TextField
                           value={editIsActive ? descriptionEdit : data.description}
                           onChange={(e) => setDescriptionEdit(e.target.value)}
                           fullWidth
                           multiline
-                          rows={6}
+                          rows={isSmallMobile ? 4 : 6}
                           disabled={!editIsActive}
+                          sx={{
+                            '& .MuiInputBase-input': {
+                              fontSize: {
+                                xs: '0.875rem',
+                                sm: '1rem'
+                              }
+                            }
+                          }}
                         />
                       </Box>
                     </Box>
-                    <Box display="flex" flexDirection="column" justifyContent="space-between" alignItems="center" height="100%">
-                      <Button onClick={() => handleChangEditState(data)}>
+
+                    {/* Action Buttons */}
+                    <Box 
+                      sx={{
+                        display: "flex",
+                        flexDirection: {
+                          xs: "row",
+                          md: "column"
+                        },
+                        justifyContent: {
+                          xs: "space-between",
+                          md: "space-around"
+                        },
+                        alignItems: "center",
+                        gap: 1,
+                        minWidth: {
+                          xs: "100%",
+                          md: "auto"
+                        }
+                      }}
+                    >
+                      <Button 
+                        onClick={() => handleChangEditState(data)}
+                        sx={{
+                          fontSize: {
+                            xs: "0.75rem",
+                            sm: "0.875rem"
+                          }
+                        }}
+                      >
                         {editIsActive ? 'Cancelar' : 'Editar'}
                       </Button>
                       {editIsActive ? (
-                        <Button color="success" onClick={() => updateMediaById(descriptionEdit, data.id!)}>Salvar</Button>
+                        <Button 
+                          color="success" 
+                          onClick={() => updateMediaById(descriptionEdit, data.id!)}
+                          sx={{
+                            fontSize: {
+                              xs: "0.75rem",
+                              sm: "0.875rem"
+                            }
+                          }}
+                        >
+                          Salvar
+                        </Button>
                       ) : (
-                        <Button sx={{ color: "red" }} onClick={() => deleteMediaById(data.id!)}>Excluir</Button>
+                        <Button 
+                          sx={{ 
+                            color: "red",
+                            fontSize: {
+                              xs: "0.75rem",
+                              sm: "0.875rem"
+                            }
+                          }} 
+                          onClick={() => deleteMediaById(data.id!)}
+                        >
+                          Excluir
+                        </Button>
                       )}
                     </Box>
                   </Box>
                 </AccordionDetails>
               </Accordion>
             ))}
-            <TablePagination
-              sx={{ display: 'flex', justifyContent: 'center' }}
-              rowsPerPageOptions={[12, 24, 48]}
-              component="div"
-              labelRowsPerPage="Vídeos por página"
-              count={userVideosData.data!.totalCount!}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
+
+            {/* Pagination */}
+            <Box 
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                width: "100%"
+              }}
+            >
+              <TablePagination
+                rowsPerPageOptions={[12, 24, 48]}
+                component="div"
+                labelRowsPerPage="Vídeos por página"
+                count={userVideosData.data!.totalCount!}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                sx={{
+                  '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                    fontSize: {
+                      xs: '0.75rem',
+                      sm: '0.875rem'
+                    }
+                  }
+                }}
+              />
+            </Box>
           </Paper>
         )}
-        {userVideosData.data?.items?.length === 0 && (<Typography fontWeight="bold">Você ainda não possui nenhum vídeo, comece a postar! &#128512;</Typography>)}
+        {userVideosData.data?.items?.length === 0 && (
+          <Typography 
+            fontWeight="bold"
+            sx={{
+              fontSize: {
+                xs: "1rem",
+                sm: "1.25rem",
+                md: "1.5rem"
+              },
+              textAlign: "center"
+            }}
+          >
+            Você ainda não possui nenhum vídeo, comece a postar! &#128512;
+          </Typography>
+        )}
       </Box>
     </>
   )

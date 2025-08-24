@@ -1,4 +1,4 @@
-import { Avatar, Box, Typography } from "@mui/material"
+import { Avatar, Box, Typography, useTheme, useMediaQuery } from "@mui/material"
 import NewLevelButton from "../../components/NewLevelButton";
 import React, { useRef, useState } from "react";
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -12,6 +12,10 @@ import NewLevelLoading from "../../components/NewLevelLoading";
 
 const ChooseUserAvatar = () => {
     const userService = new UserApi(ApiConfiguration);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [imageSrc, setImageSrc] = useState<string | null>(null);
@@ -77,15 +81,75 @@ const ChooseUserAvatar = () => {
     return (
         <>
         <NewLevelLoading isLoading={loading} />
-            <Box display="flex" bgcolor="#F3F3F3" height="100vh" justifyContent="flex-start" flexDirection="column" alignItems="center">
-                <Box mt={5} display="flex" justifyContent="center" alignItems="center" flexDirection="column">
-                    <Typography variant="h3">Escolha seu avatar</Typography>
-                    <Typography variant="h6">* Você poderá utilizar uma foto depois caso não queira selecionar uma agora &#129345;</Typography>
+            <Box 
+                sx={{
+                    display: "flex",
+                    bgcolor: "#F3F3F3",
+                    minHeight: "100vh",
+                    justifyContent: "flex-start",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    p: {
+                        xs: 2,
+                        sm: 3,
+                        md: 4
+                    }
+                }}
+            >
+                <Box 
+                    sx={{
+                        mt: {
+                            xs: 3,
+                            sm: 4,
+                            md: 5
+                        },
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        flexDirection: "column",
+                        textAlign: "center"
+                    }}
+                >
+                    <Typography 
+                        variant={isSmallMobile ? "h4" : "h3"}
+                        sx={{
+                            fontSize: {
+                                xs: "2rem",
+                                sm: "3rem",
+                                md: "3.75rem"
+                            },
+                            fontWeight: "bold",
+                            mb: 2
+                        }}
+                    >
+                        Escolha seu avatar
+                    </Typography>
+                    <Typography 
+                        variant={isSmallMobile ? "body1" : "h6"}
+                        sx={{
+                            fontSize: {
+                                xs: "0.875rem",
+                                sm: "1rem",
+                                md: "1.25rem"
+                            },
+                            textAlign: "center",
+                            maxWidth: {
+                                xs: "100%",
+                                sm: "600px"
+                            }
+                        }}
+                    >
+                        * Você poderá utilizar uma foto depois caso não queira selecionar uma agora &#129345;
+                    </Typography>
                 </Box>
                 <Box
                     onClick={handleButtonClick}
-                    mt={5}
                     sx={{
+                        mt: {
+                            xs: 3,
+                            sm: 4,
+                            md: 5
+                        },
                         cursor: "pointer",
                         display: 'flex',
                         flexDirection: 'column',
@@ -95,17 +159,39 @@ const ChooseUserAvatar = () => {
                     <Avatar
                         src={imageSrc || undefined}
                         sx={{
-                            width: "300px",
-                            height: "300px",
+                            width: {
+                                xs: "200px",
+                                sm: "250px",
+                                md: "300px"
+                            },
+                            height: {
+                                xs: "200px",
+                                sm: "250px",
+                                md: "300px"
+                            },
                             bgcolor: imageSrc ? 'transparent' : randomColor,
                             '&:hover': {
                                 border: '2px dashed #000',
                                 opacity: 0.7,
                             },
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease-in-out'
                         }}
                     >
-                        {!imageSrc && 'C'}
+                        {!imageSrc && (
+                            <Typography
+                                sx={{
+                                    fontSize: {
+                                        xs: "4rem",
+                                        sm: "5rem",
+                                        md: "6rem"
+                                    },
+                                    fontWeight: "bold"
+                                }}
+                            >
+                                C
+                            </Typography>
+                        )}
                     </Avatar>
                     <input
                         type="file"
@@ -116,9 +202,54 @@ const ChooseUserAvatar = () => {
                         onChange={handleImageChange}
                     />
                 </Box>
-                <Box mt={6} width="100%" display="flex" justifyContent="center">
-                    {imageSrc && <Box mr={2}><NewLevelButton onClick={handleRemoveImage} icon={CloseIcon} title="Remover foto" /></Box>}
-                    <Box><NewLevelButton onClick={redirectToNextPageAndSaveAvatar} icon={ArrowForwardIcon} title="Próximo" /></Box>
+                <Box 
+                    sx={{
+                        mt: {
+                            xs: 4,
+                            sm: 5,
+                            md: 6
+                        },
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        flexDirection: {
+                            xs: "column",
+                            sm: "row"
+                        },
+                        alignItems: "center",
+                        gap: 2
+                    }}
+                >
+                    {imageSrc && (
+                        <Box
+                            sx={{
+                                width: {
+                                    xs: "100%",
+                                    sm: "auto"
+                                }
+                            }}
+                        >
+                            <NewLevelButton 
+                                onClick={handleRemoveImage} 
+                                icon={CloseIcon} 
+                                title="Remover foto"
+                            />
+                        </Box>
+                    )}
+                    <Box
+                        sx={{
+                            width: {
+                                xs: "100%",
+                                sm: "auto"
+                            }
+                        }}
+                    >
+                        <NewLevelButton 
+                            onClick={redirectToNextPageAndSaveAvatar} 
+                            icon={ArrowForwardIcon} 
+                            title="Próximo"
+                        />
+                    </Box>
                 </Box>
             </Box>
         </>

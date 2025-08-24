@@ -1,11 +1,10 @@
-import { Avatar, Box, Button, CircularProgress, Divider, Grid, Paper, TextField } from "@mui/material";
+import { Avatar, Box, Button, CircularProgress, Divider, Grid, Paper, TextField, useTheme, useMediaQuery } from "@mui/material";
 import NewLevelModal from "../../../../components/NewLevelModal"
 import NewLevelModalHeader from "../../../../components/NewLevelModalHeader"
 import React, { useEffect } from "react";
 import { CommentApi, CommentsPhotoResponseDto, ReceiveCommentDto } from "../../../../gen/api/src";
 import ApiConfiguration from "../../../../apiConfig";
 import * as toastr from 'toastr';
-import { useMobile } from "../../../../MobileContext";
 
 interface ICommentsModal {
     open: boolean;
@@ -16,7 +15,8 @@ interface ICommentsModal {
 
 const CommentsModal: React.FC<ICommentsModal> = ({ open, photoId, mediaId, onClose }) => {
     const commentService = new CommentApi(ApiConfiguration)
-    const { isMobile } = useMobile()
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [loading, setLoading] = React.useState(false)
     const [comments, setComments] = React.useState<CommentsPhotoResponseDto>({ comments: [], title: "" })
     const [comment, setComment] = React.useState("")

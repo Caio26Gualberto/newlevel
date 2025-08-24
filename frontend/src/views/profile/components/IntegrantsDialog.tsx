@@ -1,4 +1,4 @@
-import { Box, Dialog, DialogTitle, Link, Typography } from "@mui/material";
+import { Box, Dialog, DialogTitle, Link, Typography, useTheme, useMediaQuery } from "@mui/material";
 import { IntegrantInfoDto } from "../../../gen/api/src";
 import LinkIcon from '@mui/icons-material/Link';
 
@@ -10,19 +10,61 @@ interface SimpleDialogProps {
 }
 
 const IntegrantsDialog: React.FC<SimpleDialogProps> = ({ title, data, dataWithUrl }) => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     return (
         <>
             {!dataWithUrl ?
                 (
-                    <Box mb={3}>
-                        <Box mb={2} display="flex" justifyContent="center" alignItems="center">
-                            <Typography variant="h5">{title}</Typography>
+                    <Box 
+                        sx={{
+                            mb: 3
+                        }}
+                    >
+                        <Box 
+                            sx={{
+                                mb: 2,
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center"
+                            }}
+                        >
+                            <Typography 
+                                variant="h5"
+                                sx={{
+                                    fontSize: {
+                                        xs: "1.25rem",
+                                        sm: "1.5rem",
+                                        md: "1.75rem"
+                                    }
+                                }}
+                            >
+                                {title}
+                            </Typography>
                         </Box>
                         {data &&
                             Object.entries(data).map(([member, instrument], index) => (
-                                <Box display="flex" justifyContent="center" alignItems="center">
-                                    <Typography key={index} variant="body1">
+                                <Box 
+                                    key={index}
+                                    sx={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        mb: 1
+                                    }}
+                                >
+                                    <Typography 
+                                        variant="body1"
+                                        sx={{
+                                            fontSize: {
+                                                xs: "0.875rem",
+                                                sm: "1rem"
+                                            },
+                                            textAlign: "center"
+                                        }}
+                                    >
                                         <strong>{member}</strong> {instrument}
                                     </Typography>
                                 </Box>
@@ -33,14 +75,58 @@ const IntegrantsDialog: React.FC<SimpleDialogProps> = ({ title, data, dataWithUr
                 )
                 :
                 (
-                    <Box m={1} mb={3}>
-                        <Box display="flex" justifyContent="center" alignItems="center">
-                            <DialogTitle>{title}</DialogTitle>
+                    <Box 
+                        sx={{
+                            m: 1,
+                            mb: 3
+                        }}
+                    >
+                        <Box 
+                            sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center"
+                            }}
+                        >
+                            <DialogTitle
+                                sx={{
+                                    fontSize: {
+                                        xs: "1.25rem",
+                                        sm: "1.5rem",
+                                        md: "1.75rem"
+                                    }
+                                }}
+                            >
+                                {title}
+                            </DialogTitle>
                         </Box>
                         {dataWithUrl &&
                             dataWithUrl.map((integrant, index) => (
-                                <Box display="flex" justifyContent="center" alignItems="center">
-                                    <Typography key={index} variant="body1" sx={{ display: "flex", alignItems: "center" }}>
+                                <Box 
+                                    key={index}
+                                    sx={{
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        mb: 1
+                                    }}
+                                >
+                                    <Typography 
+                                        variant="body1" 
+                                        sx={{ 
+                                            display: "flex", 
+                                            alignItems: "center",
+                                            fontSize: {
+                                                xs: "0.875rem",
+                                                sm: "1rem"
+                                            },
+                                            flexDirection: {
+                                                xs: "column",
+                                                sm: "row"
+                                            },
+                                            textAlign: "center"
+                                        }}
+                                    >
                                         <strong>
                                             <Link
                                                 href={integrant.profileUrl}
@@ -56,14 +142,32 @@ const IntegrantsDialog: React.FC<SimpleDialogProps> = ({ title, data, dataWithUr
                                                         color: "red",
                                                         textDecoration: "underline",
                                                         transform: "scale(1.05)"
+                                                    },
+                                                    fontSize: {
+                                                        xs: "0.875rem",
+                                                        sm: "1rem"
                                                     }
                                                 }}
                                             >
                                                 {integrant.name}
-                                                <LinkIcon sx={{ fontSize: 16 }} />
+                                                <LinkIcon 
+                                                    sx={{ 
+                                                        fontSize: {
+                                                            xs: 14,
+                                                            sm: 16
+                                                        }
+                                                    }} 
+                                                />
                                             </Link>
                                         </strong>
-                                        <span style={{ marginLeft: "8px" }}>{integrant.instrument}</span>
+                                        <span 
+                                            style={{ 
+                                                marginLeft: "8px",
+                                                marginTop: isSmallMobile ? "4px" : "0"
+                                            }}
+                                        >
+                                            {integrant.instrument}
+                                        </span>
                                     </Typography>
                                 </Box>
                             ))
