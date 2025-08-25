@@ -3,9 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using NewLevel.Context;
 using NewLevel.Dtos.User;
 using NewLevel.Entities;
+using NewLevel.Enums;
+using NewLevel.Enums.Authenticate;
 using NewLevel.Interfaces.Services.Email;
 using NewLevel.Interfaces.Services.User;
 using NewLevel.Services.AmazonS3;
+using NewLevel.Utils;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
@@ -267,7 +270,7 @@ namespace NewLevel.Services.UserService
                 throw new Exception("Não foi possivel encontrar o usuário selecionado");
 
             var searchedBand = await _context.BandsUsers.Include(bandUser => bandUser.Band)
-                .Where(x => x.UserId == searchedUser.Id)
+                .Where(x => x.UserId == searchedUser.Id && x.IsBand)
                 .Select(bandUser => bandUser.Band)
                 .FirstOrDefaultAsync();
 
@@ -281,7 +284,6 @@ namespace NewLevel.Services.UserService
                     .ToListAsync();
             }
 
-
             return new ProfileInfoDto
             {
                 Name = searchedUser.Nickname,
@@ -290,11 +292,7 @@ namespace NewLevel.Services.UserService
                     Position = searchedUser.BannerPosition,
                     URL = searchedUser.BannerUrl
                 },
-                CityName = searchedUser.ActivityLocation.GetType()
-                    .GetMember(searchedUser.ActivityLocation.ToString())[0]
-                    .GetCustomAttributes(typeof(DisplayAttribute), false)
-                    .Cast<DisplayAttribute>()
-                    .FirstOrDefault()?.Name ?? searchedUser.ActivityLocation.ToString(),
+                CityName = EnumHelper<EActivityLocation>.GetDisplayValue(searchedUser.ActivityLocation),
                 AvatarUrl = searchedUser.AvatarUrl,
                 IsEnabledToEdit = user.Id == searchedUser.Id,
                 Band = searchedBand == null ? null : new BandDto
@@ -305,13 +303,14 @@ namespace NewLevel.Services.UserService
                     CreatedAt = searchedBand.CreatedAt,
                     Description = searchedBand.Description,
                     IsVerified = searchedBand.IsVerified,
-                    MusicGenres = searchedBand.MusicGenres,
+                    MusicGenres = EnumHelper<EMusicGenres>.GetDisplayValues(searchedBand.MusicGenres),
                     Integrants = searchedBand.Integrants,
                     IntegrantsWithUrl = integrants?.Select(integrant => new IntegrantInfoDto
                     {
                         Name = integrant.Nickname,
                         Instrument = integrant.Instrument,
-                        ProfileUrl = $"/profile/{integrant.Nickname}/{integrant.Id}"
+                        ProfileUrl = $"/profile/{integrant.Nickname}/{integrant.Id}",
+                        AvatarUrl = integrant.AvatarUrl
                     }).ToList()
                 },
                 ProfileInfoPhotos = searchedUser?.Photos?.Select(photo => new ProfileInfoPhotoDto

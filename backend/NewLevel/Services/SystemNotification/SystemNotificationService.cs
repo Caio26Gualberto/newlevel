@@ -93,6 +93,7 @@ namespace NewLevel.Services.SystemNotificationService
         {
             var user = await _utils.GetUserAsync();
             var band = await _context.BandsUsers.Include(x => x.Band).Where(x => x.UserId == user.Id).Select(x => x.Band).FirstOrDefaultAsync();
+
             var notifications = await _context.SystemNotifications
                 .Include(x => x.User)
                 .Where(x => x.Message.Contains(band.Name))

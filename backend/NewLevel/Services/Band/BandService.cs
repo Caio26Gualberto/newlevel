@@ -20,6 +20,7 @@ namespace NewLevel.Services.Band
             _context = context;
         }
 
+        //TODO Ajustar os localhost
         public async Task<List<MemberInfoDto>> GetAllBandMembers()
         {
             var user = await _utils.GetUserAsync();

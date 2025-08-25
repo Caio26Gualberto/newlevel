@@ -23,7 +23,7 @@ namespace NewLevel.Dtos.User
         public string? SpotifyUrl { get; set; }
         public bool IsVerified { get; set; }
         public DateTime CreatedAt { get; set; }
-        public List<EMusicGenres> MusicGenres { get; set; }
+        public List<string> MusicGenres { get; set; }
         public Dictionary<string, string> Integrants { get; set; }
         public List<IntegrantInfoDto>? IntegrantsWithUrl { get; set; }
     }
@@ -33,6 +33,7 @@ namespace NewLevel.Dtos.User
         public string Name { get; set; }
         public string Instrument { get; set; }
         public string ProfileUrl { get; set; }
+        public string? AvatarUrl { get; set; }
 
     }
 
