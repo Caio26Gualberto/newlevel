@@ -365,3 +365,4 @@ FodyWeavers.xsd
 *.p12
 /backend/NewLevel.Tests/appSettings.json
 /backend/NewLevel.Tests/appsettings.Development.json
+/refatoring2/backend2/NewLevel.Api/appsettings.json
