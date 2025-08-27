@@ -37,7 +37,7 @@ import {
 } from '@mui/icons-material';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { AuthenticateApi, GeneralNotificationInfoDto, NotificationDto, SystemNotificationApi, UserApi } from '../../gen/api/src';
+import { AuthApi, GeneralNotificationInfoDto, NotificationDto, SystemNotificationApi, UserApi } from '../../gen/api/src';
 import ApiConfiguration from '../../config/apiConfig';
 import * as toastr from 'toastr';
 import Logo from '../../assets/128982_logo.png';
@@ -47,7 +47,7 @@ import PopoverNotifications from './PopoverNotifications';
 import ViewInviteModal from './ViewInviteModal';
 
 const Navbar = () => {
-  const authService = new AuthenticateApi(ApiConfiguration);
+  const authService = new AuthApi(ApiConfiguration);
   const userService = new UserApi(ApiConfiguration);
   const systemNotificationService = new SystemNotificationApi(ApiConfiguration);
   const navigate = useNavigate();
@@ -105,7 +105,7 @@ const Navbar = () => {
   };
 
   const logout = async () => {
-    const result = await authService.apiAuthenticateLogoutGet();
+    const result = await authService.apiAuthLogoutGet();
     if (result.isSuccess) {
       window.localStorage.removeItem('accessToken');
       window.localStorage.removeItem('refreshToken');
@@ -210,7 +210,7 @@ const Navbar = () => {
 
   return (
     <>
-      <AppBar position="fixed" elevation={4}>
+      <AppBar position="fixed" elevation={4} sx={{ borderRadius: 0 }}>
         <Container maxWidth="xl">
           <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
             {/* Logo */}

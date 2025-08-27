@@ -15,6 +15,7 @@
 
 import * as runtime from '../runtime';
 import type {
+  ApproveMediaInput,
   BooleanNewLevelResponse,
   MediaByUserIdDtoGenericListNewLevelResponse,
   MediaDtoGenericListNewLevelResponse,
@@ -23,6 +24,8 @@ import type {
   UpdateMediaByIdInput,
 } from '../models/index';
 import {
+    ApproveMediaInputFromJSON,
+    ApproveMediaInputToJSON,
     BooleanNewLevelResponseFromJSON,
     BooleanNewLevelResponseToJSON,
     MediaByUserIdDtoGenericListNewLevelResponseFromJSON,
@@ -37,24 +40,27 @@ import {
     UpdateMediaByIdInputToJSON,
 } from '../models/index';
 
-export interface ApiMediaApproveMediaGetRequest {
-    mediaId?: number;
-    isApprove?: boolean;
+export interface ApiMediaApproveMediaPatchRequest {
+    approveMediaInput?: ApproveMediaInput;
 }
 
-export interface ApiMediaDeleteMediaByIdPostRequest {
+export interface ApiMediaDeleteMediaByIdDeleteRequest {
     id?: number;
 }
 
-export interface ApiMediaGetMediaPostRequest {
-    pagination?: Pagination;
+export interface ApiMediaGetMediaGetRequest {
+    page?: number;
+    pageSize?: number;
+    totalItems?: number;
+    pageCount?: number;
+    search?: string;
 }
 
 export interface ApiMediaGetMediaToApprovePostRequest {
     pagination?: Pagination;
 }
 
-export interface ApiMediaGetMediasByUserIdPostRequest {
+export interface ApiMediaGetMediasByUserIdGetRequest {
     pagination?: Pagination;
 }
 
@@ -75,17 +81,16 @@ export interface ApiMediaUpdateMediaByIdPostRequest {
 export interface MediaApiInterface {
     /**
      * 
-     * @param {number} [mediaId] 
-     * @param {boolean} [isApprove] 
+     * @param {ApproveMediaInput} [approveMediaInput] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MediaApiInterface
      */
-    apiMediaApproveMediaGetRaw(requestParameters: ApiMediaApproveMediaGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
+    apiMediaApproveMediaPatchRaw(requestParameters: ApiMediaApproveMediaPatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
 
     /**
      */
-    apiMediaApproveMediaGet(requestParameters: ApiMediaApproveMediaGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
+    apiMediaApproveMediaPatch(requestParameters: ApiMediaApproveMediaPatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
 
     /**
      * 
@@ -94,24 +99,28 @@ export interface MediaApiInterface {
      * @throws {RequiredError}
      * @memberof MediaApiInterface
      */
-    apiMediaDeleteMediaByIdPostRaw(requestParameters: ApiMediaDeleteMediaByIdPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
+    apiMediaDeleteMediaByIdDeleteRaw(requestParameters: ApiMediaDeleteMediaByIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
 
     /**
      */
-    apiMediaDeleteMediaByIdPost(requestParameters: ApiMediaDeleteMediaByIdPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
+    apiMediaDeleteMediaByIdDelete(requestParameters: ApiMediaDeleteMediaByIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
 
     /**
      * 
-     * @param {Pagination} [pagination] 
+     * @param {number} [page] 
+     * @param {number} [pageSize] 
+     * @param {number} [totalItems] 
+     * @param {number} [pageCount] 
+     * @param {string} [search] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MediaApiInterface
      */
-    apiMediaGetMediaPostRaw(requestParameters: ApiMediaGetMediaPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MediaDtoGenericListNewLevelResponse>>;
+    apiMediaGetMediaGetRaw(requestParameters: ApiMediaGetMediaGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MediaDtoGenericListNewLevelResponse>>;
 
     /**
      */
-    apiMediaGetMediaPost(requestParameters: ApiMediaGetMediaPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MediaDtoGenericListNewLevelResponse>;
+    apiMediaGetMediaGet(requestParameters: ApiMediaGetMediaGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MediaDtoGenericListNewLevelResponse>;
 
     /**
      * 
@@ -133,11 +142,11 @@ export interface MediaApiInterface {
      * @throws {RequiredError}
      * @memberof MediaApiInterface
      */
-    apiMediaGetMediasByUserIdPostRaw(requestParameters: ApiMediaGetMediasByUserIdPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MediaByUserIdDtoGenericListNewLevelResponse>>;
+    apiMediaGetMediasByUserIdGetRaw(requestParameters: ApiMediaGetMediasByUserIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MediaByUserIdDtoGenericListNewLevelResponse>>;
 
     /**
      */
-    apiMediaGetMediasByUserIdPost(requestParameters: ApiMediaGetMediasByUserIdPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MediaByUserIdDtoGenericListNewLevelResponse>;
+    apiMediaGetMediasByUserIdGet(requestParameters: ApiMediaGetMediasByUserIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MediaByUserIdDtoGenericListNewLevelResponse>;
 
     /**
      * 
@@ -174,18 +183,12 @@ export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
 
     /**
      */
-    async apiMediaApproveMediaGetRaw(requestParameters: ApiMediaApproveMediaGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+    async apiMediaApproveMediaPatchRaw(requestParameters: ApiMediaApproveMediaPatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
         const queryParameters: any = {};
 
-        if (requestParameters['mediaId'] != null) {
-            queryParameters['mediaId'] = requestParameters['mediaId'];
-        }
-
-        if (requestParameters['isApprove'] != null) {
-            queryParameters['isApprove'] = requestParameters['isApprove'];
-        }
-
         const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -200,9 +203,10 @@ export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
 
         const response = await this.request({
             path: urlPath,
-            method: 'GET',
+            method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
+            body: ApproveMediaInputToJSON(requestParameters['approveMediaInput']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
@@ -210,14 +214,14 @@ export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
 
     /**
      */
-    async apiMediaApproveMediaGet(requestParameters: ApiMediaApproveMediaGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
-        const response = await this.apiMediaApproveMediaGetRaw(requestParameters, initOverrides);
+    async apiMediaApproveMediaPatch(requestParameters: ApiMediaApproveMediaPatchRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiMediaApproveMediaPatchRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      */
-    async apiMediaDeleteMediaByIdPostRaw(requestParameters: ApiMediaDeleteMediaByIdPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+    async apiMediaDeleteMediaByIdDeleteRaw(requestParameters: ApiMediaDeleteMediaByIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
         const queryParameters: any = {};
 
         if (requestParameters['id'] != null) {
@@ -239,7 +243,7 @@ export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
 
         const response = await this.request({
             path: urlPath,
-            method: 'POST',
+            method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
@@ -249,19 +253,37 @@ export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
 
     /**
      */
-    async apiMediaDeleteMediaByIdPost(requestParameters: ApiMediaDeleteMediaByIdPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
-        const response = await this.apiMediaDeleteMediaByIdPostRaw(requestParameters, initOverrides);
+    async apiMediaDeleteMediaByIdDelete(requestParameters: ApiMediaDeleteMediaByIdDeleteRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiMediaDeleteMediaByIdDeleteRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      */
-    async apiMediaGetMediaPostRaw(requestParameters: ApiMediaGetMediaPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MediaDtoGenericListNewLevelResponse>> {
+    async apiMediaGetMediaGetRaw(requestParameters: ApiMediaGetMediaGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MediaDtoGenericListNewLevelResponse>> {
         const queryParameters: any = {};
 
-        const headerParameters: runtime.HTTPHeaders = {};
+        if (requestParameters['page'] != null) {
+            queryParameters['Page'] = requestParameters['page'];
+        }
 
-        headerParameters['Content-Type'] = 'application/json';
+        if (requestParameters['pageSize'] != null) {
+            queryParameters['PageSize'] = requestParameters['pageSize'];
+        }
+
+        if (requestParameters['totalItems'] != null) {
+            queryParameters['TotalItems'] = requestParameters['totalItems'];
+        }
+
+        if (requestParameters['pageCount'] != null) {
+            queryParameters['PageCount'] = requestParameters['pageCount'];
+        }
+
+        if (requestParameters['search'] != null) {
+            queryParameters['Search'] = requestParameters['search'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -276,10 +298,9 @@ export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
 
         const response = await this.request({
             path: urlPath,
-            method: 'POST',
+            method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-            body: PaginationToJSON(requestParameters['pagination']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => MediaDtoGenericListNewLevelResponseFromJSON(jsonValue));
@@ -287,8 +308,8 @@ export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
 
     /**
      */
-    async apiMediaGetMediaPost(requestParameters: ApiMediaGetMediaPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MediaDtoGenericListNewLevelResponse> {
-        const response = await this.apiMediaGetMediaPostRaw(requestParameters, initOverrides);
+    async apiMediaGetMediaGet(requestParameters: ApiMediaGetMediaGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MediaDtoGenericListNewLevelResponse> {
+        const response = await this.apiMediaGetMediaGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -332,7 +353,7 @@ export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
 
     /**
      */
-    async apiMediaGetMediasByUserIdPostRaw(requestParameters: ApiMediaGetMediasByUserIdPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MediaByUserIdDtoGenericListNewLevelResponse>> {
+    async apiMediaGetMediasByUserIdGetRaw(requestParameters: ApiMediaGetMediasByUserIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MediaByUserIdDtoGenericListNewLevelResponse>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -352,7 +373,7 @@ export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
 
         const response = await this.request({
             path: urlPath,
-            method: 'POST',
+            method: 'GET',
             headers: headerParameters,
             query: queryParameters,
             body: PaginationToJSON(requestParameters['pagination']),
@@ -363,8 +384,8 @@ export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
 
     /**
      */
-    async apiMediaGetMediasByUserIdPost(requestParameters: ApiMediaGetMediasByUserIdPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MediaByUserIdDtoGenericListNewLevelResponse> {
-        const response = await this.apiMediaGetMediasByUserIdPostRaw(requestParameters, initOverrides);
+    async apiMediaGetMediasByUserIdGet(requestParameters: ApiMediaGetMediasByUserIdGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MediaByUserIdDtoGenericListNewLevelResponse> {
+        const response = await this.apiMediaGetMediasByUserIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

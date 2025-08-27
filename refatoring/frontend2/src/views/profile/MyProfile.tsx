@@ -151,7 +151,7 @@ const MyProfile = () => {
 
     try {
       setLoading(true);
-      const result = await userService.apiUserUpdateUserPost({
+      const result = await userService.apiUserUpdateUserPut({
         email: formUpdateRegister.email,
         nickname: formUpdateRegister.nickname,
         activityLocation: formUpdateRegister.city as EActivityLocation,
@@ -178,9 +178,14 @@ const MyProfile = () => {
   const handlePasswordReset = async () => {
     try {
       setLoading(true);
-      await userService.apiUserGenerateTokenToResetPasswordPost({});
+      const result = await userService.apiUserChangePasswordPost();
       setOpenPasswordDialog(false);
-      alert('E-mail de redefinição enviado com sucesso!');
+      if (result.isSuccess) {
+        alert('E-mail de redefinição enviado com sucesso!');
+      }
+      else {
+        alert('Algo deu errado, se o problema persistir entre em contato com o desenvolvedor');
+      }
     } catch (error) {
       console.error('Error sending password reset:', error);
       alert('Erro ao enviar e-mail de redefinição');

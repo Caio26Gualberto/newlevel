@@ -36,6 +36,12 @@ export interface Pagination {
      * @type {number}
      * @memberof Pagination
      */
+    totalItems?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Pagination
+     */
     pageCount?: number;
     /**
      * 
@@ -64,6 +70,7 @@ export function PaginationFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         
         'page': json['page'] == null ? undefined : json['page'],
         'pageSize': json['pageSize'] == null ? undefined : json['pageSize'],
+        'totalItems': json['totalItems'] == null ? undefined : json['totalItems'],
         'pageCount': json['pageCount'] == null ? undefined : json['pageCount'],
         'search': json['search'] == null ? undefined : json['search'],
     };
@@ -82,6 +89,7 @@ export function PaginationToJSONTyped(value?: Pagination | null, ignoreDiscrimin
         
         'page': value['page'],
         'pageSize': value['pageSize'],
+        'totalItems': value['totalItems'],
         'pageCount': value['pageCount'],
         'search': value['search'],
     };

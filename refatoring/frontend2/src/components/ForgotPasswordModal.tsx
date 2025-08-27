@@ -14,7 +14,7 @@ import {
   useMediaQuery
 } from '@mui/material';
 import { Close, Email } from '@mui/icons-material';
-import { UserApi } from '../gen/api/src';
+import { AuthApi, UserApi } from '../gen/api/src';
 import ApiConfiguration from '../config/apiConfig';
 import * as toastr from 'toastr';
 
@@ -31,7 +31,7 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ open, onClose
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
-  const userService = useMemo(() => new UserApi(ApiConfiguration), []);
+  const authService = useMemo(() => new AuthApi(ApiConfiguration), []);
 
   const validateEmail = (email: string): boolean => {
     if (!email.trim()) {
@@ -58,8 +58,10 @@ const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({ open, onClose
 
     setIsLoading(true);
     try {
-      const result = await userService.apiUserGenerateTokenToResetPasswordByEmailPost({
-        email: email.trim()
+      const result = await authService.apiAuthForgotPasswordPost({
+        forgotPasswordRequestDto: {
+          email : email.trim()
+        }
       });
 
       if (result.isSuccess) {

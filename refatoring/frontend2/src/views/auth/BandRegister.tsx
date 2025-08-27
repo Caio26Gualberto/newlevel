@@ -45,7 +45,7 @@ import {
   Group
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { AuthenticateApi, CommonApi, EActivityLocation, EMusicGenres } from '../../gen/api/src';
+import { AuthApi, CommonApi, EActivityLocation, EMusicGenres } from '../../gen/api/src';
 import ApiConfiguration from '../../config/apiConfig';
 import Swal from 'sweetalert2';
 import AddMembersModal, { BandMember } from '../../components/modals/AddMembersModal';
@@ -88,7 +88,7 @@ const BandRegister = () => {
   });
   
   // API services
-  const authService = useMemo(() => new AuthenticateApi(ApiConfiguration), []);
+  const authService = useMemo(() => new AuthApi(ApiConfiguration), []);
   const commonService = useMemo(() => new CommonApi(ApiConfiguration), []);
 
   // Fetch cities and music genres on component mount
@@ -237,7 +237,7 @@ const BandRegister = () => {
       const dateObject = new Date(year, month - 1, day);
       const newIntegrants = transformMembersToObject(members);
       
-      const result = await authService.apiAuthenticateBandRegisterPost({
+      const result = await authService.apiAuthBandRegisterPost({
         registerInputDto: {
           activityLocation: selectedCity.value as EActivityLocation,
           createdAt: dateObject,

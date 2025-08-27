@@ -82,7 +82,7 @@ const InviteIntegrantsModal: React.FC<InviteIntegrantsModalProps> = ({ open, tit
     }
 
     async function removePendingInvite(nickName: string) {
-        const result = await userService.apiUserDeleteInviteMemberPost({ nickname: nickName });
+        const result = await userService.apiUserDeleteInviteMemberDelete({ nickname: nickName });
         if (result.isSuccess) {
             fetchData();
             toastr.info(result.message!, '', { timeOut: 3000, progressBar: true, positionClass: "toast-bottom-right" })

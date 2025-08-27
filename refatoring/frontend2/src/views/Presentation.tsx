@@ -13,7 +13,7 @@ const Presentation = () => {
     
     const skipPresentation = async () => {
         try {
-            await userService.apiUserSkipIntroductionGet();
+            await userService.apiUserSkipIntroductionPatch();
             navigate('/videos');
         } catch (error) {
             console.error('Error skipping introduction:', error);

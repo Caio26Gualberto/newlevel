@@ -31,12 +31,12 @@ import {
     ReceiveCommentDtoToJSON,
 } from '../models/index';
 
-export interface ApiCommentGetCommentsByMediaIdPostRequest {
+export interface ApiCommentGetCommentsByMediaIdGetRequest {
     mediaId?: number;
     pagination?: Pagination;
 }
 
-export interface ApiCommentGetCommentsByPhotoIdPostRequest {
+export interface ApiCommentGetCommentsByPhotoIdGetRequest {
     photoId?: number;
     pagination?: Pagination;
 }
@@ -60,11 +60,11 @@ export interface CommentApiInterface {
      * @throws {RequiredError}
      * @memberof CommentApiInterface
      */
-    apiCommentGetCommentsByMediaIdPostRaw(requestParameters: ApiCommentGetCommentsByMediaIdPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentsPhotoResponseDtoNewLevelResponse>>;
+    apiCommentGetCommentsByMediaIdGetRaw(requestParameters: ApiCommentGetCommentsByMediaIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentsPhotoResponseDtoNewLevelResponse>>;
 
     /**
      */
-    apiCommentGetCommentsByMediaIdPost(requestParameters: ApiCommentGetCommentsByMediaIdPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentsPhotoResponseDtoNewLevelResponse>;
+    apiCommentGetCommentsByMediaIdGet(requestParameters: ApiCommentGetCommentsByMediaIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentsPhotoResponseDtoNewLevelResponse>;
 
     /**
      * 
@@ -74,11 +74,11 @@ export interface CommentApiInterface {
      * @throws {RequiredError}
      * @memberof CommentApiInterface
      */
-    apiCommentGetCommentsByPhotoIdPostRaw(requestParameters: ApiCommentGetCommentsByPhotoIdPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentsPhotoResponseDtoNewLevelResponse>>;
+    apiCommentGetCommentsByPhotoIdGetRaw(requestParameters: ApiCommentGetCommentsByPhotoIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentsPhotoResponseDtoNewLevelResponse>>;
 
     /**
      */
-    apiCommentGetCommentsByPhotoIdPost(requestParameters: ApiCommentGetCommentsByPhotoIdPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentsPhotoResponseDtoNewLevelResponse>;
+    apiCommentGetCommentsByPhotoIdGet(requestParameters: ApiCommentGetCommentsByPhotoIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentsPhotoResponseDtoNewLevelResponse>;
 
     /**
      * 
@@ -102,7 +102,7 @@ export class CommentApi extends runtime.BaseAPI implements CommentApiInterface {
 
     /**
      */
-    async apiCommentGetCommentsByMediaIdPostRaw(requestParameters: ApiCommentGetCommentsByMediaIdPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentsPhotoResponseDtoNewLevelResponse>> {
+    async apiCommentGetCommentsByMediaIdGetRaw(requestParameters: ApiCommentGetCommentsByMediaIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentsPhotoResponseDtoNewLevelResponse>> {
         const queryParameters: any = {};
 
         if (requestParameters['mediaId'] != null) {
@@ -126,7 +126,7 @@ export class CommentApi extends runtime.BaseAPI implements CommentApiInterface {
 
         const response = await this.request({
             path: urlPath,
-            method: 'POST',
+            method: 'GET',
             headers: headerParameters,
             query: queryParameters,
             body: PaginationToJSON(requestParameters['pagination']),
@@ -137,14 +137,14 @@ export class CommentApi extends runtime.BaseAPI implements CommentApiInterface {
 
     /**
      */
-    async apiCommentGetCommentsByMediaIdPost(requestParameters: ApiCommentGetCommentsByMediaIdPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentsPhotoResponseDtoNewLevelResponse> {
-        const response = await this.apiCommentGetCommentsByMediaIdPostRaw(requestParameters, initOverrides);
+    async apiCommentGetCommentsByMediaIdGet(requestParameters: ApiCommentGetCommentsByMediaIdGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentsPhotoResponseDtoNewLevelResponse> {
+        const response = await this.apiCommentGetCommentsByMediaIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      */
-    async apiCommentGetCommentsByPhotoIdPostRaw(requestParameters: ApiCommentGetCommentsByPhotoIdPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentsPhotoResponseDtoNewLevelResponse>> {
+    async apiCommentGetCommentsByPhotoIdGetRaw(requestParameters: ApiCommentGetCommentsByPhotoIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentsPhotoResponseDtoNewLevelResponse>> {
         const queryParameters: any = {};
 
         if (requestParameters['photoId'] != null) {
@@ -168,7 +168,7 @@ export class CommentApi extends runtime.BaseAPI implements CommentApiInterface {
 
         const response = await this.request({
             path: urlPath,
-            method: 'POST',
+            method: 'GET',
             headers: headerParameters,
             query: queryParameters,
             body: PaginationToJSON(requestParameters['pagination']),
@@ -179,8 +179,8 @@ export class CommentApi extends runtime.BaseAPI implements CommentApiInterface {
 
     /**
      */
-    async apiCommentGetCommentsByPhotoIdPost(requestParameters: ApiCommentGetCommentsByPhotoIdPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentsPhotoResponseDtoNewLevelResponse> {
-        const response = await this.apiCommentGetCommentsByPhotoIdPostRaw(requestParameters, initOverrides);
+    async apiCommentGetCommentsByPhotoIdGet(requestParameters: ApiCommentGetCommentsByPhotoIdGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentsPhotoResponseDtoNewLevelResponse> {
+        const response = await this.apiCommentGetCommentsByPhotoIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

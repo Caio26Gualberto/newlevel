@@ -99,7 +99,7 @@ const MyVideos = () => {
 
     try {
       setLoading(true);
-      const media = await mediaApi.apiMediaDeleteMediaByIdPost({
+      const media = await mediaApi.apiMediaDeleteMediaByIdDelete({
         id: mediaId
       });
 
@@ -168,7 +168,7 @@ const MyVideos = () => {
   const fetchUserVideos = async () => {
     try {
       setLoading(true);
-      const userVideos = await mediaApi.apiMediaGetMediasByUserIdPost({
+      const userVideos = await mediaApi.apiMediaGetMediasByUserIdGet({
         pagination: {
           page: page + 1,
           pageSize: rowsPerPage,

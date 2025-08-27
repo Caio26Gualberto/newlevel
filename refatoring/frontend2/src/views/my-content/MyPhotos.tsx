@@ -28,6 +28,7 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { PhotoApi, PhotoResponseDto } from "../../gen/api/src";
 import ApiConfiguration from "../../config/apiConfig";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
+import AddPhotoModal from "../../components/modals/AddPhotoModal";
 
 interface Photo {
   id: string;
@@ -45,6 +46,7 @@ const MyPhotos = () => {
   const [loading, setLoading] = useState(false);
   const [fadeIn, setFadeIn] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openAddPhotoModal, setOpenAddPhotoModal] = useState(false)
   const [editingPhoto, setEditingPhoto] = useState<Photo | null>(null);
   const [photoForm, setPhotoForm] = useState({
     title: '',
@@ -59,14 +61,11 @@ const MyPhotos = () => {
   const loadMyPhotos = async () => {
     setLoading(true);
     try {
-      // Use actual API call to get all photos (filtered by user on backend)
-      const result = await photoService.apiPhotoGetAllPhotosPost({
-        pagination: {
-          page: 1,
-          pageSize: 50,
-          pageCount: 0,
-          search: ''
-        }
+      const result = await photoService.apiPhotoGetAllPhotosGet({
+        page: 1,
+        pageSize: 50,
+        pageCount: 0,
+        search: ''
       });
       
       if (result.isSuccess && result.data?.items) {
@@ -92,7 +91,7 @@ const MyPhotos = () => {
   const handleAddPhoto = () => {
     setEditingPhoto(null);
     setPhotoForm({ title: '', file: null });
-    setOpenDialog(true);
+    setOpenAddPhotoModal(true);
   };
 
   const handleEditPhoto = (photo: Photo) => {
@@ -427,6 +426,9 @@ const MyPhotos = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      {openAddPhotoModal && 
+      (<AddPhotoModal open={openAddPhotoModal} onClose={ () => setOpenAddPhotoModal(false)}/>)
+      }
     </>
   );
 };

@@ -66,7 +66,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
   const getPhotoComments = async () => {
     try {
       setLoading(true);
-      const result = await commentService.apiCommentGetCommentsByPhotoIdPost({
+      const result = await commentService.apiCommentGetCommentsByPhotoIdGet({
         photoId: photoId,
         pagination: pagination
       });
@@ -94,7 +94,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
   const getMediaComments = async () => {
     try {
       setLoading(true);
-      const result = await commentService.apiCommentGetCommentsByMediaIdPost({
+      const result = await commentService.apiCommentGetCommentsByMediaIdGet({
         mediaId: mediaId,
         pagination: pagination
       });

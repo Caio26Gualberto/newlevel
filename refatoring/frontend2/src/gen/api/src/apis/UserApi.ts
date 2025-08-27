@@ -19,7 +19,6 @@ import type {
   EActivityLocation,
   InviteMemberInput,
   ProfileInfoDtoNewLevelResponse,
-  ResetPasswordInput,
   SearchBarUserDetailDtoListNewLevelResponse,
   StringNewLevelResponse,
   UserInfoResponseDtoNewLevelResponse,
@@ -33,8 +32,6 @@ import {
     InviteMemberInputToJSON,
     ProfileInfoDtoNewLevelResponseFromJSON,
     ProfileInfoDtoNewLevelResponseToJSON,
-    ResetPasswordInputFromJSON,
-    ResetPasswordInputToJSON,
     SearchBarUserDetailDtoListNewLevelResponseFromJSON,
     SearchBarUserDetailDtoListNewLevelResponseToJSON,
     StringNewLevelResponseFromJSON,
@@ -43,12 +40,8 @@ import {
     UserInfoResponseDtoNewLevelResponseToJSON,
 } from '../models/index';
 
-export interface ApiUserDeleteInviteMemberPostRequest {
+export interface ApiUserDeleteInviteMemberDeleteRequest {
     nickname?: string;
-}
-
-export interface ApiUserGenerateTokenToResetPasswordByEmailPostRequest {
-    email?: string;
 }
 
 export interface ApiUserGetProfileGetRequest {
@@ -64,11 +57,7 @@ export interface ApiUserInviteMemberBandPostRequest {
     inviteMemberInput?: InviteMemberInput;
 }
 
-export interface ApiUserResetPasswordPostRequest {
-    resetPasswordInput?: ResetPasswordInput;
-}
-
-export interface ApiUserUpdateUserPostRequest {
+export interface ApiUserUpdateUserPutRequest {
     email?: string;
     nickname?: string;
     activityLocation?: EActivityLocation;
@@ -98,11 +87,23 @@ export interface UserApiInterface {
      * @throws {RequiredError}
      * @memberof UserApiInterface
      */
-    apiUserDeleteDeleteRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<boolean>>;
+    apiUserChangePasswordPostRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
 
     /**
      */
-    apiUserDeleteDelete(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<boolean>;
+    apiUserChangePasswordPost(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserApiInterface
+     */
+    apiUserDeleteDeleteRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
+
+    /**
+     */
+    apiUserDeleteDelete(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
 
     /**
      * 
@@ -111,36 +112,11 @@ export interface UserApiInterface {
      * @throws {RequiredError}
      * @memberof UserApiInterface
      */
-    apiUserDeleteInviteMemberPostRaw(requestParameters: ApiUserDeleteInviteMemberPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
+    apiUserDeleteInviteMemberDeleteRaw(requestParameters: ApiUserDeleteInviteMemberDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
 
     /**
      */
-    apiUserDeleteInviteMemberPost(requestParameters: ApiUserDeleteInviteMemberPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
-
-    /**
-     * 
-     * @param {string} [email] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof UserApiInterface
-     */
-    apiUserGenerateTokenToResetPasswordByEmailPostRaw(requestParameters: ApiUserGenerateTokenToResetPasswordByEmailPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<StringNewLevelResponse>>;
-
-    /**
-     */
-    apiUserGenerateTokenToResetPasswordByEmailPost(requestParameters: ApiUserGenerateTokenToResetPasswordByEmailPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<StringNewLevelResponse>;
-
-    /**
-     * 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof UserApiInterface
-     */
-    apiUserGenerateTokenToResetPasswordPostRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<StringNewLevelResponse>>;
-
-    /**
-     */
-    apiUserGenerateTokenToResetPasswordPost(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<StringNewLevelResponse>;
+    apiUserDeleteInviteMemberDelete(requestParameters: ApiUserDeleteInviteMemberDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
 
     /**
      * 
@@ -196,28 +172,15 @@ export interface UserApiInterface {
 
     /**
      * 
-     * @param {ResetPasswordInput} [resetPasswordInput] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof UserApiInterface
      */
-    apiUserResetPasswordPostRaw(requestParameters: ApiUserResetPasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
+    apiUserSkipIntroductionPatchRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
 
     /**
      */
-    apiUserResetPasswordPost(requestParameters: ApiUserResetPasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
-
-    /**
-     * 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof UserApiInterface
-     */
-    apiUserSkipIntroductionGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
-
-    /**
-     */
-    apiUserSkipIntroductionGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+    apiUserSkipIntroductionPatch(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
 
     /**
      * 
@@ -229,11 +192,11 @@ export interface UserApiInterface {
      * @throws {RequiredError}
      * @memberof UserApiInterface
      */
-    apiUserUpdateUserPostRaw(requestParameters: ApiUserUpdateUserPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
+    apiUserUpdateUserPutRaw(requestParameters: ApiUserUpdateUserPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
 
     /**
      */
-    apiUserUpdateUserPost(requestParameters: ApiUserUpdateUserPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
+    apiUserUpdateUserPut(requestParameters: ApiUserUpdateUserPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
 
     /**
      * 
@@ -272,7 +235,42 @@ export class UserApi extends runtime.BaseAPI implements UserApiInterface {
 
     /**
      */
-    async apiUserDeleteDeleteRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<boolean>> {
+    async apiUserChangePasswordPostRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/User/ChangePassword`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiUserChangePasswordPost(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiUserChangePasswordPostRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiUserDeleteDeleteRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -295,23 +293,19 @@ export class UserApi extends runtime.BaseAPI implements UserApiInterface {
             query: queryParameters,
         }, initOverrides);
 
-        if (this.isJsonMime(response.headers.get('content-type'))) {
-            return new runtime.JSONApiResponse<boolean>(response);
-        } else {
-            return new runtime.TextApiResponse(response) as any;
-        }
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async apiUserDeleteDelete(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<boolean> {
+    async apiUserDeleteDelete(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
         const response = await this.apiUserDeleteDeleteRaw(initOverrides);
         return await response.value();
     }
 
     /**
      */
-    async apiUserDeleteInviteMemberPostRaw(requestParameters: ApiUserDeleteInviteMemberPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+    async apiUserDeleteInviteMemberDeleteRaw(requestParameters: ApiUserDeleteInviteMemberDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
         const queryParameters: any = {};
 
         if (requestParameters['nickname'] != null) {
@@ -333,7 +327,7 @@ export class UserApi extends runtime.BaseAPI implements UserApiInterface {
 
         const response = await this.request({
             path: urlPath,
-            method: 'POST',
+            method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
@@ -343,82 +337,8 @@ export class UserApi extends runtime.BaseAPI implements UserApiInterface {
 
     /**
      */
-    async apiUserDeleteInviteMemberPost(requestParameters: ApiUserDeleteInviteMemberPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
-        const response = await this.apiUserDeleteInviteMemberPostRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiUserGenerateTokenToResetPasswordByEmailPostRaw(requestParameters: ApiUserGenerateTokenToResetPasswordByEmailPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<StringNewLevelResponse>> {
-        const queryParameters: any = {};
-
-        if (requestParameters['email'] != null) {
-            queryParameters['email'] = requestParameters['email'];
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("Bearer", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-
-        let urlPath = `/api/User/GenerateTokenToResetPasswordByEmail`;
-
-        const response = await this.request({
-            path: urlPath,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => StringNewLevelResponseFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiUserGenerateTokenToResetPasswordByEmailPost(requestParameters: ApiUserGenerateTokenToResetPasswordByEmailPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<StringNewLevelResponse> {
-        const response = await this.apiUserGenerateTokenToResetPasswordByEmailPostRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiUserGenerateTokenToResetPasswordPostRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<StringNewLevelResponse>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("Bearer", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-
-        let urlPath = `/api/User/GenerateTokenToResetPassword`;
-
-        const response = await this.request({
-            path: urlPath,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => StringNewLevelResponseFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiUserGenerateTokenToResetPasswordPost(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<StringNewLevelResponse> {
-        const response = await this.apiUserGenerateTokenToResetPasswordPostRaw(initOverrides);
+    async apiUserDeleteInviteMemberDelete(requestParameters: ApiUserDeleteInviteMemberDeleteRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiUserDeleteInviteMemberDeleteRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -579,45 +499,7 @@ export class UserApi extends runtime.BaseAPI implements UserApiInterface {
 
     /**
      */
-    async apiUserResetPasswordPostRaw(requestParameters: ApiUserResetPasswordPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("Bearer", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-
-        let urlPath = `/api/User/ResetPassword`;
-
-        const response = await this.request({
-            path: urlPath,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: ResetPasswordInputToJSON(requestParameters['resetPasswordInput']),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiUserResetPasswordPost(requestParameters: ApiUserResetPasswordPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
-        const response = await this.apiUserResetPasswordPostRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiUserSkipIntroductionGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async apiUserSkipIntroductionPatchRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -635,7 +517,7 @@ export class UserApi extends runtime.BaseAPI implements UserApiInterface {
 
         const response = await this.request({
             path: urlPath,
-            method: 'GET',
+            method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
@@ -645,13 +527,13 @@ export class UserApi extends runtime.BaseAPI implements UserApiInterface {
 
     /**
      */
-    async apiUserSkipIntroductionGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.apiUserSkipIntroductionGetRaw(initOverrides);
+    async apiUserSkipIntroductionPatch(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.apiUserSkipIntroductionPatchRaw(initOverrides);
     }
 
     /**
      */
-    async apiUserUpdateUserPostRaw(requestParameters: ApiUserUpdateUserPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+    async apiUserUpdateUserPutRaw(requestParameters: ApiUserUpdateUserPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
         const queryParameters: any = {};
 
         if (requestParameters['email'] != null) {
@@ -701,7 +583,7 @@ export class UserApi extends runtime.BaseAPI implements UserApiInterface {
 
         const response = await this.request({
             path: urlPath,
-            method: 'POST',
+            method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
             body: formParams,
@@ -712,8 +594,8 @@ export class UserApi extends runtime.BaseAPI implements UserApiInterface {
 
     /**
      */
-    async apiUserUpdateUserPost(requestParameters: ApiUserUpdateUserPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
-        const response = await this.apiUserUpdateUserPostRaw(requestParameters, initOverrides);
+    async apiUserUpdateUserPut(requestParameters: ApiUserUpdateUserPutRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiUserUpdateUserPutRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './AuthenticateApi';
+export * from './AuthApi';
 export * from './BandApi';
 export * from './CommentApi';
 export * from './CommonApi';

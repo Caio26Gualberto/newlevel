@@ -1,4 +1,4 @@
-import { Configuration, ErrorContext, ResponseContext } from "../gen/api/src";
+import { Configuration, ResponseContext } from "../gen/api/src";
 
 let originalRequest: ResponseContext | null
 
@@ -29,14 +29,21 @@ const ApiConfiguration = new Configuration({
             post: async (context: ResponseContext) => {
                 let ret = context.response;
                 originalRequest = context;
-                let contentType = context.response.headers.get('content-type');
-                if (context.response.status == 401 || context.response.status == 403) {
-                    const response = await fetch(`${basePathAPI}/api/Authenticate/RenewToken?accessToken=${window.localStorage.getItem('accessToken')}`);
+                if (context.response.status == 401 || context.response.status == 403) {                  
+                    const response = await fetch(`${basePathAPI}/api/Auth/RefreshToken`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            refreshToken: window.localStorage.getItem("refreshToken")
+                        })
+                    });
                     if (response.ok && response.status != 204) {
                         const newTokens = await response.json();
-                        if (newTokens.token && newTokens.refreshToken) {
-                            window.localStorage.setItem('accessToken', newTokens.token);
-                            window.localStorage.setItem('refreshToken', newTokens.refreshToken);
+                        if (newTokens?.data?.token && newTokens?.data?.refreshToken) {
+                            window.localStorage.setItem('accessToken', newTokens.data.token);
+                            window.localStorage.setItem('refreshToken', newTokens.data.refreshToken);
                             const newRequest = new Request(originalRequest.url, {
                                 method: originalRequest.init.method,
                                 headers: new Headers(originalRequest.init.headers),
@@ -52,14 +59,14 @@ const ApiConfiguration = new Configuration({
                                 signal: originalRequest.init.signal
                             });
 
-                            newRequest.headers.set('Authorization', `Bearer ${newTokens.token}`);
+                            newRequest.headers.set('Authorization', `Bearer ${newTokens.data.token}`);
 
                             ret = await fetch(newRequest);
                         } else {
 
                         }
                     } else {
-                        window.location.href = 'http://localhost:3000';
+                        window.location.href = basePathFront ?? 'http://localhost:3000';
                     }
                 } else {
                     ret.json = async () => {

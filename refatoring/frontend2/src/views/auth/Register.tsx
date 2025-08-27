@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, useMemo } from "react";
 import ApiConfiguration from "../../config/apiConfig";
-import { AuthenticateApi, CommonApi, EActivityLocation, SelectOptionDto } from "../../gen/api/src";
+import { AuthApi, CommonApi, EActivityLocation, SelectOptionDto } from "../../gen/api/src";
 import { Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Tooltip, Typography, Zoom, useTheme, useMediaQuery } from "@mui/material";
 import Swal from "sweetalert2";
 import * as toastr from 'toastr';
@@ -29,7 +29,7 @@ const Register = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
     
-    const authenticateService = useMemo(() => new AuthenticateApi(ApiConfiguration), []);
+    const authenticateService = useMemo(() => new AuthApi(ApiConfiguration), []);
     const commonService = useMemo(() => new CommonApi(ApiConfiguration), []);
     
     const [cities, setCities] = useState<SelectOptionDto[]>([]);
@@ -111,7 +111,7 @@ const Register = () => {
 
         setIsLoading(true);
         try {
-            const result = await authenticateService.apiAuthenticateRegisterPost({
+            const result = await authenticateService.apiAuthRegisterPost({
                 registerInputDto: {
                     email: formRegister.email.trim(),
                     password: formRegister.password,

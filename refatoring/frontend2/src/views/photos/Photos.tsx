@@ -74,13 +74,11 @@ const Photos = () => {
   const getPhotos = async () => {
     setLoading(true);
     try {
-      const result = await photoService.apiPhotoGetAllPhotosPost({
-        pagination: {
-          page: pagination.page,
-          pageSize: pagination.pageSize,
-          pageCount: 0,
-          search: pagination.search
-        }
+      const result = await photoService.apiPhotoGetAllPhotosGet({
+        page: pagination.page,
+        pageSize: pagination.pageSize,
+        pageCount: 0,
+        search: pagination.search
       });
       
       if (result.isSuccess) {

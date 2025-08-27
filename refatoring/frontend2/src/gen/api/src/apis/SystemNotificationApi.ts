@@ -32,7 +32,7 @@ export interface ApiSystemNotificationDeleteNotificationDeleteRequest {
     notificationId?: number;
 }
 
-export interface ApiSystemNotificationReadNotificationPostRequest {
+export interface ApiSystemNotificationReadNotificationPatchRequest {
     notificationId?: number;
 }
 
@@ -92,11 +92,11 @@ export interface SystemNotificationApiInterface {
      * @throws {RequiredError}
      * @memberof SystemNotificationApiInterface
      */
-    apiSystemNotificationReadNotificationPostRaw(requestParameters: ApiSystemNotificationReadNotificationPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
+    apiSystemNotificationReadNotificationPatchRaw(requestParameters: ApiSystemNotificationReadNotificationPatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
 
     /**
      */
-    apiSystemNotificationReadNotificationPost(requestParameters: ApiSystemNotificationReadNotificationPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
+    apiSystemNotificationReadNotificationPatch(requestParameters: ApiSystemNotificationReadNotificationPatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
 
     /**
      * 
@@ -230,7 +230,7 @@ export class SystemNotificationApi extends runtime.BaseAPI implements SystemNoti
 
     /**
      */
-    async apiSystemNotificationReadNotificationPostRaw(requestParameters: ApiSystemNotificationReadNotificationPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+    async apiSystemNotificationReadNotificationPatchRaw(requestParameters: ApiSystemNotificationReadNotificationPatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
         const queryParameters: any = {};
 
         if (requestParameters['notificationId'] != null) {
@@ -252,7 +252,7 @@ export class SystemNotificationApi extends runtime.BaseAPI implements SystemNoti
 
         const response = await this.request({
             path: urlPath,
-            method: 'POST',
+            method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
@@ -262,8 +262,8 @@ export class SystemNotificationApi extends runtime.BaseAPI implements SystemNoti
 
     /**
      */
-    async apiSystemNotificationReadNotificationPost(requestParameters: ApiSystemNotificationReadNotificationPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
-        const response = await this.apiSystemNotificationReadNotificationPostRaw(requestParameters, initOverrides);
+    async apiSystemNotificationReadNotificationPatch(requestParameters: ApiSystemNotificationReadNotificationPatchRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiSystemNotificationReadNotificationPatchRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

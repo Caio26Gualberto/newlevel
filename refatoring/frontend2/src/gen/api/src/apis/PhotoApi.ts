@@ -28,16 +28,20 @@ import {
     PhotoResponseDtoGenericListNewLevelResponseToJSON,
 } from '../models/index';
 
-export interface ApiPhotoApprovePhotoGetRequest {
+export interface ApiPhotoApprovePhotoPatchRequest {
     photoId?: number;
     isApprove?: boolean;
 }
 
-export interface ApiPhotoGetAllPhotosPostRequest {
-    pagination?: Pagination;
+export interface ApiPhotoGetAllPhotosGetRequest {
+    page?: number;
+    pageSize?: number;
+    totalItems?: number;
+    pageCount?: number;
+    search?: string;
 }
 
-export interface ApiPhotoGetPhotoToApprovePostRequest {
+export interface ApiPhotoGetPhotoToApproveGetRequest {
     pagination?: Pagination;
 }
 
@@ -64,11 +68,28 @@ export interface PhotoApiInterface {
      * @throws {RequiredError}
      * @memberof PhotoApiInterface
      */
-    apiPhotoApprovePhotoGetRaw(requestParameters: ApiPhotoApprovePhotoGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
+    apiPhotoApprovePhotoPatchRaw(requestParameters: ApiPhotoApprovePhotoPatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
 
     /**
      */
-    apiPhotoApprovePhotoGet(requestParameters: ApiPhotoApprovePhotoGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
+    apiPhotoApprovePhotoPatch(requestParameters: ApiPhotoApprovePhotoPatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
+
+    /**
+     * 
+     * @param {number} [page] 
+     * @param {number} [pageSize] 
+     * @param {number} [totalItems] 
+     * @param {number} [pageCount] 
+     * @param {string} [search] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PhotoApiInterface
+     */
+    apiPhotoGetAllPhotosGetRaw(requestParameters: ApiPhotoGetAllPhotosGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PhotoResponseDtoGenericListNewLevelResponse>>;
+
+    /**
+     */
+    apiPhotoGetAllPhotosGet(requestParameters: ApiPhotoGetAllPhotosGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PhotoResponseDtoGenericListNewLevelResponse>;
 
     /**
      * 
@@ -77,24 +98,11 @@ export interface PhotoApiInterface {
      * @throws {RequiredError}
      * @memberof PhotoApiInterface
      */
-    apiPhotoGetAllPhotosPostRaw(requestParameters: ApiPhotoGetAllPhotosPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PhotoResponseDtoGenericListNewLevelResponse>>;
+    apiPhotoGetPhotoToApproveGetRaw(requestParameters: ApiPhotoGetPhotoToApproveGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PhotoResponseDtoGenericListNewLevelResponse>>;
 
     /**
      */
-    apiPhotoGetAllPhotosPost(requestParameters: ApiPhotoGetAllPhotosPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PhotoResponseDtoGenericListNewLevelResponse>;
-
-    /**
-     * 
-     * @param {Pagination} [pagination] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PhotoApiInterface
-     */
-    apiPhotoGetPhotoToApprovePostRaw(requestParameters: ApiPhotoGetPhotoToApprovePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PhotoResponseDtoGenericListNewLevelResponse>>;
-
-    /**
-     */
-    apiPhotoGetPhotoToApprovePost(requestParameters: ApiPhotoGetPhotoToApprovePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PhotoResponseDtoGenericListNewLevelResponse>;
+    apiPhotoGetPhotoToApproveGet(requestParameters: ApiPhotoGetPhotoToApproveGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PhotoResponseDtoGenericListNewLevelResponse>;
 
     /**
      * 
@@ -122,7 +130,7 @@ export class PhotoApi extends runtime.BaseAPI implements PhotoApiInterface {
 
     /**
      */
-    async apiPhotoApprovePhotoGetRaw(requestParameters: ApiPhotoApprovePhotoGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+    async apiPhotoApprovePhotoPatchRaw(requestParameters: ApiPhotoApprovePhotoPatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
         const queryParameters: any = {};
 
         if (requestParameters['photoId'] != null) {
@@ -148,7 +156,7 @@ export class PhotoApi extends runtime.BaseAPI implements PhotoApiInterface {
 
         const response = await this.request({
             path: urlPath,
-            method: 'GET',
+            method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
@@ -158,19 +166,37 @@ export class PhotoApi extends runtime.BaseAPI implements PhotoApiInterface {
 
     /**
      */
-    async apiPhotoApprovePhotoGet(requestParameters: ApiPhotoApprovePhotoGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
-        const response = await this.apiPhotoApprovePhotoGetRaw(requestParameters, initOverrides);
+    async apiPhotoApprovePhotoPatch(requestParameters: ApiPhotoApprovePhotoPatchRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiPhotoApprovePhotoPatchRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      */
-    async apiPhotoGetAllPhotosPostRaw(requestParameters: ApiPhotoGetAllPhotosPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PhotoResponseDtoGenericListNewLevelResponse>> {
+    async apiPhotoGetAllPhotosGetRaw(requestParameters: ApiPhotoGetAllPhotosGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PhotoResponseDtoGenericListNewLevelResponse>> {
         const queryParameters: any = {};
 
-        const headerParameters: runtime.HTTPHeaders = {};
+        if (requestParameters['page'] != null) {
+            queryParameters['Page'] = requestParameters['page'];
+        }
 
-        headerParameters['Content-Type'] = 'application/json';
+        if (requestParameters['pageSize'] != null) {
+            queryParameters['PageSize'] = requestParameters['pageSize'];
+        }
+
+        if (requestParameters['totalItems'] != null) {
+            queryParameters['TotalItems'] = requestParameters['totalItems'];
+        }
+
+        if (requestParameters['pageCount'] != null) {
+            queryParameters['PageCount'] = requestParameters['pageCount'];
+        }
+
+        if (requestParameters['search'] != null) {
+            queryParameters['Search'] = requestParameters['search'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -185,10 +211,9 @@ export class PhotoApi extends runtime.BaseAPI implements PhotoApiInterface {
 
         const response = await this.request({
             path: urlPath,
-            method: 'POST',
+            method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-            body: PaginationToJSON(requestParameters['pagination']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => PhotoResponseDtoGenericListNewLevelResponseFromJSON(jsonValue));
@@ -196,14 +221,14 @@ export class PhotoApi extends runtime.BaseAPI implements PhotoApiInterface {
 
     /**
      */
-    async apiPhotoGetAllPhotosPost(requestParameters: ApiPhotoGetAllPhotosPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PhotoResponseDtoGenericListNewLevelResponse> {
-        const response = await this.apiPhotoGetAllPhotosPostRaw(requestParameters, initOverrides);
+    async apiPhotoGetAllPhotosGet(requestParameters: ApiPhotoGetAllPhotosGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PhotoResponseDtoGenericListNewLevelResponse> {
+        const response = await this.apiPhotoGetAllPhotosGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
      */
-    async apiPhotoGetPhotoToApprovePostRaw(requestParameters: ApiPhotoGetPhotoToApprovePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PhotoResponseDtoGenericListNewLevelResponse>> {
+    async apiPhotoGetPhotoToApproveGetRaw(requestParameters: ApiPhotoGetPhotoToApproveGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PhotoResponseDtoGenericListNewLevelResponse>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -223,7 +248,7 @@ export class PhotoApi extends runtime.BaseAPI implements PhotoApiInterface {
 
         const response = await this.request({
             path: urlPath,
-            method: 'POST',
+            method: 'GET',
             headers: headerParameters,
             query: queryParameters,
             body: PaginationToJSON(requestParameters['pagination']),
@@ -234,8 +259,8 @@ export class PhotoApi extends runtime.BaseAPI implements PhotoApiInterface {
 
     /**
      */
-    async apiPhotoGetPhotoToApprovePost(requestParameters: ApiPhotoGetPhotoToApprovePostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PhotoResponseDtoGenericListNewLevelResponse> {
-        const response = await this.apiPhotoGetPhotoToApprovePostRaw(requestParameters, initOverrides);
+    async apiPhotoGetPhotoToApproveGet(requestParameters: ApiPhotoGetPhotoToApproveGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PhotoResponseDtoGenericListNewLevelResponse> {
+        const response = await this.apiPhotoGetPhotoToApproveGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

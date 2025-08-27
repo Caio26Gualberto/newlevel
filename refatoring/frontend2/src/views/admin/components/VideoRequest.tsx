@@ -63,11 +63,12 @@ const VideoRequest = () => {
   const acceptVideo = async (id: number) => {
     setLoading(true);
     try {
-      const result = await mediaService.apiMediaApproveMediaGet({ 
-        mediaId: id, 
-        isApprove: true 
-      });
-
+      const result = await mediaService.apiMediaApproveMediaPatch({
+        approveMediaInput: {
+          mediaId: id,
+          isApproved: true
+        }
+      })
       if (result.isSuccess) {
         await searchMedia();
       } else {
@@ -83,11 +84,12 @@ const VideoRequest = () => {
   const rejectVideo = async (id: number) => {
     setLoading(true);
     try {
-      const result = await mediaService.apiMediaApproveMediaGet({ 
-        mediaId: id, 
-        isApprove: false 
-      });
-
+      const result = await mediaService.apiMediaApproveMediaPatch({
+        approveMediaInput: {
+          mediaId: id,
+          isApproved: false
+        }
+      })
       if (result.isSuccess) {
         await searchMedia();
       } else {

@@ -22,7 +22,7 @@ import {
   Lock,
 } from "@mui/icons-material";
 import { useNavigate, Link } from "react-router-dom";
-import { AuthenticateApi } from '../../gen/api/src';
+import { AuthApi } from '../../gen/api/src';
 import ApiConfiguration from '../../config/apiConfig';
 import Swal from 'sweetalert2';
 import toastr from 'toastr';
@@ -97,8 +97,8 @@ const useLogin = () => {
     setError(null);
 
     try {
-      const api = new AuthenticateApi(ApiConfiguration);
-      const result = await api.apiAuthenticateLoginPost({ 
+      const api = new AuthApi(ApiConfiguration);
+      const result = await api.apiAuthLoginPost({ 
         loginInputDto: { 
           email: form.email, 
           password: form.password 

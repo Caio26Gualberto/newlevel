@@ -73,7 +73,7 @@ const PhotoRequest = () => {
   const approvePhoto = async (id: number) => {
     setLoading(true);
     try {
-      const result = await photoService.apiPhotoApprovePhotoGet({ 
+      const result = await photoService.apiPhotoApprovePhotoPatch({ 
         photoId: id, 
         isApprove: true 
       });
@@ -93,7 +93,7 @@ const PhotoRequest = () => {
   const rejectPhoto = async (id: number) => {
     setLoading(true);
     try {
-      const result = await photoService.apiPhotoApprovePhotoGet({ 
+      const result = await photoService.apiPhotoApprovePhotoPatch({ 
         photoId: id, 
         isApprove: false 
       });
@@ -113,7 +113,7 @@ const PhotoRequest = () => {
   const getPhotosToApprove = async () => {
     setLoading(true);
     try {
-      const photos = await photoService.apiPhotoGetPhotoToApprovePost({
+      const photos = await photoService.apiPhotoGetPhotoToApproveGet({
         pagination: {
           page: pagination.page + 1,
           pageSize: pagination.pageSize,
