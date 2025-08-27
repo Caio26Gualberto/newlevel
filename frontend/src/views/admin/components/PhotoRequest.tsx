@@ -114,12 +114,10 @@ const PhotoRequest = () => {
     setLoading(true);
     try {
       const photos = await photoService.apiPhotoGetPhotoToApproveGet({
-        pagination: {
-          page: pagination.page + 1,
-          pageSize: pagination.pageSize,
-          pageCount: pagination.pageCount,
-          search: pagination.search,
-        }
+        page: pagination.page + 1,
+        pageSize: pagination.pageSize,
+        pageCount: pagination.pageCount,
+        search: pagination.search,
       });
 
       if (photos.isSuccess) {

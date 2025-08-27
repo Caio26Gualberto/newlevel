@@ -6,6 +6,7 @@ import Presentation from '../views/Presentation';
 import Videos from '../views/videos/Videos';
 import Navbar from '../components/layout/Navbar';
 import Photos from '../views/photos/Photos';
+import Events from '../views/events/Events';
 import Podcast from '../views/podcast/Podcast';
 import AboutMe from '../views/about/AboutMe';
 import MyVideos from '../views/my-content/MyVideos';
@@ -33,6 +34,7 @@ const Routes = () => {
           <Route path="/presentation" element={<Presentation />} />
           <Route path="/videos" element={<Videos />} />
           <Route path="/photos" element={<Photos />} />
+          <Route path="/events" element={<Events />} />
           <Route path="/podcasts" element={<Podcast />} />
           <Route path="/aboutMe" element={<AboutMe />} />
           <Route path="/myVideos" element={<MyVideos />} />

@@ -6,8 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using NewLevel.Application.Interfaces;
 using NewLevel.Application.Interfaces.Bands;
+using NewLevel.Application.Interfaces.Cache;
 using NewLevel.Application.Interfaces.Comments;
 using NewLevel.Application.Interfaces.Commons;
+using NewLevel.Application.Interfaces.Events;
 using NewLevel.Application.Interfaces.Github;
 using NewLevel.Application.Interfaces.Medias;
 using NewLevel.Application.Interfaces.Photos;
@@ -16,10 +18,12 @@ using NewLevel.Application.Interfaces.User;
 using NewLevel.Application.Services.Amazon;
 using NewLevel.Application.Services.Auth;
 using NewLevel.Application.Services.Bands;
+using NewLevel.Application.Services.Cache;
 using NewLevel.Application.Services.Comments;
 using NewLevel.Application.Services.Commons;
 using NewLevel.Application.Services.DomainUser;
 using NewLevel.Application.Services.Email;
+using NewLevel.Application.Services.Events;
 using NewLevel.Application.Services.Github;
 using NewLevel.Application.Services.Medias;
 using NewLevel.Application.Services.Photos;
@@ -61,6 +65,12 @@ namespace NewLevel.Infra.IoC
             var jwtSettings = configuration.GetSection("JWT");
             var secretKey = jwtSettings["SecretKey"] ?? "your-secret-key-here-make-it-long-enough";
 
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = configuration.GetConnectionString("Redis");
+                options.InstanceName = "NewLevel_";
+            });
+
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -96,7 +106,9 @@ namespace NewLevel.Infra.IoC
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<ICommonService, CommonService>();
             services.AddScoped<IMediaService, MediaService>();
+            services.AddScoped<IEventService, EventService>();
             services.AddScoped<ISeedService, SeedService>();
+            services.AddScoped<ICacheService, CacheService>();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
             // CORS Configuration

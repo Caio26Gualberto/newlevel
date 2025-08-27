@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NewLevel.Application.Interfaces.Bands;
+using NewLevel.Application.Services.Amazon;
 using NewLevel.Application.Utils.UserUtils;
 using NewLevel.Domain.Entities;
 using NewLevel.Domain.Interfaces.Repository;
@@ -12,11 +13,13 @@ namespace NewLevel.Application.Services.Bands
         private readonly IServiceProvider _serviceProvider;
         private readonly IRepository<Band> _repository;
         private readonly IRepository<BandsUsers> _bandsUsers;
-        public BandService(IServiceProvider serviceProvider, IRepository<Band> repository, IRepository<BandsUsers> bandsRepository)
+        private readonly AmazonS3Service _s3Service;
+        public BandService(IServiceProvider serviceProvider, IRepository<Band> repository, IRepository<BandsUsers> bandsRepository, AmazonS3Service s3Service)
         {
             _serviceProvider = serviceProvider;
             _repository = repository;
             _bandsUsers = bandsRepository;
+            _s3Service = s3Service;
         }
 
         public async Task<bool> RemoveMemberByUserId(int userId)
@@ -79,20 +82,26 @@ namespace NewLevel.Application.Services.Bands
                 throw new Exception("Banda não encontrada.");
             }
 
-            var members = await _bandsUsers.GetAll().Include(x => x.User).Where(x => x.BandId == band.Id).Select(x => new MemberInfoDto
+            var membersFromDb = await _bandsUsers.GetAll()
+                .Include(x => x.User)
+                .Where(x => x.BandId == band.Id)
+                .ToListAsync();
+
+            var members = await Task.WhenAll(membersFromDb.Select(async x => new MemberInfoDto
             {
                 UserId = x.UserId,
                 Name = x.User.Nickname,
-                AvatarURL = x.User.AvatarUrl,
+                AvatarURL = await _s3Service.GetOrGenerateAvatarPrivateUrl(x.User),
                 ProfileURL = $"http://localhost:3000/profile/{x.User.Nickname}/{x.User.Id}",
                 Instrument = x.User.Instrument
-            }).ToListAsync();
+            }));
 
+            var result = members.ToList();
             var removeBand = members.FirstOrDefault(x => x.Name == band.Name);
 
-            members.Remove(removeBand);
+            result.Remove(removeBand);
 
-            return members;
+            return result;
         }
     }
 }

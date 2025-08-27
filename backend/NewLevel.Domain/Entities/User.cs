@@ -9,15 +9,11 @@ namespace NewLevel.Domain.Entities
         public string Nickname { get; set; }
         public string Email { get; set; }
         public string? AvatarKey { get; set; }
-        public string? AvatarUrl { get; set; }
         public string? Instrument { get; set; }
         public string? BannerKey { get; set; }
-        public string? BannerUrl { get; set; }
         public EActivityLocation ActivityLocation { get; set; }
-        public bool IsFirstTimeLogin { get; set; }
+        public bool IsFirstTimeLogin { get; set; } = true;
         public bool IsVerified { get; set; } = false;
-        public DateTime? PublicTimerAvatar { get; set; }
-        public DateTime? PublicTimerBanner { get; set; }
         public int? BannerPosition { get; set; }
         [NotMapped]
         public Dictionary<string, string>? IssuesIds { get; set; } = new Dictionary<string, string>
@@ -41,5 +37,6 @@ namespace NewLevel.Domain.Entities
         public List<Photo> Photos { get; set; }
         public List<Comment> Comments { get; set; }
         public List<SystemNotification> SystemNotifications { get; set; }
+        public List<Event> OrganizedEvents { get; set; } = new List<Event>();
     }
 }

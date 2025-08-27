@@ -4,6 +4,7 @@
     {
         Avatars = 0,
         Photo = 1,
-        Banner = 2
+        Banner = 2,
+        EventBanner = 3
     }
 }

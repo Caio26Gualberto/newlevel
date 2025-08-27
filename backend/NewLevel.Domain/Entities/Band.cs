@@ -12,12 +12,13 @@ namespace NewLevel.Domain.Entities
         public string? SpotifyUrl { get; set; }
         public string? YoutubeUrl { get; set; }
         public string? InstagramUrl { get; set; }
-        public bool IsVerified { get; set; }
+        public bool IsVerified { get; set; } = false;
         public DateTime CreatedAt { get; set; }
         public List<EMusicGenres> MusicGenres { get; set; }
         [NotMapped]
         public Dictionary<string, string> Integrants { get; set; }
         public virtual List<BandsUsers> BandsUsers { get; set; }
+        public List<Event> Events { get; set; }
 
         public string IntegrantsSerialized
         {

@@ -16,14 +16,11 @@
 import * as runtime from '../runtime';
 import type {
   BooleanNewLevelResponse,
-  Pagination,
   PhotoResponseDtoGenericListNewLevelResponse,
 } from '../models/index';
 import {
     BooleanNewLevelResponseFromJSON,
     BooleanNewLevelResponseToJSON,
-    PaginationFromJSON,
-    PaginationToJSON,
     PhotoResponseDtoGenericListNewLevelResponseFromJSON,
     PhotoResponseDtoGenericListNewLevelResponseToJSON,
 } from '../models/index';
@@ -42,7 +39,11 @@ export interface ApiPhotoGetAllPhotosGetRequest {
 }
 
 export interface ApiPhotoGetPhotoToApproveGetRequest {
-    pagination?: Pagination;
+    page?: number;
+    pageSize?: number;
+    totalItems?: number;
+    pageCount?: number;
+    search?: string;
 }
 
 export interface ApiPhotoUploadPhotoPostRequest {
@@ -93,7 +94,11 @@ export interface PhotoApiInterface {
 
     /**
      * 
-     * @param {Pagination} [pagination] 
+     * @param {number} [page] 
+     * @param {number} [pageSize] 
+     * @param {number} [totalItems] 
+     * @param {number} [pageCount] 
+     * @param {string} [search] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PhotoApiInterface
@@ -231,9 +236,27 @@ export class PhotoApi extends runtime.BaseAPI implements PhotoApiInterface {
     async apiPhotoGetPhotoToApproveGetRaw(requestParameters: ApiPhotoGetPhotoToApproveGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PhotoResponseDtoGenericListNewLevelResponse>> {
         const queryParameters: any = {};
 
-        const headerParameters: runtime.HTTPHeaders = {};
+        if (requestParameters['page'] != null) {
+            queryParameters['Page'] = requestParameters['page'];
+        }
 
-        headerParameters['Content-Type'] = 'application/json';
+        if (requestParameters['pageSize'] != null) {
+            queryParameters['PageSize'] = requestParameters['pageSize'];
+        }
+
+        if (requestParameters['totalItems'] != null) {
+            queryParameters['TotalItems'] = requestParameters['totalItems'];
+        }
+
+        if (requestParameters['pageCount'] != null) {
+            queryParameters['PageCount'] = requestParameters['pageCount'];
+        }
+
+        if (requestParameters['search'] != null) {
+            queryParameters['Search'] = requestParameters['search'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -251,7 +274,6 @@ export class PhotoApi extends runtime.BaseAPI implements PhotoApiInterface {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-            body: PaginationToJSON(requestParameters['pagination']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => PhotoResponseDtoGenericListNewLevelResponseFromJSON(jsonValue));

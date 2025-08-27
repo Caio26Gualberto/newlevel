@@ -81,12 +81,14 @@ namespace NewLevel.Application.Services.Auth
 
         public async Task<RegisterResponseDto> BandRegister(RegisterInputDto input)
         {
-            var result = await _authService.RegisterUser(input.Email, input.Password, input.Nickname, input.ActivityLocation);
-            
+            var bandUser = await _authService.BandRegister(input.Email, input.Password, input.Nickname, input.Description, input.CreatedAt, input.MusicGenres, input.Integrants, 
+                input.ActivityLocation);
+
+
             return new RegisterResponseDto
             {
-                Result = result,
-                Message = result ? "Banda registrada com sucesso" : "Erro ao registrar banda"
+                Result = bandUser,
+                Message = bandUser ? "Banda registrada com sucesso" : "Erro ao registrar banda"
             };
         }
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NewLevel.Application.Interfaces.SystemNotification;
 using NewLevel.Application.Interfaces.User;
+using NewLevel.Application.Services.Amazon;
 using NewLevel.Application.Utils.UserUtils;
 using NewLevel.Domain.Entities;
 using NewLevel.Domain.Interfaces.Repository;
@@ -16,13 +17,15 @@ namespace NewLevel.Application.Services.SystemNotifications
         private readonly IRepository<SystemNotification> _repository;
         private readonly IRepository<BandsUsers> _bandUsers;
         private readonly IUserService _userService;
+        private readonly AmazonS3Service _s3Service;
         public SystemNotificationService(IServiceProvider serviceProvider, IRepository<SystemNotification> repository, IUserService userService, 
-            IRepository<BandsUsers> bandUsers)
+            IRepository<BandsUsers> bandUsers, AmazonS3Service s3Service)
         {
             _serviceProvider = serviceProvider;
             _repository = repository;
             _userService = userService;
             _bandUsers = bandUsers;
+            _s3Service = s3Service;
         }
 
         public async Task<bool> AcceptInvite(int notificationId)
@@ -35,18 +38,25 @@ namespace NewLevel.Application.Services.SystemNotifications
             var user = await UserUtils.GetCurrentUserAsync(_serviceProvider);
             var band = await _bandUsers.GetAll().Include(x => x.Band).Where(x => x.UserId == user.Id).Select(x => x.Band).FirstOrDefaultAsync();
 
-            var notifications = await _repository.GetAll()
+            var notificationsFromDb = await _repository.GetAll()
                 .Include(x => x.User)
                 .Where(x => x.Message.Contains(band.Name))
-                .Where(x => x.IsDeleted == false && x.IsRead == false).ToListAsync();
+                .Where(x => !x.IsDeleted && !x.IsRead)
+                .ToListAsync();
 
-            return notifications.Select(x => new PendingInvitesDto
+            var notifications = await Task.WhenAll(notificationsFromDb.Select(async x =>
             {
-                NotificationId = x.Id,
-                Name = x.User.Nickname,
-                AvatarURL = x.User.AvatarUrl,
-                Instrument = Regex.Match(x.Message, @"como\s(.*)").Groups[1].Value,
-            }).ToList();
+                var match = Regex.Match(x.Message, @"como\s(.*)");
+                return new PendingInvitesDto
+                {
+                    NotificationId = x.Id,
+                    Name = x.User.Nickname,
+                    AvatarURL = await _s3Service.GetOrGenerateAvatarPrivateUrl(x.User),
+                    Instrument = match.Success ? match.Groups[1].Value : string.Empty,
+                };
+            }));
+
+            return notifications.ToList();
         }
 
         public async Task<bool> DeclineInvite(int notificationId)

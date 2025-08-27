@@ -105,13 +105,11 @@ const VideoRequest = () => {
   const searchMedia = async () => {
     setLoading(true);
     try {
-      const result = await mediaService.apiMediaGetMediaToApprovePost({
-        pagination: {
-          page: pagination.page + 1,
-          pageSize: pagination.pageSize,
-          pageCount: pagination.pageCount,
-          search: "",
-        }
+      const result = await mediaService.apiMediaGetMediaToApproveGet({
+        page: pagination.page + 1,
+        pageSize: pagination.pageSize,
+        pageCount: pagination.pageCount,
+        search: pagination.search,
       });
 
       if (result.isSuccess) {

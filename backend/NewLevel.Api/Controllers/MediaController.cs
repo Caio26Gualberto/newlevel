@@ -106,8 +106,8 @@ namespace NewLevel.Api.Controllers
             }
         }
 
-        [HttpPost("GetMediaToApprove")]
-        public async Task<ActionResult<NewLevelResponse<GenericList<MediaDto>>>> GetMediaToApprove(Pagination input)
+        [HttpGet("GetMediaToApprove")]
+        public async Task<ActionResult<NewLevelResponse<GenericList<MediaDto>>>> GetMediaToApprove([FromQuery] Pagination input)
         {
             try
             {

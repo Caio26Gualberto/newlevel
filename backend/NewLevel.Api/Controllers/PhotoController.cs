@@ -55,7 +55,7 @@ namespace NewLevel.Api.Controllers
         }
 
         [HttpGet("GetPhotoToApprove")]
-        public async Task<ActionResult<NewLevelResponse<GenericList<PhotoResponseDto>>>> GetPhotoToApprove(Pagination input)
+        public async Task<ActionResult<NewLevelResponse<GenericList<PhotoResponseDto>>>> GetPhotoToApprove([FromQuery] Pagination input)
         {
             try
             {

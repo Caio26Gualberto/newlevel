@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NewLevel.Domain.Entities;
 using NewLevel.Infra.Data.Identity;
+using System.Reflection.Emit;
 
 namespace NewLevel.Infra.Data.Context
 {
@@ -74,6 +75,45 @@ namespace NewLevel.Infra.Data.Context
                 .HasMany(u => u.SystemNotifications)
                 .WithOne(n => n.User)
                 .HasForeignKey(n => n.UserId);
+
+            // Configuração do relacionamento eventos e bandas (muitos-para-muitos)
+            builder.Entity<Event>()
+             .HasMany(e => e.Bands)
+             .WithMany(b => b.Events)
+             .UsingEntity<Dictionary<string, object>>(
+                 "EventBands", // nome da tabela de junção
+                 j => j.HasOne<Band>()
+                       .WithMany()
+                       .HasForeignKey("BandId")
+                       .OnDelete(DeleteBehavior.Cascade),
+                 j => j.HasOne<Event>()
+                       .WithMany()
+                       .HasForeignKey("EventId")
+                       .OnDelete(DeleteBehavior.Cascade),
+                 j =>
+                 {
+                     j.HasKey("EventId", "BandId"); // chave composta
+                     j.ToTable("EventBands");       // nome explícito da tabela
+                 }
+             );
+
+            builder.Entity<Event>()
+                .HasMany(e => e.Photos)
+                .WithOne(p => p.Event)
+                .HasForeignKey(p => p.EventId)
+                .OnDelete(DeleteBehavior.Cascade); // se deletar evento, apaga fotos
+
+            builder.Entity<Event>()
+                .HasMany(e => e.Comments)
+                .WithOne(c => c.Event)
+                .HasForeignKey(c => c.EventId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Event>()
+                .HasOne(e => e.Organizer)
+                .WithMany(u => u.OrganizedEvents)
+                .HasForeignKey(e => e.OrganizerId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

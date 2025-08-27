@@ -18,11 +18,13 @@ namespace NewLevel.Application.Services.Photos
         private readonly IServiceProvider _serviceProvider;
         private readonly IConfiguration _configuration;
         private readonly IRepository<Photo> _repository;
-        public PhotoService(IServiceProvider serviceProvider, IConfiguration configuration, IRepository<Photo> repository)
+        private readonly AmazonS3Service _s3Service;
+        public PhotoService(IServiceProvider serviceProvider, IConfiguration configuration, IRepository<Photo> repository, AmazonS3Service s3Service)
         {
             _serviceProvider = serviceProvider;
             _configuration = configuration;
             _repository = repository;
+            _s3Service = s3Service;
         }
 
         public async Task<bool> ApprovePhoto(int photoId, bool isApprove)
@@ -55,50 +57,27 @@ namespace NewLevel.Application.Services.Photos
                 .WhereIf(!isForApprove, x => x.IsPublic)
                 .WhereIf(!string.IsNullOrEmpty(input.Search), photo => photo.Title.ToLower().Contains(input.Search.ToLower()) || photo.Title.ToLower() == input.Search.ToLower())
                 .OrderByDescending(photo => photo.CreationTime)
+                .Where(x => x.UserId != null)
                 .Skip(skip)
                 .Take(input.PageSize)
                 .ToListAsync();
 
             var response = new List<PhotoResponseDto>();
-            var s3 = new AmazonS3Service(_configuration);
 
             foreach (var photo in photos)
             {
-                if (photo.PublicTimer == null || photo.PublicTimer < DateTime.UtcNow.AddHours(-3))
+                response.Add(new PhotoResponseDto
                 {
-                    var url = await s3.CreateTempURLS3(photo.KeyS3, EAmazonFolderType.Photo);
-                    response.Add(new PhotoResponseDto
-                    {
-                        Id = photo.Id,
-                        Src = url,
-                        AvatarSrc = await GetOrGenerateAvatarPrivateUrl(photo),
-                        Title = photo.Title,
-                        Subtitle = photo.Subtitle,
-                        CaptureDate = photo.CaptureDate,
-                        Nickname = photo.User.Nickname,
-                        Description = photo.Description,
-                        UserId = photo.UserId
-                    });
-
-                    photo.PrivateURL = url;
-                    photo.PublicTimer = DateTime.Now.AddDays(2).AddHours(-3); 
-                    await _repository.UpdateAsync(photo);
-                }
-                else
-                {
-                    response.Add(new PhotoResponseDto
-                    {
-                        Id = photo.Id,
-                        Src = photo.PrivateURL,
-                        AvatarSrc = await GetOrGenerateAvatarPrivateUrl(photo),
-                        Title = photo.Title,
-                        Subtitle = photo.Subtitle,
-                        CaptureDate = photo.CaptureDate,
-                        Nickname = photo.User.Nickname,
-                        Description = photo.Description,
-                        UserId = photo.UserId
-                    });
-                }
+                    Id = photo.Id,
+                    Src = await _s3Service.GetOrGeneratePhotoPrivateUrl(photo),
+                    AvatarSrc = await _s3Service.GetOrGenerateAvatarPrivateUrl(photo.User),
+                    Title = photo.Title,
+                    Subtitle = photo.Subtitle,
+                    CaptureDate = photo.CaptureDate,
+                    Nickname = photo.User.Nickname,
+                    Description = photo.Description,
+                    UserId = (int)photo.UserId
+                });
             }
 
             return new GenericList<PhotoResponseDto>
@@ -116,8 +95,7 @@ namespace NewLevel.Application.Services.Photos
             if (user == null)
                 throw new Exception("Usuário não encontrado");
 
-            var s3 = new AmazonS3Service(_configuration);
-            var key = s3.CreateKey(EAmazonFolderType.Photo, file.Title);
+            var key = _s3Service.CreateKey(EAmazonFolderType.Photo, file.Title);
 
             Photo photo = new Photo             
             {
@@ -128,10 +106,8 @@ namespace NewLevel.Application.Services.Photos
                 UserId = user.Id,
                 CaptureDate = formattedDate
             };
-            await _repository.AddAsync(photo);
 
-
-            var awsResult = await s3.UploadFilesAsync(key, file.File, EAmazonFolderType.Photo);
+            var awsResult = await _s3Service.UploadFilesAsync(key, file.File, EAmazonFolderType.Photo);
 
             if (!awsResult)
                 throw new Exception("Erro ao adicionar imagem a nuvem, caso o problema persista entre em contato com o desenvolvedor");
@@ -139,25 +115,6 @@ namespace NewLevel.Application.Services.Photos
             await _repository.AddAsync(photo);
 
             return true;
-        }
-
-        private async Task<string> GetOrGenerateAvatarPrivateUrl(Photo photo)
-        {
-            if (photo.User.PublicTimerAvatar == null || photo.User.PublicTimerAvatar < DateTime.UtcNow.AddHours(-3))
-            {
-                var s3 = new AmazonS3Service(_configuration);
-                var url = await s3.CreateTempURLS3(photo.KeyS3, EAmazonFolderType.Photo);
-
-                photo.User.PublicTimerAvatar = DateTime.Now.AddDays(2).AddHours(-3);
-                photo.User.AvatarUrl = url;
-
-                await _repository.UpdateAsync(photo);
-                return url;
-            }
-            else
-            {
-                return photo.User.AvatarUrl!;
-            }
         }
     }
 }

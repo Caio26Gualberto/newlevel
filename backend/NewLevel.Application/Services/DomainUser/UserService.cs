@@ -27,8 +27,10 @@ namespace NewLevel.Application.Services.DomainUser
         private readonly IServiceProvider _serviceProvider;
         private readonly IConfiguration _configuration;
         private readonly AuthAppService _authService;
+        private readonly AmazonS3Service _s3Service;
         public UserService(IRepository<User> repository, IServiceProvider serviceProvider, IConfiguration configuration, IRepository<Band> bandRepository,
-            IRepository<BandsUsers> bandsUsersRepository, IRepository<SystemNotification> systemNotificationRepository, AuthAppService authenticateService)
+            IRepository<BandsUsers> bandsUsersRepository, IRepository<SystemNotification> systemNotificationRepository, AuthAppService authenticateService, 
+            AmazonS3Service s3Service)
         {
             _repository = repository;
             _serviceProvider = serviceProvider;
@@ -37,6 +39,7 @@ namespace NewLevel.Application.Services.DomainUser
             _bandsUsersRepository = bandsUsersRepository;
             _systemNotificationRepository = systemNotificationRepository;
             _authService = authenticateService;
+            _s3Service = s3Service;
         }
 
         public async Task<bool> DeleteAsync()
@@ -91,8 +94,8 @@ namespace NewLevel.Application.Services.DomainUser
                 Id = user.Id,
                 Nickname = user.Nickname,
                 Email = user.Email,
-                ProfilePicture = string.IsNullOrEmpty(user.AvatarUrl) ? null : await GetOrSetAvatarURL(user),
-                ProfileBanner = string.IsNullOrEmpty(user.BannerUrl) ? null : await GetOrSetBannerURL(user),
+                ProfilePicture = string.IsNullOrEmpty(user.AvatarKey) ? null : await _s3Service.GetOrGenerateAvatarPrivateUrl(user),
+                ProfileBanner = string.IsNullOrEmpty(user.BannerKey) ? null : await _s3Service.GetOrGenerateBannerPrivateUrl(user),
                 BannerPosition = user.BannerPosition
             };
         }
@@ -175,20 +178,21 @@ namespace NewLevel.Application.Services.DomainUser
 
             var lowerSearchTerm = nickname.ToLower();
 
-            var users = await _repository.GetAll()
+            var usersFromDb = await _repository.GetAll()
                 .Where(x => x.Id != user.Id)
                 .Where(u => u.Nickname.ToLower().Contains(lowerSearchTerm) ||
                             u.Email.ToLower().Contains(lowerSearchTerm))
                 .Take(10)
-                .Select(u => new SearchBarUserDetailDto
-                {
-                    UserId = u.Id,
-                    NickName = u.Nickname,
-                    AvatarUrl = u.AvatarUrl
-                })
                 .ToListAsync();
 
-            return users;
+            var users = await Task.WhenAll(usersFromDb.Select(async u => new SearchBarUserDetailDto
+            {
+                UserId = u.Id,
+                NickName = u.Nickname,
+                AvatarUrl = await _s3Service.GetOrGenerateAvatarPrivateUrl(u)
+            }));
+
+            return users.ToList();
         }
 
         public async Task<ProfileInfoDto> GetProfile(string nickname, int userId)
@@ -225,16 +229,49 @@ namespace NewLevel.Application.Services.DomainUser
                     .ToListAsync();
             }
 
+            var bannerUrl = await _s3Service.GetOrGenerateBannerPrivateUrl(searchedUser);
+            var avatarUrl = await _s3Service.GetOrGenerateAvatarPrivateUrl(searchedUser);
+
+            List<IntegrantInfoDto>? integrantsWithUrl = null;
+            if (searchedBand != null && integrants != null)
+            {
+                integrantsWithUrl = (await Task.WhenAll(integrants.Select(async integrant => new IntegrantInfoDto
+                {
+                    Name = integrant.Nickname,
+                    Instrument = integrant.Instrument,
+                    ProfileUrl = $"/profile/{integrant.Nickname}/{integrant.Id}",
+                    AvatarUrl = await _s3Service.GetOrGenerateAvatarPrivateUrl(integrant)
+                }))).ToList();
+            }
+
+            List<ProfileInfoPhotoDto>? profileInfoPhotos = null;
+            if (searchedUser?.Photos != null)
+            {
+                profileInfoPhotos = (await Task.WhenAll(searchedUser.Photos.Select(async photo => new ProfileInfoPhotoDto
+                {
+                    Id = photo.Id,
+                    Title = photo.Title,
+                    PhotoSrc = await _s3Service.GetOrGeneratePhotoPrivateUrl(photo)
+                }))).ToList();
+            }
+
+            var profileInfoVideos = searchedUser?.Medias?.Select(media => new ProfileInfoVideoDto
+            {
+                Id = media.Id,
+                MediaSrc = media.Src,
+                Title = media.Title,
+            }).ToList();
+
             return new ProfileInfoDto
             {
                 Name = searchedUser.Nickname,
                 Banner = new BannerInfos
                 {
                     Position = searchedUser.BannerPosition,
-                    URL = searchedUser.BannerUrl
+                    URL = bannerUrl
                 },
                 CityName = EnumHelper<EActivityLocation>.GetDisplayValue(searchedUser.ActivityLocation),
-                AvatarUrl = searchedUser.AvatarUrl,
+                AvatarUrl = avatarUrl,
                 IsEnabledToEdit = user.Id == searchedUser.Id,
                 Band = searchedBand == null ? null : new BandDto
                 {
@@ -246,60 +283,43 @@ namespace NewLevel.Application.Services.DomainUser
                     IsVerified = searchedBand.IsVerified,
                     MusicGenres = EnumHelper<EMusicGenres>.GetDisplayValues(searchedBand.MusicGenres),
                     Integrants = searchedBand.Integrants,
-                    IntegrantsWithUrl = integrants?.Select(integrant => new IntegrantInfoDto
-                    {
-                        Name = integrant.Nickname,
-                        Instrument = integrant.Instrument,
-                        ProfileUrl = $"/profile/{integrant.Nickname}/{integrant.Id}",
-                        AvatarUrl = integrant.AvatarUrl
-                    }).ToList()
+                    IntegrantsWithUrl = integrantsWithUrl
                 },
-                ProfileInfoPhotos = searchedUser?.Photos?.Select(photo => new ProfileInfoPhotoDto
-                {
-                    Id = photo.Id,
-                    Title = photo.Title,
-                    PhotoSrc = photo.PrivateURL
-                }).ToList(),
-                ProfileInfoVideos = searchedUser?.Medias?.Select(media => new ProfileInfoVideoDto
-                {
-                    Id = media.Id,
-                    MediaSrc = media.Src,
-                    Title = media.Title,
-                }).ToList()
+                ProfileInfoPhotos = profileInfoPhotos,
+                ProfileInfoVideos = profileInfoVideos
             };
-        }
 
+        }
+        
         public async Task<bool> UpdateUser(UpdateUserInput input)
         {
             User user = await UserUtils.GetCurrentUserAsync(_serviceProvider);
-            AmazonS3Service s3 = new AmazonS3Service(_configuration);
 
             if (input.File != null)
             {
-                var key = s3.CreateKey(EAmazonFolderType.Avatars, user.Id.ToString());
-                var isUploaded = await s3.UploadFilesAsync(key, input.File, EAmazonFolderType.Avatars);
+                var key = _s3Service.CreateKey(EAmazonFolderType.Avatars, user.Id.ToString());
+                var isUploaded = await _s3Service.UploadFilesAsync(key, input.File, EAmazonFolderType.Avatars);
 
                 if (!isUploaded)
                     throw new Exception("Erro ao adicionar imagem a nuvem, caso o problema persista entre em contato com o desenvolvedor");
 
                 if (!string.IsNullOrEmpty(user.AvatarKey))
                 {
-                    var fileDeleted = await s3.DeleteFileAsync(user.AvatarKey, EAmazonFolderType.Avatars);
+                    var fileDeleted = await _s3Service.DeleteFileAsync(user.AvatarKey, EAmazonFolderType.Avatars);
                     if (!fileDeleted)
                         throw new Exception("Erro ao deletar imagem antiga, caso o problema persista entre em contato com o desenvolvedor");
                 }
 
-                var url = await s3.CreateTempURLS3(key, EAmazonFolderType.Avatars);
+                user.AvatarKey = key;
+                await _s3Service.GetOrGenerateAvatarPrivateUrl(user);
 
                 PatchHelper.Patch(user, input);
-                user.PublicTimerAvatar = DateTime.Now.AddDays(2).AddHours(-3);
-                user.AvatarUrl = url;
             }
             else
             {
                 PatchHelper.Patch(user, input);
             }
-
+            user.UpdatedAt = DateTime.UtcNow.AddHours(-3);
             await _repository.UpdateAsync(user);
             return true;
 
@@ -308,16 +328,14 @@ namespace NewLevel.Application.Services.DomainUser
         public async Task<bool> UploadBannerImage(UploadImageInput input)
         {
             var user = await UserUtils.GetCurrentUserAsync(_serviceProvider);
-            AmazonS3Service s3 = new AmazonS3Service(_configuration);
 
             if (!string.IsNullOrEmpty(user.BannerKey))
             {
-                await s3.DeleteFileAsync(user.Id.ToString(), EAmazonFolderType.Banner);
+                await _s3Service.DeleteFileAsync(user.BannerKey, EAmazonFolderType.Banner);
             }
 
-            var key = s3.CreateKey(EAmazonFolderType.Banner, user.Id.ToString());
-            var result = await s3.UploadFilesAsync(key, input.File, EAmazonFolderType.Banner);
-            var url = await s3.CreateTempURLS3(key, EAmazonFolderType.Banner);
+            var key = _s3Service.CreateKey(EAmazonFolderType.Banner, user.Id.ToString());
+            var result = await _s3Service.UploadFilesAsync(key, input.File, EAmazonFolderType.Banner);
 
             if (!result)
             {
@@ -325,10 +343,10 @@ namespace NewLevel.Application.Services.DomainUser
             }
 
             user.BannerKey = key;
-            user.BannerUrl = url;
             user.BannerPosition = input.Position;
-            user.PublicTimerBanner = DateTime.Now.AddDays(2).AddHours(-3);
+            await _s3Service.GetOrGenerateBannerPrivateUrl(user);
 
+            user.UpdatedAt = DateTime.UtcNow.AddHours(-3);
             await _repository.UpdateAsync(user);
 
             return true;
@@ -338,10 +356,8 @@ namespace NewLevel.Application.Services.DomainUser
         {
             var user = await UserUtils.GetCurrentUserAsync(_serviceProvider);
 
-            AmazonS3Service s3 = new AmazonS3Service(_configuration);
-            var key = s3.CreateKey(EAmazonFolderType.Avatars, user.Id.ToString());
-            var result = await s3.UploadFilesAsync(key, input.File, EAmazonFolderType.Avatars);
-            var url = await s3.CreateTempURLS3(key, EAmazonFolderType.Avatars);
+            var key = _s3Service.CreateKey(EAmazonFolderType.Avatars, user.Id.ToString());
+            var result = await _s3Service.UploadFilesAsync(key, input.File, EAmazonFolderType.Avatars);
 
             if (!result)
             {
@@ -349,37 +365,11 @@ namespace NewLevel.Application.Services.DomainUser
             }
 
             user.AvatarKey = key;
-            user.AvatarUrl = url;
-            user.PublicTimerAvatar = DateTime.Now.AddDays(2).AddHours(-3);
+            await _s3Service.GetOrGenerateAvatarPrivateUrl(user);
+            user.UpdatedAt = DateTime.UtcNow.AddHours(-3);
             await _repository.UpdateAsync(user);
 
             return true;
-        }
-
-        private async Task<string> GetOrSetAvatarURL(User user)
-        {
-            if (user.PublicTimerAvatar == null || user.PublicTimerAvatar < DateTime.UtcNow.AddHours(-3))
-            {
-                AmazonS3Service s3 = new AmazonS3Service(_configuration);
-                string key = user.AvatarKey!;
-                var url = await s3.CreateTempURLS3(user.Id.ToString(), EAmazonFolderType.Avatars);
-                return url;
-            }
-
-            return user.AvatarUrl!;
-        }
-
-        private async Task<string> GetOrSetBannerURL(User user)
-        {
-            if (user.PublicTimerBanner == null || user.PublicTimerBanner < DateTime.UtcNow.AddHours(-3))
-            {
-                AmazonS3Service s3 = new AmazonS3Service(_configuration);
-                string key = user.BannerKey!;
-                var url = await s3.CreateTempURLS3(user.Id.ToString(), EAmazonFolderType.Avatars);
-                return url;
-            }
-
-            return user.BannerUrl!;
         }
 
         public async Task<bool> ChangePassword()

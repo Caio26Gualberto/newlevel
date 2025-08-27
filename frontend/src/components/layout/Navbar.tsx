@@ -25,6 +25,7 @@ import {
   Mail as MailIcon,
   Drafts as DraftsIcon,
   VideoLibrary,
+  Event as EventIcon,
   Photo,
   Podcasts,
   Info,
@@ -193,6 +194,7 @@ const Navbar = () => {
   const menuItems = [
     { text: 'Vídeos', path: '/videos', icon: <VideoLibrary /> },
     { text: 'Fotos', path: '/photos', icon: <Photo /> },
+    { text: 'Eventos', path: '/events', icon: <EventIcon /> },
     { text: 'Podcasts', path: '/podcasts', icon: <Podcasts /> },
     { text: 'Sobre mim', path: '/aboutMe', icon: <Info /> },
     { text: 'Loja Parceira', path: '/partnerStore', icon: <Store /> },

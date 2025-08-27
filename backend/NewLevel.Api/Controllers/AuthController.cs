@@ -51,19 +51,7 @@ namespace NewLevel.Api.Controllers
         {
             try
             {
-                var appInput = new RegisterInputDto
-                {
-                    Email = input.Email,
-                    Nickname = input.Nickname,
-                    Password = input.Password,
-                    ActivityLocation = input.ActivityLocation,
-                    MusicGenres = input.MusicGenres,
-                    Description = input.Description,
-                    CreatedAt = input.CreatedAt,
-                    Integrants = input.Integrants
-                };
-
-                var result = await _authAppService.Register(appInput);
+                var result = await _authAppService.Register(input);
 
                 return Ok(new NewLevelResponse<RegisterResponseDto>()
                 {
@@ -88,19 +76,7 @@ namespace NewLevel.Api.Controllers
         {
             try
             {
-                var appInput = new RegisterInputDto
-                {
-                    Email = input.Email,
-                    Nickname = input.Nickname,
-                    Password = input.Password,
-                    ActivityLocation = input.ActivityLocation,
-                    MusicGenres = input.MusicGenres,
-                    Description = input.Description,
-                    CreatedAt = input.CreatedAt,
-                    Integrants = input.Integrants
-                };
-
-                var result = await _authAppService.BandRegister(appInput);
+                var result = await _authAppService.BandRegister(input);
 
                 return Ok(new NewLevelResponse<RegisterResponseDto>()
                 {
@@ -211,14 +187,7 @@ namespace NewLevel.Api.Controllers
         {
             try
             {
-                var appRequest = new ResetPasswordRequestDto
-                {
-                    Email = request.Email,
-                    Token = request.Token,
-                    NewPassword = request.NewPassword
-                };
-
-                var result = await _authAppService.ResetPassword(appRequest);
+                var result = await _authAppService.ResetPassword(request);
 
                 return Ok(new NewLevelResponse<bool>
                 {

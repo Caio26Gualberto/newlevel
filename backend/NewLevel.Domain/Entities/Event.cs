@@ -10,12 +10,18 @@ namespace NewLevel.Domain.Entities
         public DateTime DateStart { get; set; }
         public DateTime? DateEnd { get; set; }
         public string Location { get; set; }
-        public string? bannerUrl { get; set; }
-        public int OrganizerId { get; set; }
+        public int? BannerPosition { get; set; }
+        public string? BannerKey { get; set; }
         public List<EMusicGenres> Genre { get; set; }
         public string? TicketsLink { get; set; }
         public decimal? Price { get; set; }
         public int? Capacity { get; set; }
         public EEventStatus EventStatus { get; set; }
+
+        public List<Band>? Bands { get; set; }
+        public List<Comment> Comments { get; set; } = new();
+        public List<Photo>? Photos { get; set; }
+        public int OrganizerId { get; set; }
+        public User Organizer { get; set; }
     }
 }

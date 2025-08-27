@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using NewLevel.Domain.Entities;
+using NewLevel.Domain.Enums.Band;
 using NewLevel.Domain.Enums.User;
 using NewLevel.Domain.Interfaces.Authenticate;
 using NewLevel.Infra.Data.Context;
@@ -64,7 +65,6 @@ namespace NewLevel.Infra.Data.Identity.AuthenticateService
                     return false;
                 }
 
-                await _signInManager.SignInAsync(applicationUser, isPersistent: false);
                 await transaction.CommitAsync();
 
                 return true;
@@ -196,6 +196,68 @@ namespace NewLevel.Infra.Data.Identity.AuthenticateService
             token.IsRevoked = true;
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<bool> BandRegister(string email, string password, string nickname, string description, DateTime createdAt, List<EMusicGenres> musicGenres,
+            Dictionary<string, string>? integrants, EActivityLocation activityLocation)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var user = new User
+                {
+                    Email = email,
+                    Nickname = nickname,
+                    ActivityLocation = activityLocation,
+                };
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                var applicationUser = new ApplicationUser
+                {
+                    UserName = email,
+                    Email = email,
+                    DomainUserId = user.Id
+                };
+
+                var result = await _userManager.CreateAsync(applicationUser, password);
+                var band = await _context.Bands.AddAsync(new Band
+                {
+                    Name = nickname,
+                    Description = description,
+                    CreatedAt = createdAt,
+                    Integrants = integrants,
+                    MusicGenres = musicGenres,
+                    Email = email,
+                });
+
+                await _context.SaveChangesAsync();
+
+                var bandUser = await _context.BandsUsers.AddAsync(new BandsUsers
+                {
+                    BandId = band.Entity.Id,
+                    UserId = user.Id,
+                    IsBand = true,
+                });
+
+                await _context.SaveChangesAsync();
+
+                if (!result.Succeeded)
+                {
+                    await transaction.RollbackAsync();
+                    return false;
+                }
+
+                await transaction.CommitAsync();
+
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
     }
 }

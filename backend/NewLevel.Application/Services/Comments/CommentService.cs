@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NewLevel.Application.Interfaces.Comments;
+using NewLevel.Application.Services.Amazon;
 using NewLevel.Application.Utils.UserUtils;
 using NewLevel.Domain.Entities;
 using NewLevel.Domain.Interfaces.Repository;
@@ -14,12 +15,15 @@ namespace NewLevel.Application.Services.Comments
         private readonly IRepository<Photo> _photoRepository;
         private readonly IRepository<Media> _mediaRepository;
         private readonly IServiceProvider _serviceProvider;
-        public CommentService(IRepository<Comment> repository, IRepository<Photo> photoRepository, IRepository<Media> mediaRepository, IServiceProvider serviceProvider)
+        private readonly AmazonS3Service _s3Service;
+        public CommentService(IRepository<Comment> repository, IRepository<Photo> photoRepository, IRepository<Media> mediaRepository, IServiceProvider serviceProvider,
+            AmazonS3Service s3Service)
         {
             _repository = repository;
             _photoRepository = photoRepository;
             _mediaRepository = mediaRepository;
             _serviceProvider = serviceProvider;
+            _s3Service = s3Service;
         }
 
         public async Task<bool> SaveComment(ReceiveCommentDto input)
@@ -43,24 +47,23 @@ namespace NewLevel.Application.Services.Comments
 
             var media = await _mediaRepository.FirstOrDefaultAsync(x => x.Id == mediaId);
 
-            var comments = await _repository.GetAll()
-                .Include(x => x.User)
-                .Where(x => x.MediaId == mediaId)
-                .OrderByDescending(photo => photo.CreationTime)
-                .Skip(skip)
-                .Take(pagination.PageSize)
+            var commentsFromDb = await _repository.GetAll()
+                .Include(c => c.User)
+                .Where(c => c.MediaId == media.Id)
                 .ToListAsync();
+
+            var commentDtos = await Task.WhenAll(commentsFromDb.Select(async x => new CommentsListDto
+            {
+                Comment = x.Text,
+                DateOfComment = x.CreationTime,
+                UserAvatarSrc = await _s3Service.GetOrGenerateAvatarPrivateUrl(x.User),
+                UserName = x.User.Nickname
+            }));
 
             return new CommentsPhotoResponseDto
             {
                 Title = media.Title,
-                Comments = comments.Select(x => new CommentsListDto
-                {
-                    Comment = x.Text,
-                    DateOfComment = x.CreationTime,
-                    UserAvatarSrc = x.User.AvatarUrl,
-                    UserName = x.User.Nickname
-                }).ToList()
+                Comments = commentDtos.ToList()
             };
         }
 
@@ -78,17 +81,20 @@ namespace NewLevel.Application.Services.Comments
                 .Take(pagination.PageSize)
                 .ToListAsync();
 
+            var commentsDto = await Task.WhenAll(comments.Select(async x => new CommentsListDto
+            {
+                Comment = x.Text,
+                DateOfComment = x.CreationTime,
+                UserAvatarSrc = await _s3Service.GetOrGenerateAvatarPrivateUrl(x.User),
+                UserName = x.User.Nickname
+            }));
+
             return new CommentsPhotoResponseDto
             {
                 Title = photo.Title,
-                Comments = comments.Select(x => new CommentsListDto
-                {
-                    Comment = x.Text,
-                    DateOfComment = x.CreationTime,
-                    UserAvatarSrc = x.User.AvatarUrl,
-                    UserName = x.User.Nickname
-                }).ToList()
+                Comments = commentsDto.ToList()
             };
+
         }
     }
 }

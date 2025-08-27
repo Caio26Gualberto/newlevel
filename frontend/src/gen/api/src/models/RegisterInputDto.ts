@@ -75,7 +75,7 @@ export interface RegisterInputDto {
      * @type {Date}
      * @memberof RegisterInputDto
      */
-    createdAt?: Date | null;
+    createdAt?: Date;
     /**
      * 
      * @type {{ [key: string]: string; }}
@@ -131,7 +131,7 @@ export function RegisterInputDtoToJSONTyped(value?: RegisterInputDto | null, ign
         'activityLocation': EActivityLocationToJSON(value['activityLocation']),
         'musicGenres': value['musicGenres'] == null ? undefined : ((value['musicGenres'] as Array<any>).map(EMusicGenresToJSON)),
         'description': value['description'],
-        'createdAt': value['createdAt'] === null ? null : ((value['createdAt'] as any)?.toISOString()),
+        'createdAt': value['createdAt'] == null ? undefined : ((value['createdAt']).toISOString()),
         'integrants': value['integrants'],
     };
 }
