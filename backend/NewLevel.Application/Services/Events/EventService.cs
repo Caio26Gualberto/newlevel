@@ -25,6 +25,28 @@ namespace NewLevel.Application.Services.Events
             _s3Service = amazonService;
         }
 
+        public async Task<bool> DeleteEvent(int id)
+        {
+            var @event = await _repository.FirstOrDefaultAsync(x => x.Id == id);
+            if (@event == null)
+                throw new Exception("Evento não encontrado, se o problema persistir entre em contato com o desenvolvedor");
+
+            if (@event.Photos != null && @event.Photos.Any())
+            {
+                foreach (var photo in @event.Photos)
+                {
+                    await _s3Service.DeleteFileAsync(photo.KeyS3, EAmazonFolderType.Photo);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(@event.BannerKey))
+                await _s3Service.DeleteFileAsync(@event.BannerKey, EAmazonFolderType.EventBanner);
+
+            await _repository.DeleteAsync(@event);
+
+            return true;
+        }
+
         public async Task<bool> CreateEvent(CreateEventInput input)
         {
             var user = await UserUtils.GetCurrentUserAsync(_serviceProvider);

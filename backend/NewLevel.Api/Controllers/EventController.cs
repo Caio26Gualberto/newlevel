@@ -75,5 +75,27 @@ namespace NewLevel.Api.Controllers
             }
         }
 
+        [HttpDelete("DeleteEvent")]
+        public async Task<ActionResult<NewLevelResponse<bool>>> DeleteEvent(int id)
+        {
+            try
+            {
+                var result = await _eventService.DeleteEvent(id);
+                return Ok(new NewLevelResponse<bool>
+                {
+                    IsSuccess = true,
+                    Message = "Evento deletado"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<bool>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                });
+            }
+        }
+
     }
 }

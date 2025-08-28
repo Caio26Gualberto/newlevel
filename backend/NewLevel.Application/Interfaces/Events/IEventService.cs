@@ -7,5 +7,6 @@ namespace NewLevel.Application.Interfaces.Events
     {
         public Task<bool> CreateEvent(CreateEventInput input);
         public Task<GenericList<EventResponseDto>> GetAllEvents(Pagination input);
+        public Task<bool> DeleteEvent(int id);
     }
 }

@@ -46,7 +46,7 @@ import AddEventModal from "../../components/modals/AddEventModal";
 import * as toastr from 'toastr';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { EventApi, EventResponseDto, EventResponseDtoGenericList } from "../../gen/api/src";
+import { CommonApi, EventApi, EventResponseDto, EventResponseDtoGenericList, SelectOptionDto } from "../../gen/api/src";
 import ApiConfiguration from "../../config/apiConfig";
 
 const Events = () => {
@@ -54,11 +54,13 @@ const Events = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const eventService = new EventApi(ApiConfiguration);
+  const commonService = new CommonApi(ApiConfiguration);
 
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [events, setEvents] = useState<EventResponseDtoGenericList>({ items: [], totalCount: 0 });
   const [loading, setLoading] = useState<boolean>(false);
   const [fadeIn, setFadeIn] = useState(false);
+  const [genres, setGenres] = useState<SelectOptionDto[]>([]);
   const [descriptionModal, setDescriptionModal] = useState<{ open: boolean; title: string; description: string }>({ open: false, title: '', description: '' });
   const [pagination, setPagination] = useState({
     page: 1,
@@ -84,6 +86,30 @@ const Events = () => {
     getEvents();
   };
 
+  const getGenres = async () => {
+    setLoading(true);
+    try {
+      const result = await commonService.apiCommonGetDisplayMusicGenresGet();
+      if (result.isSuccess) {
+        setGenres(result.data!);
+      } else {
+        toastr.error(result.message!, 'Erro!', { 
+          timeOut: 3000, 
+          progressBar: true, 
+          positionClass: "toast-bottom-right" 
+        });
+      }
+    } catch (error) {
+      toastr.error('Erro ao carregar gêneros', 'Erro!', { 
+        timeOut: 3000, 
+        progressBar: true, 
+        positionClass: "toast-bottom-right" 
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const getEvents = async () => {
     setLoading(true);
     try {
@@ -94,10 +120,10 @@ const Events = () => {
         search: pagination.search
       });
 
-      if (result.isSuccess) {
-        setEvents(result.data!);
-        return; // retorna para não sobrescrever com mock
-      }
+      // if (result.isSuccess) {
+      //   setEvents(result.data!);
+      //   return; // retorna para não sobrescrever com mock
+      // }
 
       // Se a API falhar ou não retornar sucesso, você pode usar mockEvents
       const mockEvents: EventResponseDto[] = [
@@ -220,30 +246,15 @@ const Events = () => {
     setDescriptionModal({ open: true, title, description });
   };
 
-  const getGenreNames = (genreIds?: number[]): string[] => {
-    if (!genreIds || genreIds.length === 0) return [];
-
-    const genreMap: { [key: number]: string } = {
-      1: 'Rock',
-      2: 'Metal',
-      3: 'Heavy Metal',
-      4: 'Pop',
-      5: 'Jazz',
-      6: 'Blues',
-      7: 'Country',
-      8: 'Eletrônica',
-      9: 'Reggae',
-      10: 'Hip Hop'
-    };
-
-    return genreIds.map(id => genreMap[id] || 'Desconhecido').filter(Boolean);
-  };
-
   const totalPages = Math.ceil((events.totalCount || 0) / pagination.pageSize);
 
   useEffect(() => {
     getEvents();
   }, [pagination.page]);
+
+  useEffect(() => {
+    getGenres();
+  }, []);
 
   const renderEventSkeleton = () => (
     <Grid item xs={12} md={6} lg={6}>
@@ -484,10 +495,10 @@ const Events = () => {
                                 </Typography>
                               </Stack>
                               <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                                {getGenreNames(event.genre).map((genre, index) => (
+                                {event.genre.map((genre, index) => (
                                   <Chip
                                     key={index}
-                                    label={genre}
+                                    label={genres.find(g => g.value === genre)?.name || genre}
                                     size="small"
                                     color="primary"
                                     variant="outlined"

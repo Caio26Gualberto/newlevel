@@ -512,20 +512,6 @@ const AddEventModal: React.FC<AddEventModalProps> = ({ open, onClose }) => {
                   </Select>
                 </FormControl>
               </Grid>
-
-              <Grid item xs={12}>
-                <FormControl fullWidth disabled={loading}>
-                  <InputLabel>Status do Evento</InputLabel>
-                  <Select
-                    value={form.eventStatus || EEventStatus.Draft}
-                    onChange={handleSelectChange('eventStatus')}
-                    label="Status do Evento"
-                  >
-                    <MenuItem value={EEventStatus.Draft}>Rascunho</MenuItem>
-                    <MenuItem value={EEventStatus.Published}>Publicado</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
             </Grid>
           </Box>
 
