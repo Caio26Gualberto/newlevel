@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using NewLevel.Application.Interfaces;
 using NewLevel.Application.Interfaces.Bands;
+using NewLevel.Application.Interfaces.BandVerificationRequests;
 using NewLevel.Application.Interfaces.Cache;
 using NewLevel.Application.Interfaces.Comments;
 using NewLevel.Application.Interfaces.Commons;
@@ -18,6 +19,7 @@ using NewLevel.Application.Interfaces.User;
 using NewLevel.Application.Services.Amazon;
 using NewLevel.Application.Services.Auth;
 using NewLevel.Application.Services.Bands;
+using NewLevel.Application.Services.BandVerificationRequests;
 using NewLevel.Application.Services.Cache;
 using NewLevel.Application.Services.Comments;
 using NewLevel.Application.Services.Commons;
@@ -57,6 +59,7 @@ namespace NewLevel.Infra.IoC
                 options.Password.RequireUppercase = false;
                 options.Password.RequireLowercase = false;
                 options.User.RequireUniqueEmail = true;
+                //options.SignIn.RequireConfirmedEmail = true; // TODO Em produção , habilitar confirmação de email
             })
             .AddEntityFrameworkStores<NewLevelDbContext>()
             .AddDefaultTokenProviders();
@@ -108,6 +111,7 @@ namespace NewLevel.Infra.IoC
             services.AddScoped<IMediaService, MediaService>();
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<ISeedService, SeedService>();
+            services.AddScoped<IBandVerificationService, BandVerificationService>();
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 

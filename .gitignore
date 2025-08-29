@@ -367,3 +367,5 @@ FodyWeavers.xsd
 /backend/NewLevel.Tests/appsettings.Development.json
 /refatoring2/backend2/NewLevel.Api/appsettings.json
 /backend/NewLevel.Api/appsettings.json
+/backend/NewLevel.Api/appsettings.Dev.json
+/backend/NewLevel.Api/appsettings.Prod.json

@@ -73,7 +73,7 @@ const MyPhotos = () => {
           id: photo.id?.toString() || '',
           title: photo.title || '',
           imageUrl: photo.src || '/api/placeholder/300/200',
-          createdAt: photo.takeAt ? new Date(photo.takeAt).toISOString().split('T')[0] : ''
+          createdAt: photo.captureDate ? new Date(photo.captureDate).toISOString().split('T')[0] : ''
         }));
         setPhotos(userPhotos);
       } else {

@@ -71,6 +71,16 @@ namespace NewLevel.Application.Services.DomainUser
 
                     notification.IsRead = true;
                     await _systemNotificationRepository.UpdateAsync(notification);
+                    user.Instrument = instrument;
+                    await _repository.UpdateAsync(user);
+
+                    await _systemNotificationRepository.AddAsync(new SystemNotification
+                    {
+                        Title = "Convite aceito",
+                        Message = $"{user.Nickname} aceitou seu convite para tocar na banda {band.Band.Name}",
+                        SystemNotificationType = ESystemNotificationType.Simple,
+                        UserId = band.UserId
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -78,7 +88,7 @@ namespace NewLevel.Application.Services.DomainUser
                 }
             }
 
-            return false;
+            return true;
         }
 
         public async Task<UserInfoResponseDto> GetUserInfo()
@@ -138,6 +148,9 @@ namespace NewLevel.Application.Services.DomainUser
                             .Where(x => x.UserId == user.Id)
                             .Select(x => x.Band)
                             .FirstOrDefaultAsync();
+
+                if (band == null)
+                    throw new Exception("Você não possui uma banda para convidar membros");
 
                 bool notificationExists = await _systemNotificationRepository.GetAll()
                                         .AnyAsync(n => n.UserId == input.UserInvited.UserId

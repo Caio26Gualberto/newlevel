@@ -2,6 +2,7 @@
 /* eslint-disable */
 export * from './AuthApi';
 export * from './BandApi';
+export * from './BandVerificationApi';
 export * from './CommentApi';
 export * from './CommonApi';
 export * from './EventApi';

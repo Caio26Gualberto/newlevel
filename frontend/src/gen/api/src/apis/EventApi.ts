@@ -18,6 +18,7 @@ import type {
   BooleanNewLevelResponse,
   EMusicGenres,
   EventResponseDtoGenericListNewLevelResponse,
+  EventResponseDtoNewLevelResponse,
 } from '../models/index';
 import {
     BooleanNewLevelResponseFromJSON,
@@ -26,6 +27,8 @@ import {
     EMusicGenresToJSON,
     EventResponseDtoGenericListNewLevelResponseFromJSON,
     EventResponseDtoGenericListNewLevelResponseToJSON,
+    EventResponseDtoNewLevelResponseFromJSON,
+    EventResponseDtoNewLevelResponseToJSON,
 } from '../models/index';
 
 export interface ApiEventCreateEventPostRequest {
@@ -43,12 +46,37 @@ export interface ApiEventCreateEventPostRequest {
     photos?: Array<Blob>;
 }
 
+export interface ApiEventDeleteEventDeleteRequest {
+    id?: number;
+}
+
+export interface ApiEventGetRequest {
+    eventId?: number;
+}
+
 export interface ApiEventGetAllGetRequest {
     page?: number;
     pageSize?: number;
     totalItems?: number;
     pageCount?: number;
     search?: string;
+}
+
+export interface ApiEventUpdateEventPutRequest {
+    eventId?: number;
+    photosToDeleteId?: Array<number>;
+    title?: string;
+    description?: string;
+    location?: string;
+    startTime?: Date;
+    endTime?: Date;
+    price?: number;
+    capacity?: number;
+    ticketLink?: string;
+    genres?: Array<EMusicGenres>;
+    bannerPosition?: number;
+    banner?: Blob;
+    photos?: Array<Blob>;
 }
 
 /**
@@ -84,6 +112,32 @@ export interface EventApiInterface {
 
     /**
      * 
+     * @param {number} [id] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof EventApiInterface
+     */
+    apiEventDeleteEventDeleteRaw(requestParameters: ApiEventDeleteEventDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
+
+    /**
+     */
+    apiEventDeleteEventDelete(requestParameters: ApiEventDeleteEventDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
+
+    /**
+     * 
+     * @param {number} [eventId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof EventApiInterface
+     */
+    apiEventGetRaw(requestParameters: ApiEventGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EventResponseDtoNewLevelResponse>>;
+
+    /**
+     */
+    apiEventGet(requestParameters: ApiEventGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EventResponseDtoNewLevelResponse>;
+
+    /**
+     * 
      * @param {number} [page] 
      * @param {number} [pageSize] 
      * @param {number} [totalItems] 
@@ -98,6 +152,32 @@ export interface EventApiInterface {
     /**
      */
     apiEventGetAllGet(requestParameters: ApiEventGetAllGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EventResponseDtoGenericListNewLevelResponse>;
+
+    /**
+     * 
+     * @param {number} [eventId] 
+     * @param {Array<number>} [photosToDeleteId] 
+     * @param {string} [title] 
+     * @param {string} [description] 
+     * @param {string} [location] 
+     * @param {Date} [startTime] 
+     * @param {Date} [endTime] 
+     * @param {number} [price] 
+     * @param {number} [capacity] 
+     * @param {string} [ticketLink] 
+     * @param {Array<EMusicGenres>} [genres] 
+     * @param {number} [bannerPosition] 
+     * @param {Blob} [banner] 
+     * @param {Array<Blob>} [photos] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof EventApiInterface
+     */
+    apiEventUpdateEventPutRaw(requestParameters: ApiEventUpdateEventPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
+
+    /**
+     */
+    apiEventUpdateEventPut(requestParameters: ApiEventUpdateEventPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
 
 }
 
@@ -212,6 +292,84 @@ export class EventApi extends runtime.BaseAPI implements EventApiInterface {
 
     /**
      */
+    async apiEventDeleteEventDeleteRaw(requestParameters: ApiEventDeleteEventDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['id'] != null) {
+            queryParameters['id'] = requestParameters['id'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/Event/DeleteEvent`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiEventDeleteEventDelete(requestParameters: ApiEventDeleteEventDeleteRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiEventDeleteEventDeleteRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiEventGetRaw(requestParameters: ApiEventGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EventResponseDtoNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['eventId'] != null) {
+            queryParameters['eventId'] = requestParameters['eventId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/Event`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EventResponseDtoNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiEventGet(requestParameters: ApiEventGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EventResponseDtoNewLevelResponse> {
+        const response = await this.apiEventGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
     async apiEventGetAllGetRaw(requestParameters: ApiEventGetAllGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EventResponseDtoGenericListNewLevelResponse>> {
         const queryParameters: any = {};
 
@@ -262,6 +420,118 @@ export class EventApi extends runtime.BaseAPI implements EventApiInterface {
      */
     async apiEventGetAllGet(requestParameters: ApiEventGetAllGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EventResponseDtoGenericListNewLevelResponse> {
         const response = await this.apiEventGetAllGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiEventUpdateEventPutRaw(requestParameters: ApiEventUpdateEventPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['eventId'] != null) {
+            queryParameters['EventId'] = requestParameters['eventId'];
+        }
+
+        if (requestParameters['photosToDeleteId'] != null) {
+            queryParameters['PhotosToDeleteId'] = requestParameters['photosToDeleteId'];
+        }
+
+        if (requestParameters['title'] != null) {
+            queryParameters['Title'] = requestParameters['title'];
+        }
+
+        if (requestParameters['description'] != null) {
+            queryParameters['Description'] = requestParameters['description'];
+        }
+
+        if (requestParameters['location'] != null) {
+            queryParameters['Location'] = requestParameters['location'];
+        }
+
+        if (requestParameters['startTime'] != null) {
+            queryParameters['StartTime'] = (requestParameters['startTime'] as any).toISOString();
+        }
+
+        if (requestParameters['endTime'] != null) {
+            queryParameters['EndTime'] = (requestParameters['endTime'] as any).toISOString();
+        }
+
+        if (requestParameters['price'] != null) {
+            queryParameters['Price'] = requestParameters['price'];
+        }
+
+        if (requestParameters['capacity'] != null) {
+            queryParameters['Capacity'] = requestParameters['capacity'];
+        }
+
+        if (requestParameters['ticketLink'] != null) {
+            queryParameters['TicketLink'] = requestParameters['ticketLink'];
+        }
+
+        if (requestParameters['genres'] != null) {
+            queryParameters['Genres'] = requestParameters['genres'];
+        }
+
+        if (requestParameters['bannerPosition'] != null) {
+            queryParameters['BannerPosition'] = requestParameters['bannerPosition'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['banner'] != null) {
+            formParams.append('Banner', requestParameters['banner'] as any);
+        }
+
+        if (requestParameters['photos'] != null) {
+            requestParameters['photos'].forEach((element) => {
+                formParams.append('Photos', element as any);
+            })
+        }
+
+
+        let urlPath = `/api/Event/UpdateEvent`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiEventUpdateEventPut(requestParameters: ApiEventUpdateEventPutRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiEventUpdateEventPutRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

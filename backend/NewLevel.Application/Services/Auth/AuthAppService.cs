@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NewLevel.Application.Interfaces;
+using NewLevel.Application.Services.Amazon;
 using NewLevel.Domain.Entities;
 using NewLevel.Domain.Interfaces.Authenticate;
 using NewLevel.Domain.Interfaces.Repository;
@@ -13,14 +14,21 @@ namespace NewLevel.Application.Services.Auth
         private readonly IEmailService _emailService;
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<BandsUsers> _bandsUsersRepository;
+        private readonly AmazonS3Service _s3Service;
 
         public AuthAppService(IAuthenticateService authenticateService, IEmailService emailService, IRepository<User> userRepository, 
-            IRepository<BandsUsers> bandsUsersRepository)
+            IRepository<BandsUsers> bandsUsersRepository, AmazonS3Service amazonS3Service)
         {
             _authService = authenticateService;
             _emailService = emailService;
             _userRepository = userRepository;
             _bandsUsersRepository = bandsUsersRepository;
+            _s3Service = amazonS3Service;
+        }
+
+        public async Task<bool> ConfirmEmail(string userId, string token)
+        {
+            return await _authService.ConfirmEmail(userId, token);
         }
 
         public async Task<LoginResponseDto> Authenticate(string email, string password)
@@ -40,7 +48,7 @@ namespace NewLevel.Application.Services.Auth
             var user = await _userRepository.FirstOrDefaultAsync(x => x.Email == email);
 
             // Generate JWT tokens
-            var accessToken = await _authService.GenerateJwtToken(email);
+            var accessToken = await _authService.GenerateJwtToken(email, await _s3Service.GetOrGenerateAvatarPrivateUrl(user));
             var refreshToken = await _authService.GenerateRefreshToken();
             
             // Save refresh token
@@ -61,9 +69,11 @@ namespace NewLevel.Application.Services.Auth
 
         public async Task<RegisterResponseDto> Register(RegisterInputDto input)
         {
-            var result = await _authService.RegisterUser(input.Email, input.Password, input.Nickname, input.ActivityLocation);
-            
-            if (!result)
+            var (token, userId, email) = await _authService.RegisterUser(input.Email, input.Password, input.Nickname, input.ActivityLocation);
+
+            //await _emailService.SendEmailVerificationRequest(token, userId, email); // TODO Descomentar em produção
+
+            if (string.IsNullOrEmpty(token))
             {
                 return new RegisterResponseDto
                 {
@@ -81,14 +91,15 @@ namespace NewLevel.Application.Services.Auth
 
         public async Task<RegisterResponseDto> BandRegister(RegisterInputDto input)
         {
-            var bandUser = await _authService.BandRegister(input.Email, input.Password, input.Nickname, input.Description, input.CreatedAt, input.MusicGenres, input.Integrants, 
+            var (token, bandId, email) = await _authService.BandRegister(input.Email, input.Password, input.Nickname, input.Description, input.CreatedAt, input.MusicGenres, input.Integrants, 
                 input.ActivityLocation);
 
+            //await _emailService.SendEmailVerificationRequest(token, bandId, email); // TODO Descomentar em produção
 
             return new RegisterResponseDto
             {
-                Result = bandUser,
-                Message = bandUser ? "Banda registrada com sucesso" : "Erro ao registrar banda"
+                BandId = bandId,
+                Message = bandId > 0 ? "Banda registrada com sucesso" : "Erro ao registrar banda"
             };
         }
 

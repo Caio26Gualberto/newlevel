@@ -110,15 +110,30 @@ const themeOptions: ThemeOptions = {
           textTransform: 'none',
           fontWeight: 500,
           padding: '8px 16px',
+          transition: 'all 1s ease-in-out',
           '@media (max-width:600px)': {
             padding: '6px 12px',
             fontSize: '0.875rem',
           },
+          '&:disabled': {
+            backgroundColor: 'transparent !important',
+            color: 'rgba(255, 255, 255, 0.3) !important',
+            border: '1px solid rgba(255, 255, 255, 0.12) !important',
+            boxShadow: 'none !important',
+            opacity: 0.6,
+            transition: 'all 0.4s ease-in-out',
+          },
         },
         contained: {
           boxShadow: '0 2px 8px rgba(211, 47, 47, 0.3)',
+          background: 'linear-gradient(45deg, #d32f2f 30%, #ff6b6b 90%)',
           '&:hover': {
             boxShadow: '0 4px 12px rgba(211, 47, 47, 0.4)',
+            background: 'linear-gradient(45deg, #b71c1c 30%, #d32f2f 90%)',
+            transform: 'translateY(-1px)',
+          },
+          '&:not(:disabled)': {
+            animation: 'fadeInButton 0.4s ease-in-out',
           },
         },
       },

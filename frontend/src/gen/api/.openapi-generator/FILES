@@ -5,6 +5,7 @@ README.md
 package.json
 src/apis/AuthApi.ts
 src/apis/BandApi.ts
+src/apis/BandVerificationApi.ts
 src/apis/CommentApi.ts
 src/apis/CommonApi.ts
 src/apis/EventApi.ts
@@ -18,6 +19,7 @@ src/models/ApproveMediaInput.ts
 src/models/BandDto.ts
 src/models/BandInfoByUser.ts
 src/models/BandInfoByUserNewLevelResponse.ts
+src/models/BandVerificationInput.ts
 src/models/BannerInfos.ts
 src/models/BooleanNewLevelResponse.ts
 src/models/CommentsListDto.ts
@@ -32,6 +34,7 @@ src/models/ESystemNotificationType.ts
 src/models/EventResponseDto.ts
 src/models/EventResponseDtoGenericList.ts
 src/models/EventResponseDtoGenericListNewLevelResponse.ts
+src/models/EventResponseDtoNewLevelResponse.ts
 src/models/ForgotPasswordRequestDto.ts
 src/models/GeneralNotificationInfoDto.ts
 src/models/GeneralNotificationInfoDtoNewLevelResponse.ts
@@ -49,7 +52,6 @@ src/models/MediaDtoGenericListNewLevelResponse.ts
 src/models/MemberInfoDto.ts
 src/models/MemberInfoDtoListNewLevelResponse.ts
 src/models/NotificationDto.ts
-src/models/Pagination.ts
 src/models/PendingInvitesDto.ts
 src/models/PendingInvitesDtoListNewLevelResponse.ts
 src/models/PhotoResponseDto.ts

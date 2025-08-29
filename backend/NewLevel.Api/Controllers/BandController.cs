@@ -72,5 +72,24 @@ namespace NewLevel.Api.Controllers
                 return StatusCode(500, new NewLevelResponse<bool> { IsSuccess = false, Message = ex.Message });
             }
         }
+
+        [HttpPut("UpdateBand")]
+        public async Task<ActionResult<NewLevelResponse<bool>>> UpdateBand(UpdateBandInput input)
+        {
+            try
+            {
+                var result = await _bandService.UpdateBand(input);
+
+                return new NewLevelResponse<bool>()
+                {
+                    IsSuccess = true,
+                    Message = "Banda atualizada"
+                };
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<bool> { IsSuccess = false, Message = ex.Message });
+            }
+        }
     }
 }

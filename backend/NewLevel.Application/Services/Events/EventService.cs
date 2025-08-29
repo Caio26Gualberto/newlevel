@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NewLevel.Application.Interfaces.Events;
 using NewLevel.Application.Services.Amazon;
+using NewLevel.Application.Utils;
 using NewLevel.Application.Utils.IQueryableExtensions;
 using NewLevel.Application.Utils.UserUtils;
 using NewLevel.Domain.Entities;
@@ -56,9 +57,9 @@ namespace NewLevel.Application.Services.Events
 
             if (input.Banner != null)
             {
-                bannerKey = _s3Service.CreateKey(EAmazonFolderType.Banner, user.Id.ToString());
-                var result = await _s3Service.UploadFilesAsync(bannerKey, input.Banner, EAmazonFolderType.Banner);
-                var url = await _s3Service.CreateTempURLS3(bannerKey, EAmazonFolderType.Banner);
+                bannerKey = _s3Service.CreateKey(EAmazonFolderType.EventBanner, user.Id.ToString());
+                var result = await _s3Service.UploadFilesAsync(bannerKey, input.Banner, EAmazonFolderType.EventBanner);
+                var url = await _s3Service.CreateTempURLS3(bannerKey, EAmazonFolderType.EventBanner);
                 bannerUrl = url;
                 havebanner = true;
             }
@@ -114,6 +115,7 @@ namespace NewLevel.Application.Services.Events
             var events = await _repository.GetAll()
                 .Include(x => x.Organizer)
                 .Include(x => x.Photos)
+                .Include(x => x.Comments)
                 .WhereIf(!string.IsNullOrEmpty(input.Search), photo => photo.Title.ToLower().Contains(input.Search!.ToLower()) || photo.Title.ToLower() == input.Search.ToLower())
                 .OrderByDescending(photo => photo.CreationTime)
                 .Skip(skip)
@@ -178,6 +180,108 @@ namespace NewLevel.Application.Services.Events
             {
                 Items = new List<EventResponseDto>(),
                 TotalCount = 0
+            };
+        }
+
+        public async Task<bool> UpdateEvent(UpdateEventInput input)
+        {
+            var @event = await _repository.GetAll().Include(x => x.Photos).FirstOrDefaultAsync(x => x.Id == input.EventId);
+
+            if (@event == null)
+                throw new Exception("Evento não encontrado, se o problema persistir entre em contato com o desenvolvedor");
+
+            PatchHelper.Patch(@event, input);
+
+            if (input.PhotosToDeleteId != null && input.PhotosToDeleteId.Count > 0)
+            {
+                foreach (var photoId in input.PhotosToDeleteId)
+                {
+                    var photo = @event.Photos.FirstOrDefault(p => p.Id == photoId);
+                    if (photo != null)
+                    {
+                        await _s3Service.DeleteFileAsync(photo.KeyS3, EAmazonFolderType.Photo);
+                        @event.Photos.Remove(photo);
+                    }
+                }
+            }
+
+            if (input.Photos != null && input.Photos.Any())
+            {
+                foreach (var photo in input.Photos)
+                {
+                    var key = _s3Service.CreateKey(EAmazonFolderType.Photo, @event.Id.ToString());
+                    await _s3Service.UploadFilesAsync(key, photo, EAmazonFolderType.Photo);
+                    @event.Photos.Add(new Photo
+                    {
+                        KeyS3 = key,
+                        Title = input.Title,         
+                        Subtitle = input.Title,
+                        Description = input.Description ?? "Foto do evento",
+                        CaptureDate = DateTime.Now.AddHours(-3)
+                    });
+                }
+            }
+
+            if (input.Banner != null)
+            {
+                if (!string.IsNullOrEmpty(@event.BannerKey))
+                    await _s3Service.DeleteFileAsync(@event.BannerKey, EAmazonFolderType.EventBanner);
+                var bannerKey = _s3Service.CreateKey(EAmazonFolderType. EventBanner, @event.OrganizerId.ToString());
+                await _s3Service.UploadFilesAsync(bannerKey, input.Banner, EAmazonFolderType.EventBanner);
+                @event.BannerKey = bannerKey;
+                @event.BannerPosition = input.BannerPosition;
+            }
+
+            await _repository.UpdateAsync(@event);
+
+            return true;
+        }
+
+        public async Task<EventResponseDto> GetEvent(int eventId)
+        {
+            var @event = await _repository.GetAll()
+                .Include(x => x.Organizer)
+                .Include(x => x.Photos)
+                .Include(x => x.Comments)
+                .FirstOrDefaultAsync(x => x.Id == eventId);
+
+            if (@event == null)
+                throw new Exception("Evento não encontrado, se o problema persistir entre em contato com o desenvolvedor");
+
+            var photos = new List<PhotoResponseDto>();
+
+            if (@event.Photos != null && @event.Photos.Count > 0)
+            {
+                photos = (await Task.WhenAll(@event.Photos.Select(async p => new PhotoResponseDto
+                {
+                    Id = p.Id,
+                    Src = await _s3Service.GetOrGeneratePhotoPrivateUrl(p),
+                    Title = p.Title,
+                    Subtitle = p.Subtitle,
+                    CaptureDate = p.CaptureDate,
+                    Nickname = p.User?.Nickname ?? "Usuário desconhecido",
+                    Description = p.Description
+                }))).ToList();
+            }
+
+            return new EventResponseDto
+            {
+                Id = @event.Id,
+                Title = @event.Title,
+                Description = @event.Description,
+                Location = @event.Location,
+                DateStart = @event.DateStart,
+                DateEnd = @event.DateEnd,
+                Price = @event.Price,
+                Capacity = @event.Capacity,
+                TicketsLink = @event.TicketsLink,
+                Genre = @event.Genre,
+                BannerUrl = await _s3Service.GetOrGenerateBannerForEventPrivateUrl(@event),
+                BannerPosition = @event.BannerPosition,
+                OrganizerName = @event.Organizer?.Nickname ?? "Organizador não informado",
+                EventStatus = @event.EventStatus,
+                Photos = photos,
+                CommentsCount = @event.Comments.Count,
             };
         }
     }

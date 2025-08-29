@@ -17,7 +17,7 @@ namespace NewLevel.Api.Controllers
         }
 
         [HttpGet("GetCommentsByPhotoId")]
-        public async Task<ActionResult<NewLevelResponse<CommentsPhotoResponseDto>>> GetCommentsByPhotoId(Pagination pagination, int photoId)
+        public async Task<ActionResult<NewLevelResponse<CommentsPhotoResponseDto>>> GetCommentsByPhotoId([FromQuery] Pagination pagination, int photoId)
         {
             try
             {
@@ -36,8 +36,28 @@ namespace NewLevel.Api.Controllers
             }
         }
 
+        [HttpGet("GetCommentsByEventId")]
+        public async Task<ActionResult<NewLevelResponse<CommentsPhotoResponseDto>>> GetCommentsByEventId([FromQuery] Pagination pagination, int eventId)
+        {
+            try
+            {
+                var result = await _commentService.GetCommentsByEventId(pagination, eventId);
+
+                if (result.Comments.Count >= 0)
+                {
+                    return Ok(new NewLevelResponse<CommentsPhotoResponseDto> { IsSuccess = true, Data = result });
+                }
+
+                return StatusCode(500, new NewLevelResponse<CommentsPhotoResponseDto> { IsSuccess = false });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<CommentsPhotoResponseDto> { Message = ex.Message, IsSuccess = false });
+            }
+        }
+
         [HttpGet("GetCommentsByMediaId")]
-        public async Task<ActionResult<NewLevelResponse<CommentsPhotoResponseDto>>> GetCommentsByMediaId(Pagination pagination, int mediaId)
+        public async Task<ActionResult<NewLevelResponse<CommentsPhotoResponseDto>>> GetCommentsByMediaId([FromQuery] Pagination pagination, int mediaId)
         {
             try
             {

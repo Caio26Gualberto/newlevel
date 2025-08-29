@@ -21,6 +21,7 @@ namespace NewLevel.Infra.Data.Context
         public DbSet<SystemNotification> SystemNotifications { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<BandVerificationRequest> BandVerificationRequests { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -35,10 +36,40 @@ namespace NewLevel.Infra.Data.Context
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<User>()
-                        .HasMany(u => u.Comments)
-                        .WithOne(c => c.User)
-                        .HasForeignKey(c => c.UserId)
-                        .OnDelete(DeleteBehavior.Restrict);
+                .HasMany(u => u.Comments)
+                .WithOne(c => c.User)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<User>()
+                .HasMany(u => u.Medias)
+                .WithOne(c => c.User)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<User>()
+                .HasMany(u => u.BandsUsers)
+                .WithOne(bu => bu.User)
+                .HasForeignKey(bu => bu.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<User>()
+                .HasMany(u => u.SystemNotifications)
+                .WithOne(n => n.User)
+                .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<User>()
+                .HasMany(u => u.OrganizedEvents)
+                .WithOne(e => e.Organizer)
+                .HasForeignKey(e => e.OrganizerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<User>()
+                .HasMany(u => u.Photos)
+                .WithOne(e => e.User)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Configuração da entidade Media
             builder.Entity<Media>()
@@ -114,6 +145,12 @@ namespace NewLevel.Infra.Data.Context
                 .WithMany(u => u.OrganizedEvents)
                 .HasForeignKey(e => e.OrganizerId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Band>()
+                .HasOne(b => b.VerificationRequest)
+                .WithOne(v => v.Band)
+                .HasForeignKey<BandVerificationRequest>(v => v.BandId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

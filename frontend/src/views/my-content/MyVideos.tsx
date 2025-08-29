@@ -169,12 +169,10 @@ const MyVideos = () => {
     try {
       setLoading(true);
       const userVideos = await mediaApi.apiMediaGetMediasByUserIdGet({
-        pagination: {
-          page: page + 1,
-          pageSize: rowsPerPage,
-          pageCount: 0,
-          search: searchTerm
-        }
+        page: page + 1,
+        pageSize: rowsPerPage,
+        pageCount: 0,
+        search: searchTerm
       });
 
       if (userVideos.isSuccess) {

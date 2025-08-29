@@ -6,7 +6,6 @@ using Amazon.S3.Transfer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using NewLevel.Application.Interfaces.Cache;
-using NewLevel.Application.Services.Cache;
 using NewLevel.Domain.Entities;
 using NewLevel.Shared.Enums.Amazon;
 
@@ -111,6 +110,9 @@ namespace NewLevel.Application.Services.Amazon
 
         public async Task<string> GetOrGenerateAvatarPrivateUrl(User user)
         {
+            if (string.IsNullOrEmpty(user.AvatarKey))
+                return string.Empty;
+
             var cacheKey = $"user:{user.AvatarKey}:avatar";
 
             var cachedUrl = await _redisService.GetAsync<string>(cacheKey);
@@ -126,6 +128,9 @@ namespace NewLevel.Application.Services.Amazon
 
         public async Task<string> GetOrGenerateBannerPrivateUrl(User user)
         {
+            if (string.IsNullOrEmpty(user.AvatarKey))
+                return string.Empty;
+
             var cacheKey = $"user:{user.BannerKey}:banner";
 
             var cachedUrl = await _redisService.GetAsync<string>(cacheKey);
@@ -141,6 +146,9 @@ namespace NewLevel.Application.Services.Amazon
 
         public async Task<string> GetOrGenerateBannerForEventPrivateUrl(Event @event)
         {
+            if (string.IsNullOrEmpty(@event.BannerKey))
+                return string.Empty;
+
             var cacheKey = $"user:{@event.BannerKey}:eventBanner";
 
             var cachedUrl = await _redisService.GetAsync<string>(cacheKey);

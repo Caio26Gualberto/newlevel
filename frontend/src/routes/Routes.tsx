@@ -10,8 +10,10 @@ import Events from '../views/events/Events';
 import Podcast from '../views/podcast/Podcast';
 import AboutMe from '../views/about/AboutMe';
 import MyVideos from '../views/my-content/MyVideos';
+import MyEvents from '../views/my-content/MyEvents';
 import MyProfile from '../views/profile/MyProfile';
 import ResetPassword from '../views/auth/ResetPassword';
+import ConfirmEmail from '../views/auth/ConfirmEmail';
 import ChooseUserAvatar from '../views/profile/ChooseUserAvatar';
 import { AuthProvider } from '../contexts/AuthContext';
 import Request from '../views/admin/Request';
@@ -20,6 +22,7 @@ import PartnerStore from '../views/store/PartnerStore';
 import IssueReport from '../views/support/IssueReport';
 import NotFound from '../views/error/NotFound';
 import Profile from '../views/profile/Profile';
+import EventDetail from '../views/events/EventDetail';
 
 const Routes = () => {
   return (
@@ -35,13 +38,16 @@ const Routes = () => {
           <Route path="/videos" element={<Videos />} />
           <Route path="/photos" element={<Photos />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/event/:eventId" element={<EventDetail />} />
           <Route path="/podcasts" element={<Podcast />} />
           <Route path="/aboutMe" element={<AboutMe />} />
           <Route path="/myVideos" element={<MyVideos />} />
           <Route path="/myPhotos" element={<MyPhotos />} />
+          <Route path="/myEvents" element={<MyEvents />} />
           <Route path="/myAccount" element={<MyProfile />} />
           <Route path="/profile/:nickname/:id" element={<Profile />} />
           <Route path="/security/resetPassword" element={<ResetPassword />} />
+          <Route path="/confirm-email" element={<ConfirmEmail />} />
           <Route path="/newAvatar" element={<ChooseUserAvatar />} />
           <Route path="/acceptContent" element={<Request />} />
           <Route path="/partnerStore" element={<PartnerStore />} />

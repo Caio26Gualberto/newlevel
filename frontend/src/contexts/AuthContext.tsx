@@ -4,17 +4,28 @@ import { jwtDecode } from 'jwt-decode';
 
 // Definir a interface para o payload do JWT
 interface JwtPayload {
+  nameid: string;
   name: string;
   email: string;
   role: string;
+  avatar: string;
+}
+
+interface CurrentUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  avatarUrl: string;
 }
 
 // Definir a interface para o contexto de autenticação
 interface AuthContextType {
   token: string | null;
+  currentUser: CurrentUser | null;
   isAdmin: () => boolean;
   isBand: () => boolean;
-  setToken: (token: string) => void;
+  setToken: (token: string | null) => void;
 }
 
 // Criar o contexto de autenticação
@@ -22,15 +33,35 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Criar o Provider do contexto de autenticação
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [token, setToken] = useState<string | null>(null);
+    const [token, setTokenState] = useState<string | null>(localStorage.getItem('accessToken'));
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
-  useEffect(() => {
-    // Recuperar o token do localStorage quando o componente é montado
-    const storedToken = localStorage.getItem('accessToken');
-    if (storedToken) {
-      setToken(storedToken);
+    useEffect(() => {
+    if (token) {
+      try {
+        const decoded = jwtDecode<JwtPayload>(token);
+        setCurrentUser({
+          id: decoded.nameid,
+          name: decoded.name,
+          email: decoded.email,
+          role: decoded.role,
+          avatarUrl: decoded.avatar
+        });
+        localStorage.setItem('accessToken', token);
+      } catch (error) {
+        console.error('Invalid token', error);
+        setCurrentUser(null);
+        localStorage.removeItem('accessToken');
+      }
+    } else {
+      setCurrentUser(null);
+      localStorage.removeItem('accessToken');
     }
-  }, []);
+  }, [token]);
+
+  const setToken = (newToken: string | null) => {
+    setTokenState(newToken);
+  };
 
   // Função para verificar se o usuário é Admin
   const isAdmin = (): boolean => {
@@ -59,8 +90,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return false;
   };
 
-  return (
-    <AuthContext.Provider value={{ token, isAdmin, isBand, setToken }}>
+    return (
+    <AuthContext.Provider value={{ token, currentUser, isAdmin, isBand, setToken }}>
       {children}
     </AuthContext.Provider>
   );

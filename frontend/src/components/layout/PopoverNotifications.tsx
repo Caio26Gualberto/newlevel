@@ -19,13 +19,17 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import React from 'react';
 import ApiConfiguration from '../../config/apiConfig';
 import * as toastr from 'toastr';
+import { NotificationHandlerService } from '../../services/NotificationHandlerService';
 
 interface PopoverNotificationsProps {
     anchorEl: HTMLButtonElement | null;
     notificationList: NotificationDto[] | undefined | null;
     open: boolean;
     onClose: () => void;
-    onOpenInviteModal: () => void;
+    onOpenInviteModal: (notification: NotificationDto) => void;
+    onOpenSimpleModal: (notification: NotificationDto) => void;
+    onOpenBannerModal: (notification: NotificationDto) => void;
+    onOpenPopupModal: (notification: NotificationDto) => void;
     updateNotifications: () => void;
     getNotification: (notification: NotificationDto) => void;
 }
@@ -35,7 +39,10 @@ const PopoverNotifications: React.FC<PopoverNotificationsProps> = ({
     notificationList, 
     open, 
     onClose, 
-    onOpenInviteModal, 
+    onOpenInviteModal,
+    onOpenSimpleModal,
+    onOpenBannerModal,
+    onOpenPopupModal,
     getNotification, 
     updateNotifications 
 }) => {
@@ -44,12 +51,21 @@ const PopoverNotifications: React.FC<PopoverNotificationsProps> = ({
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-    const handleOpenInviteMessage = (notificationId: number) => {
-        const notification = notificationList?.find(notification => notification.id === notificationId);
-        if (notification) {
-            getNotification(notification);
-            onOpenInviteModal();
-        }
+    // Initialize notification handler service
+    const notificationHandler = React.useMemo(() => {
+        return new NotificationHandlerService(
+            (notification: NotificationDto) => {
+                getNotification(notification);
+                onOpenInviteModal(notification);
+            },
+            onOpenSimpleModal,
+            onOpenBannerModal,
+            onOpenPopupModal
+        );
+    }, [getNotification, onOpenInviteModal, onOpenSimpleModal, onOpenBannerModal, onOpenPopupModal]);
+
+    const handleNotificationClick = (notification: NotificationDto) => {
+        notificationHandler.handleNotificationClick(notification);
     }
 
     async function deleteMessage(notificationId: number) {
@@ -136,7 +152,7 @@ const PopoverNotifications: React.FC<PopoverNotificationsProps> = ({
                                 <ListItemButton
                                     disableRipple={isButtonHovered}
                                     onClick={() => {
-                                        handleOpenInviteMessage(notification.id!);
+                                        handleNotificationClick(notification);
                                         onClose();
                                     }}
                                     sx={{

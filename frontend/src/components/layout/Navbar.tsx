@@ -35,6 +35,8 @@ import {
   AdminPanelSettings,
   BugReport,
   Group,
+  ExpandMore,
+  Folder,
 } from '@mui/icons-material';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -46,6 +48,9 @@ import UserSearchBar from './UserSearchBar';
 import InviteIntegrantsModal from './InviteIntegrantsModal';
 import PopoverNotifications from './PopoverNotifications';
 import ViewInviteModal from './ViewInviteModal';
+import SimpleNotificationModal from '../modals/SimpleNotificationModal';
+import BannerNotificationModal from '../modals/BannerNotificationModal';
+import PopupNotificationModal from '../modals/PopupNotificationModal';
 
 const Navbar = () => {
   const authService = new AuthApi(ApiConfiguration);
@@ -68,8 +73,12 @@ const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [anchorElAvatar, setAnchorElAvatar] = useState<null | HTMLElement>(null);
   const [anchorElNotifications, setAnchorElNotifications] = useState<null | HTMLButtonElement>(null);
+  const [anchorElMyContent, setAnchorElMyContent] = useState<null | HTMLElement>(null);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [viewInviteModalOpen, setViewInviteModalOpen] = useState(false);
+  const [simpleModalOpen, setSimpleModalOpen] = useState(false);
+  const [bannerModalOpen, setBannerModalOpen] = useState(false);
+  const [popupModalOpen, setPopupModalOpen] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<NotificationDto | undefined>(undefined);
 
   const notAllowedPaths = [
@@ -79,7 +88,8 @@ const Navbar = () => {
     "/bandRegister",
     "/security/resetPassword",
     "/newAvatar",
-    "/presentation"
+    "/presentation",
+    "/confirm-email"
   ];
 
   const toggleDrawer = (open: boolean) => (event: any) => {
@@ -103,6 +113,14 @@ const Navbar = () => {
 
   const handleNotificationsClose = () => {
     setAnchorElNotifications(null);
+  };
+
+  const handleMyContentClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElMyContent(event.currentTarget);
+  };
+
+  const handleMyContentClose = () => {
+    setAnchorElMyContent(null);
   };
 
   const logout = async () => {
@@ -173,6 +191,13 @@ const Navbar = () => {
     }
   };
 
+  const deleteNotification = async (notificationId: number) => {
+    const result = await systemNotificationService.apiSystemNotificationDeleteNotificationDelete({ notificationId });
+    if (result.isSuccess) {
+      getNotifications();
+    }
+  };
+
   const getNotifications = async () => {
     const result = await systemNotificationService.apiSystemNotificationGetAllNotificationByUserGet();
     if (result.isSuccess) {
@@ -203,9 +228,13 @@ const Navbar = () => {
   const profileMenuItems = [
     { text: 'Minha Conta', path: '/myAccount', icon: <AccountCircle /> },
     { text: 'Meu Perfil', path: `/profile/${profileSrc.nickname}/${profileSrc.userId}`, icon: <AccountCircle /> },
+    { text: 'Reportar Problema', path: '/issueReport', icon: <BugReport /> },
+  ];
+
+  const myContentItems = [
     { text: 'Meus Vídeos', path: '/myVideos', icon: <VideoLibrary /> },
     { text: 'Minhas Fotos', path: '/myPhotos', icon: <Photo /> },
-    { text: 'Reportar Problema', path: '/issueReport', icon: <BugReport /> },
+    { text: 'Meus Eventos', path: '/myEvents', icon: <EventIcon /> },
   ];
 
   if (!showNavbar) return null;
@@ -220,7 +249,7 @@ const Navbar = () => {
               component="img"
               src={Logo}
               alt="New Level Logo"
-              onClick={() => navigate('/welcome')}
+              onClick={() => navigate('/events')}
               sx={{
                 height: { xs: 32, sm: 40 },
                 cursor: 'pointer',
@@ -354,6 +383,43 @@ const Navbar = () => {
             </ListItem>
           ))}
 
+          {/* My Content Submenu */}
+          <ListItem
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover',
+              },
+              cursor: 'pointer'
+            }}
+          >
+            <ListItemIcon sx={{ color: 'primary.main' }}>
+              <Folder />
+            </ListItemIcon>
+            <ListItemText primary="Meu Conteúdo" />
+          </ListItem>
+          
+          {myContentItems.map((item) => (
+            <ListItem
+              key={item.path}
+              component={Link}
+              to={item.path}
+              onClick={toggleDrawer(false)}
+              sx={{
+                color: 'text.primary',
+                textDecoration: 'none',
+                pl: 4,
+                '&:hover': {
+                  backgroundColor: 'action.hover',
+                },
+              }}
+            >
+              <ListItemIcon sx={{ color: 'primary.main' }}>
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItem>
+          ))}
+
           {isBand() && (
             <ListItem
               onClick={() => {
@@ -436,6 +502,18 @@ const Navbar = () => {
           </MenuItem>
         ))}
 
+        {/* My Content Submenu */}
+        <MenuItem
+          onClick={handleMyContentClick}
+          sx={{ cursor: 'pointer' }}
+        >
+          <ListItemIcon sx={{ color: 'primary.main' }}>
+            <Folder />
+          </ListItemIcon>
+          Meu Conteúdo
+          <ExpandMore sx={{ ml: 'auto' }} />
+        </MenuItem>
+
         {isBand() && (
           <MenuItem
             onClick={() => {
@@ -486,7 +564,22 @@ const Navbar = () => {
         notificationList={notifications.notifications}
         open={Boolean(anchorElNotifications)}
         onClose={handleNotificationsClose}
-        onOpenInviteModal={() => setViewInviteModalOpen(true)}
+        onOpenInviteModal={(notification) => {
+          setSelectedNotification(notification);
+          setViewInviteModalOpen(true);
+        }}
+        onOpenSimpleModal={(notification) => {
+          setSelectedNotification(notification);
+          setSimpleModalOpen(true);
+        }}
+        onOpenBannerModal={(notification) => {
+          setSelectedNotification(notification);
+          setBannerModalOpen(true);
+        }}
+        onOpenPopupModal={(notification) => {
+          setSelectedNotification(notification);
+          setPopupModalOpen(true);
+        }}
         updateNotifications={getNotifications}
         getNotification={(notification) => setSelectedNotification(notification)}
       />
@@ -505,10 +598,72 @@ const Navbar = () => {
         notification={selectedNotification}
         onClose={() => {
           setViewInviteModalOpen(false);
+          deleteNotification(selectedNotification!.id!);
           setSelectedNotification(undefined);
           getNotifications(); // Refresh notifications after accepting/declining
         }}
       />
+
+      {/* Simple Notification Modal */}
+      <SimpleNotificationModal
+        open={simpleModalOpen}
+        notification={selectedNotification}
+        onClose={() => {
+          setSimpleModalOpen(false);
+          deleteNotification(selectedNotification!.id!);
+          setSelectedNotification(undefined);
+        }}
+      />
+
+      {/* Banner Notification Modal */}
+      <BannerNotificationModal
+        open={bannerModalOpen}
+        notification={selectedNotification}
+        onClose={() => {
+          setBannerModalOpen(false);
+          deleteNotification(selectedNotification!.id!);
+          setSelectedNotification(undefined);
+        }}
+      />
+
+      {/* Popup Notification Modal */}
+      <PopupNotificationModal
+        open={popupModalOpen}
+        notification={selectedNotification}
+        onClose={() => {
+          setPopupModalOpen(false);
+          deleteNotification(selectedNotification!.id!);
+          setSelectedNotification(undefined);
+        }}
+      />
+
+      {/* My Content Submenu */}
+      <Menu
+        anchorEl={anchorElMyContent}
+        open={Boolean(anchorElMyContent)}
+        onClose={handleMyContentClose}
+        transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+      >
+        {myContentItems.map((item) => (
+          <MenuItem
+            key={item.path}
+            component={Link}
+            to={item.path}
+            onClick={() => {
+              handleMyContentClose();
+              handleAvatarClose();
+            }}
+            sx={{ color: 'text.primary', textDecoration: 'none' }}
+          >
+            <ListItemIcon sx={{ color: 'primary.main' }}>
+              {item.icon}
+            </ListItemIcon>
+            {item.text}
+          </MenuItem>
+        ))}
+      </Menu>
+
       {/* Spacer for fixed navbar */}
       <Toolbar />
     </>

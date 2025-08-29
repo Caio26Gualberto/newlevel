@@ -12,7 +12,7 @@
         public int? PhotoId { get; set; }
         public Photo Photo { get; set; }
 
-        public int EventId { get; set; }
-        public Event Event { get; set; }
+        public int? EventId { get; set; }
+        public Event? Event { get; set; }
     }
 }

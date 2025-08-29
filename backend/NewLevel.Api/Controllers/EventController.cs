@@ -16,6 +16,30 @@ namespace NewLevel.Api.Controllers
             _eventService = eventService;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<NewLevelResponse<EventResponseDto>>> GetEvent([FromQuery] int eventId)
+        {
+            try
+            {
+                var result = await _eventService.GetEvent(eventId);    
+
+                return Ok(new NewLevelResponse<EventResponseDto>
+                {
+                    IsSuccess = true,
+                    Data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<GenericList<EventResponseDto>>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message,
+                    Data = null
+                });
+            }
+        }
+
         [HttpPost("CreateEvent")]
         public async Task<ActionResult<NewLevelResponse<bool>>> CreateEvent(CreateEventInput input)
         {
@@ -97,5 +121,26 @@ namespace NewLevel.Api.Controllers
             }
         }
 
+        [HttpPut("UpdateEvent")]
+        public async Task<ActionResult<NewLevelResponse<bool>>> UpdateEvent(UpdateEventInput input)
+        {
+            try
+            {
+                var result = await _eventService.UpdateEvent(input);
+                return Ok(new NewLevelResponse<bool>
+                {
+                    IsSuccess = true,
+                    Message = "Evento deletado"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<bool>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                });
+            }
+        }
     }
 }

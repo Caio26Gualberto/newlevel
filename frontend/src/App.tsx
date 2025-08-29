@@ -12,7 +12,17 @@ function App() {
           },
           '.swal2-popup': {
             zIndex: '9999 !important',
-          }
+          },
+          '@keyframes fadeInButton': {
+            '0%': {
+              opacity: 0.6,
+              transform: 'scale(0.95)',
+            },
+            '100%': {
+              opacity: 1,
+              transform: 'scale(1)',
+            },
+          },
         }}
       />
       <Container 

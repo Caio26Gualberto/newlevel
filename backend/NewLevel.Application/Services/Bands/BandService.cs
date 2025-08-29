@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using NewLevel.Application.Interfaces.Bands;
 using NewLevel.Application.Services.Amazon;
+using NewLevel.Application.Utils;
 using NewLevel.Application.Utils.UserUtils;
 using NewLevel.Domain.Entities;
 using NewLevel.Domain.Interfaces.Repository;
@@ -14,12 +16,15 @@ namespace NewLevel.Application.Services.Bands
         private readonly IRepository<Band> _repository;
         private readonly IRepository<BandsUsers> _bandsUsers;
         private readonly AmazonS3Service _s3Service;
-        public BandService(IServiceProvider serviceProvider, IRepository<Band> repository, IRepository<BandsUsers> bandsRepository, AmazonS3Service s3Service)
+        private readonly IConfiguration _configuration;
+        public BandService(IServiceProvider serviceProvider, IRepository<Band> repository, IRepository<BandsUsers> bandsRepository, AmazonS3Service s3Service,
+            IConfiguration configuration)
         {
             _serviceProvider = serviceProvider;
             _repository = repository;
             _bandsUsers = bandsRepository;
             _s3Service = s3Service;
+            _configuration = configuration;
         }
 
         public async Task<bool> RemoveMemberByUserId(int userId)
@@ -74,6 +79,7 @@ namespace NewLevel.Application.Services.Bands
 
         public async Task<List<MemberInfoDto>> GetAllBandMembers()
         {
+            string basePath = _configuration["Frontend:Url"];
             var user = await UserUtils.GetCurrentUserAsync(_serviceProvider);
             var band = await _bandsUsers.GetAll().Include(x => x.Band).Where(x => x.UserId == user.Id).Select(x => x.Band).FirstOrDefaultAsync();
 
@@ -92,7 +98,7 @@ namespace NewLevel.Application.Services.Bands
                 UserId = x.UserId,
                 Name = x.User.Nickname,
                 AvatarURL = await _s3Service.GetOrGenerateAvatarPrivateUrl(x.User),
-                ProfileURL = $"http://localhost:3000/profile/{x.User.Nickname}/{x.User.Id}",
+                ProfileURL = $"{basePath}/profile/{x.User.Nickname}/{x.User.Id}",
                 Instrument = x.User.Instrument
             }));
 
@@ -102,6 +108,25 @@ namespace NewLevel.Application.Services.Bands
             result.Remove(removeBand);
 
             return result;
+        }
+
+        public async Task<bool> UpdateBand(UpdateBandInput input)
+        {
+            var user = await UserUtils.GetCurrentUserAsync(_serviceProvider);
+            var band = await _bandsUsers.GetAll().Include(x => x.Band).Where(x => x.UserId == user.Id).Select(x => x.Band).FirstOrDefaultAsync();
+
+            if (band == null)
+                throw new Exception("Banda não encontrada, caso o erro persista favor entrar em contato com o desenvolvedor");
+
+            PatchHelper.Patch(band, input);
+
+            if (input.MusicGenres != null)
+                band.MusicGenres = input.MusicGenres;
+
+            band.UpdatedAt = DateTime.UtcNow.AddHours(-3);
+            await _repository.UpdateAsync(band);
+
+            return true;
         }
     }
 }

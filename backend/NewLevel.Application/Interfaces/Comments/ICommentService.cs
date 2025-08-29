@@ -7,6 +7,7 @@ namespace NewLevel.Application.Interfaces.Comments
     {
         public Task<CommentsPhotoResponseDto> GetCommentsByPhotoId(Pagination pagination, int photoId);
         public Task<CommentsPhotoResponseDto> GetCommentsByMediaId(Pagination pagination, int mediaId);
+        public Task<CommentsPhotoResponseDto> GetCommentsByEventId(Pagination pagination, int eventId);
         public Task<bool> SaveComment(ReceiveCommentDto input);
 
 

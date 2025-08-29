@@ -1,31 +1,62 @@
 import React, { useState } from 'react';
-import { 
-  Box, 
-  Button, 
-  Typography, 
-  TextField, 
+import {
+  Box,
+  Button,
+  Typography,
+  TextField,
   Paper,
   Container,
   Stack,
   InputAdornment,
   Fade,
+  IconButton,
 } from "@mui/material";
-import { 
-  Email, 
-  ArrowBack 
+import {
+  Lock,
+  ArrowBack,
+  Visibility,
+  VisibilityOff
 } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { AuthApi } from '../../gen/api/src';
+import ApiConfiguration from '../../config/apiConfig';
 
 const ResetPassword = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [searchParams] = useSearchParams();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const token = searchParams.get("token");
+  const email = searchParams.get("email");
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle password reset logic here
-    setIsSubmitted(true);
+    const authService = new AuthApi(ApiConfiguration);
+    try {
+      const response = await authService.apiAuthResetPasswordPost({
+        resetPasswordRequestDto: {
+          email: email || '',
+          token: token || '',
+          newPassword: password,
+        }
+      });
+      if (response.isSuccess) {
+        setIsSubmitted(true);
+      }
+    } catch (error) {
+      console.error('Error resetting password:', error);
+    }
   };
+
+  React.useEffect(() => {
+    const rootElement = document.getElementById('root');
+    if (rootElement && window.location.pathname === '/security/resetPassword') {
+      rootElement.classList.add('image-with-opacity-reset-password');
+      return () => rootElement.classList.remove('image-with-opacity-reset-password');
+    }
+  }, []);
 
   return (
     <Box
@@ -74,7 +105,7 @@ const ResetPassword = () => {
                   <Button
                     startIcon={<ArrowBack />}
                     onClick={() => navigate('/')}
-                    sx={{ 
+                    sx={{
                       color: 'rgba(255,255,255,0.7)',
                       textTransform: 'none'
                     }}
@@ -85,9 +116,9 @@ const ResetPassword = () => {
 
                 {/* Header */}
                 <Box textAlign="center">
-                  <Typography 
-                    variant="h4" 
-                    fontWeight="bold" 
+                  <Typography
+                    variant="h4"
+                    fontWeight="bold"
                     gutterBottom
                     sx={{
                       fontSize: { xs: '1.75rem', sm: '2rem', md: '2.5rem' },
@@ -99,49 +130,60 @@ const ResetPassword = () => {
                   >
                     Recuperar Senha
                   </Typography>
-                  <Typography 
-                    variant="body1" 
+                  <Typography
+                    variant="body1"
                     color="rgba(255,255,255,0.8)"
                     sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
                   >
-                    Digite seu email para receber as instruções de recuperação
+                    Digite sua nova senha
                   </Typography>
                 </Box>
 
-                {/* Email Field */}
+                {/* Password Field */}
                 <TextField
                   fullWidth
-                  label="Email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  label="Nova senha"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Email sx={{ color: 'rgba(255,255,255,0.7)' }} />
+                        <Lock sx={{ color: "rgba(255,255,255,0.7)" }} />
+                      </InputAdornment>
+                    ),
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                          sx={{ color: "rgba(255,255,255,0.7)" }}
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
                       </InputAdornment>
                     ),
                   }}
                   sx={{
-                    '& .MuiOutlinedInput-root': {
-                      color: 'white',
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      '& fieldset': { 
-                        borderColor: 'rgba(255,255,255,0.3)',
-                        borderWidth: 2
+                    "& .MuiOutlinedInput-root": {
+                      color: "white",
+                      backgroundColor: "rgba(255,255,255,0.05)",
+                      "& fieldset": {
+                        borderColor: "rgba(255,255,255,0.3)",
+                        borderWidth: 2,
                       },
-                      '&:hover fieldset': { 
-                        borderColor: 'rgba(255,255,255,0.5)' 
+                      "&:hover fieldset": {
+                        borderColor: "rgba(255,255,255,0.5)",
                       },
-                      '&.Mui-focused fieldset': { 
-                        borderColor: '#ff6b6b',
-                        borderWidth: 2
-                      }
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#ff6b6b",
+                        borderWidth: 2,
+                      },
                     },
-                    '& .MuiInputLabel-root': { 
-                      color: 'rgba(255,255,255,0.7)',
-                      '&.Mui-focused': { color: '#ff6b6b' }
+                    "& .MuiInputLabel-root": {
+                      color: "rgba(255,255,255,0.7)",
+                      "&.Mui-focused": { color: "#ff6b6b" },
                     },
                   }}
                 />
@@ -158,7 +200,7 @@ const ResetPassword = () => {
                     fontWeight: 600,
                     background: 'linear-gradient(45deg, #d32f2f 30%, #ff6b6b 90%)',
                     boxShadow: '0 4px 20px rgba(211, 47, 47, 0.4)',
-                    '&:hover': { 
+                    '&:hover': {
                       background: 'linear-gradient(45deg, #b71c1c 30%, #d32f2f 90%)',
                       boxShadow: '0 6px 25px rgba(211, 47, 47, 0.6)',
                       transform: 'translateY(-2px)'
@@ -166,16 +208,16 @@ const ResetPassword = () => {
                     transition: 'all 0.3s ease'
                   }}
                 >
-                  Enviar Instruções
+                  Alterar Senha
                 </Button>
               </Stack>
             ) : (
               // Success State
-              <Stack spacing={4} alignItems="center" textAlign="center">
+              <Stack spacing={2} alignItems="center" textAlign="center">
                 <Box>
-                  <Typography 
-                    variant="h4" 
-                    fontWeight="bold" 
+                  <Typography
+                    variant="h4"
+                    fontWeight="bold"
                     gutterBottom
                     sx={{
                       fontSize: { xs: '1.75rem', sm: '2rem' },
@@ -185,42 +227,21 @@ const ResetPassword = () => {
                       backgroundClip: 'text',
                     }}
                   >
-                    Email Enviado!
+                    Senha alterada!
                   </Typography>
-                  <Typography 
-                    variant="body1" 
+                  <Typography
+                    variant="body1"
                     color="rgba(255,255,255,0.8)"
-                    sx={{ 
+                    sx={{
                       fontSize: { xs: '0.875rem', sm: '1rem' },
                       mb: 2
                     }}
                   >
-                    Verifique sua caixa de entrada e siga as instruções para redefinir sua senha.
-                  </Typography>
-                  <Typography 
-                    variant="body2" 
-                    color="rgba(255,255,255,0.6)"
-                    sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-                  >
-                    Não recebeu o email? Verifique sua pasta de spam.
+                    Sua senha foi alterada com sucesso!
                   </Typography>
                 </Box>
 
                 <Stack spacing={2} width="100%">
-                  <Button
-                    variant="contained"
-                    onClick={() => setIsSubmitted(false)}
-                    size="large"
-                    sx={{
-                      background: 'linear-gradient(45deg, #d32f2f 30%, #ff6b6b 90%)',
-                      '&:hover': { 
-                        background: 'linear-gradient(45deg, #b71c1c 30%, #d32f2f 90%)',
-                      }
-                    }}
-                  >
-                    Reenviar Email
-                  </Button>
-                  
                   <Button
                     variant="outlined"
                     onClick={() => navigate('/')}

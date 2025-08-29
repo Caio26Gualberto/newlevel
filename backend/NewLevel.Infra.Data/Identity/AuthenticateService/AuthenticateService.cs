@@ -32,10 +32,14 @@ namespace NewLevel.Infra.Data.Identity.AuthenticateService
         public async Task<bool> Authenticate(string email, string password)
         {
             var result = await _signInManager.PasswordSignInAsync(email, password, false, lockoutOnFailure: false);
+
+            if (result.IsNotAllowed)
+                throw new Exception("Usuário não confirmado. Por favor, confirme seu e-mail antes de fazer login.");
+
             return result.Succeeded;
         }
 
-        public async Task<bool> RegisterUser(string email, string password, string nickname, EActivityLocation activityLocation)
+        public async Task<(string, int, string)> RegisterUser(string email, string password, string nickname, EActivityLocation activityLocation)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -62,12 +66,12 @@ namespace NewLevel.Infra.Data.Identity.AuthenticateService
                 if (!result.Succeeded)
                 {
                     await transaction.RollbackAsync();
-                    return false;
+                    return (string.Empty, 0, string.Empty);
                 }
 
                 await transaction.CommitAsync();
 
-                return true;
+                return (await _userManager.GenerateEmailConfirmationTokenAsync(applicationUser), applicationUser.Id, applicationUser.Email);
             }
             catch
             {
@@ -102,14 +106,14 @@ namespace NewLevel.Infra.Data.Identity.AuthenticateService
         }
 
         // JWT Methods Implementation
-        public async Task<string> GenerateJwtToken(string email)
+        public async Task<string> GenerateJwtToken(string email, string avatar = "")
         {
             var user = await _userManager.FindByEmailAsync(email);
             IList<string> roles = await _userManager.GetRolesAsync(user);
             if (user == null) return string.Empty;
             var domainUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.DomainUserId);
             if (domainUser == null) return string.Empty;
-            var band = await _context.BandsUsers.Include(bu => bu.Band).Where(bu => bu.UserId == user.Id && bu.IsBand).Select(bu => bu.Band).FirstOrDefaultAsync();
+            var band = await _context.BandsUsers.Include(bu => bu.Band).Where(bu => bu.UserId == user.DomainUserId && bu.IsBand).Select(bu => bu.Band).FirstOrDefaultAsync();
 
             if (band != null && band.IsVerified)
                 roles.Add("Band");
@@ -122,6 +126,7 @@ namespace NewLevel.Infra.Data.Identity.AuthenticateService
                 new Claim(ClaimTypes.Email, email),
                 new Claim(ClaimTypes.NameIdentifier, domainUser.Id.ToString()),
                 new Claim("userId", domainUser.Id.ToString()),
+                avatar != "" ? new Claim("avatar", avatar) : new Claim("avatar", ""),
             };
 
             foreach (var role in roles)
@@ -198,7 +203,7 @@ namespace NewLevel.Infra.Data.Identity.AuthenticateService
             return true;
         }
 
-        public async Task<bool> BandRegister(string email, string password, string nickname, string description, DateTime createdAt, List<EMusicGenres> musicGenres,
+        public async Task<(string, int, string)> BandRegister(string email, string password, string nickname, string description, DateTime createdAt, List<EMusicGenres> musicGenres,
             Dictionary<string, string>? integrants, EActivityLocation activityLocation)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -246,18 +251,27 @@ namespace NewLevel.Infra.Data.Identity.AuthenticateService
                 if (!result.Succeeded)
                 {
                     await transaction.RollbackAsync();
-                    return false;
+                    return (string.Empty, 0, string.Empty);
                 }
 
                 await transaction.CommitAsync();
 
-                return true;
+                return (await _userManager.GenerateEmailConfirmationTokenAsync(applicationUser), applicationUser.Id, applicationUser.Email);
             }
             catch
             {
                 await transaction.RollbackAsync();
                 throw;
             }
+        }
+
+        public async Task<bool> ConfirmEmail(string userId, string token)
+        {
+            var applicationUser = await _userManager.FindByIdAsync(userId);
+            if (applicationUser == null) return false;
+
+            var result = await _userManager.ConfirmEmailAsync(applicationUser, token);
+            return result.Succeeded;
         }
     }
 }

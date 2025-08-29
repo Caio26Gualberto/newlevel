@@ -45,10 +45,12 @@ import {
   Group
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { AuthApi, CommonApi, EActivityLocation, EMusicGenres } from '../../gen/api/src';
+import { AuthApi, BandVerificationApi, CommonApi, EActivityLocation, EMusicGenres } from '../../gen/api/src';
 import ApiConfiguration from '../../config/apiConfig';
 import Swal from 'sweetalert2';
 import AddMembersModal, { BandMember } from '../../components/modals/AddMembersModal';
+import VerificationRequestConfirmModal from '../../components/modals/VerificationRequestConfirmModal';
+import BandVerificationRequestModal, { VerificationRequestData } from '../../components/modals/BandVerificationRequestModal';
 
 interface City {
   value: number;
@@ -75,6 +77,9 @@ const BandRegister = () => {
   const [musicGenres, setMusicGenres] = useState<MusicGenre[]>([]);
   const [openMemberModal, setOpenMemberModal] = useState(false);
   const [members, setMembers] = useState<BandMember[]>([]);
+  const [showVerificationConfirm, setShowVerificationConfirm] = useState(false);
+  const [bandId, setBandId] = useState(0);
+  const [showVerificationRequest, setShowVerificationRequest] = useState(false);
   
   // Form data
   const [userForm, setUserForm] = useState({
@@ -90,6 +95,7 @@ const BandRegister = () => {
   // API services
   const authService = useMemo(() => new AuthApi(ApiConfiguration), []);
   const commonService = useMemo(() => new CommonApi(ApiConfiguration), []);
+  const bandVerificationService = useMemo(() => new BandVerificationApi(ApiConfiguration), []);
 
   // Fetch cities and music genres on component mount
   useEffect(() => {
@@ -169,6 +175,61 @@ const BandRegister = () => {
       acc[member.name] = member.instrument;
       return acc;
     }, {} as { [key: string]: string });
+  };
+
+  const handleVerificationConfirm = () => {
+    setShowVerificationConfirm(false);
+    setShowVerificationRequest(true);
+  };
+
+  const handleVerificationCancel = () => {
+    setShowVerificationConfirm(false);
+    navigate('/');
+  };
+
+  const handleVerificationSubmit = async (data: VerificationRequestData) => {
+    try {
+      const response = await bandVerificationService.apiBandVerificationCreateBandVerificationPost({
+        bandVerificationInput: {
+          bandId: bandId,
+          bandName: data.bandName,
+          email: data.email,
+          message: data.message,
+          phone: data.phone,
+          responsibleName: data.responsibleName,  
+        }
+      });
+      if (response.isSuccess) {
+        Swal.fire({
+          title: 'Pedido Enviado!',
+          text: 'Seu pedido de verificação foi enviado com sucesso. Entraremos em contato em breve!',
+          icon: 'success',
+          confirmButtonColor: '#4caf50'
+        });
+      } else {
+        Swal.fire({
+          title: 'Erro!',
+          text: 'Erro ao enviar pedido de verificação. Tente novamente.',
+          icon: 'error',
+          confirmButtonColor: '#d32f2f'
+        });
+      }
+      setShowVerificationRequest(false);
+      navigate('/');
+    } catch (error) {
+      console.error('Error submitting verification request:', error);
+      Swal.fire({
+        title: 'Erro!',
+        text: 'Erro ao enviar pedido de verificação. Tente novamente.',
+        icon: 'error',
+        confirmButtonColor: '#d32f2f'
+      });
+    }
+  };
+
+  const handleVerificationRequestClose = () => {
+    setShowVerificationRequest(false);
+    navigate('/');
   };
   
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -251,13 +312,8 @@ const BandRegister = () => {
       });
       
       if (result.isSuccess) {
-        Swal.fire({
-          title: 'Sucesso!',
-          text: result.message || 'Banda registrada com sucesso!',
-          icon: 'success',
-          confirmButtonColor: '#d32f2f'
-        });
-        navigate('/');
+        setBandId(result.data!.bandId!);
+        setShowVerificationConfirm(true);
       }
     } catch (error) {
       console.error('Registration error:', error);
@@ -576,6 +632,20 @@ const BandRegister = () => {
         onClose={handleCloseMemberModal}
         onSaveMembers={handleSaveMembers}
         initialMembers={members}
+      />
+
+      {/* Modal de confirmação para verificação */}
+      <VerificationRequestConfirmModal
+        open={showVerificationConfirm}
+        onConfirm={handleVerificationConfirm}
+        onCancel={handleVerificationCancel}
+      />
+
+      {/* Modal de pedido de verificação */}
+      <BandVerificationRequestModal
+        open={showVerificationRequest}
+        onClose={handleVerificationRequestClose}
+        onSubmit={handleVerificationSubmit}
       />
     </>
   );

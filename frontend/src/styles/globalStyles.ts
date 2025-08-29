@@ -1,7 +1,7 @@
 import { GlobalStyles } from '@mui/material';
 import HeadbangerBackground from '../assets/HeadbangerBackground.jpg';
 import Headbanger2 from '../assets/Headbanger2.jpeg';
-import Slayer4 from '../assets/Slayer4.png';
+import Slayer5 from '../assets/Slayer5.jpg';
 
 export const globalStylesConfig = {
       '*': {
@@ -53,7 +53,7 @@ export const globalStylesConfig = {
         },
       },
       '.image-with-opacity-reset-password': {
-        backgroundImage: `url(${Slayer4})`,
+        backgroundImage: `url(${Slayer5})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',

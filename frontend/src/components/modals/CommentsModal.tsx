@@ -35,6 +35,7 @@ interface CommentsModalProps {
   onClose: () => void;
   photoId?: number;
   mediaId?: number;
+  eventId?: number;
   title?: string;
 }
 
@@ -43,6 +44,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
   onClose, 
   photoId, 
   mediaId, 
+  eventId,
   title 
 }) => {
   const commentService = new CommentApi(ApiConfiguration);
@@ -63,12 +65,44 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
     search: ""
   });
 
+  const getEventComments = async () => {
+    try {
+      setLoading(true);
+      const result = await commentService.apiCommentGetCommentsByEventIdGet({
+        eventId: eventId,
+        page: pagination.page,
+        pageSize: pagination.pageSize,
+        search: pagination.search
+      });
+
+      if (result.isSuccess) {
+        setComments(result.data!);
+      } else {
+        toastr.error(result.message!, 'Erro!', { 
+          timeOut: 3000, 
+          progressBar: true, 
+          positionClass: "toast-bottom-right" 
+        });
+      }
+    } catch (error) {
+      toastr.error('Erro ao carregar comentários', 'Erro!', { 
+        timeOut: 3000, 
+        progressBar: true, 
+        positionClass: "toast-bottom-right" 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getPhotoComments = async () => {
     try {
       setLoading(true);
       const result = await commentService.apiCommentGetCommentsByPhotoIdGet({
         photoId: photoId,
-        pagination: pagination
+        page: pagination.page,
+        pageSize: pagination.pageSize,
+        search: pagination.search
       });
 
       if (result.isSuccess) {
@@ -96,7 +130,9 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
       setLoading(true);
       const result = await commentService.apiCommentGetCommentsByMediaIdGet({
         mediaId: mediaId,
-        pagination: pagination
+        page: pagination.page,
+        pageSize: pagination.pageSize,
+        search: pagination.search
       });
 
       if (result.isSuccess) {
@@ -131,10 +167,25 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
 
     try {
       setSubmitting(true);
-
-      const payload: ReceiveCommentDto = photoId 
-        ? { photoId: photoId, text: newComment.trim() }
-        : { mediaId: mediaId, text: newComment.trim() };
+      let payload: ReceiveCommentDto;
+      switch (true) {
+        case !!photoId:
+          payload = { photoId, text: newComment.trim() };
+          break;  
+        case !!mediaId:
+          payload = { mediaId, text: newComment.trim() };
+          break;     
+        case !!eventId:
+          payload = { eventId, text: newComment.trim() };
+          break; 
+        default:
+          toastr.error("Nenhum identificador válido foi fornecido. se o problema persistir entre em contato com o desenvolvedor", 'Erro!', { 
+            timeOut: 3000, 
+            progressBar: true, 
+            positionClass: "toast-bottom-right" 
+          });
+          return;
+      }
 
       const result = await commentService.apiCommentSaveCommentPost({
         receiveCommentDto: payload
@@ -151,8 +202,10 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
         // Refresh comments
         if (photoId) {
           await getPhotoComments();
-        } else {
+        } else if (mediaId) {
           await getMediaComments();
+        } else if (eventId) {
+          await getEventComments();
         }
       } else {
         toastr.error(result.message!, 'Erro!', { 
@@ -195,6 +248,8 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
         getPhotoComments();
       } else if (mediaId) {
         getMediaComments();
+      } else if (eventId) {
+        getEventComments();
       }
     }
   }, [open, photoId, mediaId]);
@@ -386,7 +441,7 @@ const CommentsModal: React.FC<CommentsModalProps> = ({
           <TextField
             fullWidth
             multiline
-            rows={isMobile ? 3 : 2}
+            rows={isMobile ? 2 : 1}
             placeholder="Escreva seu comentário..."
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}

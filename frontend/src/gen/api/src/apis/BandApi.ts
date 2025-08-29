@@ -17,6 +17,8 @@ import * as runtime from '../runtime';
 import type {
   BandInfoByUserNewLevelResponse,
   BooleanNewLevelResponse,
+  EActivityLocation,
+  EMusicGenres,
   MemberInfoDtoListNewLevelResponse,
 } from '../models/index';
 import {
@@ -24,12 +26,28 @@ import {
     BandInfoByUserNewLevelResponseToJSON,
     BooleanNewLevelResponseFromJSON,
     BooleanNewLevelResponseToJSON,
+    EActivityLocationFromJSON,
+    EActivityLocationToJSON,
+    EMusicGenresFromJSON,
+    EMusicGenresToJSON,
     MemberInfoDtoListNewLevelResponseFromJSON,
     MemberInfoDtoListNewLevelResponseToJSON,
 } from '../models/index';
 
 export interface ApiBandRemoveMemberByUserIdDeleteRequest {
     userId?: number;
+}
+
+export interface ApiBandUpdateBandPutRequest {
+    spotifyUrl?: string;
+    youtubeUrl?: string;
+    instagramUrl?: string;
+    description?: string;
+    musicGenres?: Array<EMusicGenres>;
+    email?: string;
+    nickname?: string;
+    activityLocation?: EActivityLocation;
+    file?: Blob;
 }
 
 /**
@@ -75,6 +93,27 @@ export interface BandApiInterface {
     /**
      */
     apiBandRemoveMemberByUserIdDelete(requestParameters: ApiBandRemoveMemberByUserIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
+
+    /**
+     * 
+     * @param {string} [spotifyUrl] 
+     * @param {string} [youtubeUrl] 
+     * @param {string} [instagramUrl] 
+     * @param {string} [description] 
+     * @param {Array<EMusicGenres>} [musicGenres] 
+     * @param {string} [email] 
+     * @param {string} [nickname] 
+     * @param {EActivityLocation} [activityLocation] 
+     * @param {Blob} [file] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof BandApiInterface
+     */
+    apiBandUpdateBandPutRaw(requestParameters: ApiBandUpdateBandPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
+
+    /**
+     */
+    apiBandUpdateBandPut(requestParameters: ApiBandUpdateBandPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
 
 }
 
@@ -189,6 +228,94 @@ export class BandApi extends runtime.BaseAPI implements BandApiInterface {
      */
     async apiBandRemoveMemberByUserIdDelete(requestParameters: ApiBandRemoveMemberByUserIdDeleteRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
         const response = await this.apiBandRemoveMemberByUserIdDeleteRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiBandUpdateBandPutRaw(requestParameters: ApiBandUpdateBandPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['spotifyUrl'] != null) {
+            queryParameters['SpotifyUrl'] = requestParameters['spotifyUrl'];
+        }
+
+        if (requestParameters['youtubeUrl'] != null) {
+            queryParameters['YoutubeUrl'] = requestParameters['youtubeUrl'];
+        }
+
+        if (requestParameters['instagramUrl'] != null) {
+            queryParameters['InstagramUrl'] = requestParameters['instagramUrl'];
+        }
+
+        if (requestParameters['description'] != null) {
+            queryParameters['Description'] = requestParameters['description'];
+        }
+
+        if (requestParameters['musicGenres'] != null) {
+            queryParameters['MusicGenres'] = requestParameters['musicGenres'];
+        }
+
+        if (requestParameters['email'] != null) {
+            queryParameters['Email'] = requestParameters['email'];
+        }
+
+        if (requestParameters['nickname'] != null) {
+            queryParameters['Nickname'] = requestParameters['nickname'];
+        }
+
+        if (requestParameters['activityLocation'] != null) {
+            queryParameters['ActivityLocation'] = requestParameters['activityLocation'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['file'] != null) {
+            formParams.append('File', requestParameters['file'] as any);
+        }
+
+
+        let urlPath = `/api/Band/UpdateBand`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+            body: formParams,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiBandUpdateBandPut(requestParameters: ApiBandUpdateBandPutRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiBandUpdateBandPutRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

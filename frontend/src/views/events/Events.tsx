@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
@@ -48,9 +49,11 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { CommonApi, EventApi, EventResponseDto, EventResponseDtoGenericList, SelectOptionDto } from "../../gen/api/src";
 import ApiConfiguration from "../../config/apiConfig";
+import CommentsModal from "../../components/modals/CommentsModal";
 
 const Events = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const eventService = new EventApi(ApiConfiguration);
@@ -59,7 +62,8 @@ const Events = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [events, setEvents] = useState<EventResponseDtoGenericList>({ items: [], totalCount: 0 });
   const [loading, setLoading] = useState<boolean>(false);
-  const [fadeIn, setFadeIn] = useState(false);
+  const [openCommentsModal, setOpenCommentsModal] = useState<boolean>(false);
+  const [eventId, setEventId] = useState<number | null>(null);
   const [genres, setGenres] = useState<SelectOptionDto[]>([]);
   const [descriptionModal, setDescriptionModal] = useState<{ open: boolean; title: string; description: string }>({ open: false, title: '', description: '' });
   const [pagination, setPagination] = useState({
@@ -120,62 +124,10 @@ const Events = () => {
         search: pagination.search
       });
 
-      // if (result.isSuccess) {
-      //   setEvents(result.data!);
-      //   return; // retorna para não sobrescrever com mock
-      // }
-
-      // Se a API falhar ou não retornar sucesso, você pode usar mockEvents
-      const mockEvents: EventResponseDto[] = [
-        {
-          id: 1,
-          title: "Rock Festival 2024",
-          description: "O maior festival de rock da região com bandas nacionais e internacionais",
-          dateStart: new Date("2024-12-15T20:00:00"),
-          dateEnd: new Date("2024-12-16T02:00:00"),
-          location: "Estádio Municipal - São Paulo, SP",
-          bannerUrl: "/assets/event-banner-1.jpg",
-          organizerId: 1,
-          organizerName: "Rock Events",
-          price: 150.0,
-          capacity: 5000,
-          eventStatus: EEventStatus.Published,
-          ticketsLink: "https://tickets.com/rock-festival-2024",
-          genre: [1, 2], // Rock, Metal
-          // photosSrc: [
-          //   "/assets/event-photo-1.jpg",
-          //   "/assets/event-photo-2.jpg",
-          //   "/assets/event-photo-3.jpg",
-          //   "/assets/event-photo-4.jpg",
-          //   "/assets/event-photo-5.jpg",
-          //   "/assets/event-photo-6.jpg",
-          //   "/assets/event-photo-7.jpg",
-          //   "/assets/event-photo-8.jpg",
-          // ],
-          commentsCount: 25
-        },
-        {
-          id: 2,
-          title: "Metal Underground Night",
-          description: "Noite especial dedicada ao metal underground com bandas locais. Este evento promete ser uma experiência única para os amantes do metal mais pesado, com apresentações de bandas que estão revolucionando a cena underground nacional. Teremos também food trucks especializados, área de merchandise exclusiva e muito mais. Não perca esta oportunidade de vivenciar o melhor do metal brasileiro em um ambiente intimista e cheio de energia.",
-          dateStart: new Date("2024-11-30T21:00:00"),
-          dateEnd: null,
-          location: "Club Metal - Rio de Janeiro, RJ",
-          organizerId: 2,
-          organizerName: "Underground Events",
-          price: 80.0,
-          capacity: 300,
-          eventStatus: EEventStatus.Published,
-          genre: [2, 3], // Metal, Heavy Metal
-          // photosSrc: [
-          //   "/assets/event-photo-9.jpg",
-          //   "/assets/event-photo-10.jpg",
-          // ],
-          commentsCount: 12
-        }
-      ];
-
-      setEvents({ items: mockEvents, totalCount: mockEvents.length });
+      if (result.isSuccess) {
+        setEvents(result.data!);
+        return; // retorna para não sobrescrever com mock
+      }
 
     } catch (error) {
       toastr.error('Erro ao carregar eventos', 'Erro!', {
@@ -222,6 +174,11 @@ const Events = () => {
     }
   };
 
+  const handleOpenCommentsModal = (eventId: number) => {
+    setEventId(eventId);
+    setOpenCommentsModal(true);
+  };
+
   const formatDateRange = (startDate?: Date | string, endDate?: Date | string | null): string => {
     if (!startDate) return "";
 
@@ -244,6 +201,10 @@ const Events = () => {
 
   const handleReadMore = (title: string, description: string) => {
     setDescriptionModal({ open: true, title, description });
+  };
+
+  const handleEventClick = (eventId: number) => {
+    navigate(`/event/${eventId}`);
   };
 
   const totalPages = Math.ceil((events.totalCount || 0) / pagination.pageSize);
@@ -311,6 +272,7 @@ const Events = () => {
     <>
       {/* Add Event Modal */}
       <AddEventModal open={openModal} onClose={handleCloseModal} />
+      <CommentsModal open={openCommentsModal} onClose={() => {getEvents(); setOpenCommentsModal(false)}} eventId={eventId || 0}/>
 
       <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 } }}>
         <Fade in timeout={600}>
@@ -435,11 +397,13 @@ const Events = () => {
                           borderRadius: 3,
                           overflow: 'hidden',
                           transition: 'all 0.3s ease',
+                          cursor: 'pointer',
                           '&:hover': {
                             transform: 'translateY(-8px)',
                             boxShadow: theme.shadows[12]
                           }
                         }}
+                        onClick={() => handleEventClick(event.id!)}
                       >
                         {/* Event Banner */}
                         <CardMedia
@@ -595,16 +559,20 @@ const Events = () => {
                               <Typography variant="caption" color="text.secondary">
                                 Por: {event.organizerName}
                               </Typography>
-                              {event.commentsCount !== null && event.commentsCount !== undefined && event.commentsCount > 0 && (
-                                <IconButton size="small" sx={{ color: 'primary.main' }}>
+                                <IconButton 
+                                  size="small" 
+                                  sx={{ color: 'primary.main' }} 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOpenCommentsModal(event.id || 0);
+                                  }}
+                                >
                                   <CommentIcon sx={{ fontSize: 16 }} />
                                   <Typography variant="caption" ml={0.5}>
                                     {event.commentsCount}
                                   </Typography>
                                 </IconButton>
-                              )}
                             </Stack>
-
                             {event.ticketsLink && (
                               <Button
                                 variant="contained"
@@ -612,6 +580,7 @@ const Events = () => {
                                 startIcon={<TicketIcon />}
                                 href={event.ticketsLink}
                                 target="_blank"
+                                onClick={(e) => e.stopPropagation()}
                                 sx={{
                                   background: 'linear-gradient(45deg, #d32f2f 30%, #ff6b6b 90%)',
                                   '&:hover': {
@@ -680,12 +649,6 @@ const Events = () => {
           <AddIcon />
         </Fab>
       )}
-
-      {/* Add Event Modal */}
-      <AddEventModal
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-      />
 
       {/* Description Modal */}
       <Dialog

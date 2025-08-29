@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NewLevel.Api.ApiResponse;
 using NewLevel.Application.Services.Auth;
@@ -84,9 +85,10 @@ namespace NewLevel.Api.Controllers
                     {
                         Result = result.Result,
                         Message = result.Message,
-                        UserId = result.UserId
+                        UserId = result.UserId,
+                        BandId = result.BandId
                     },
-                    IsSuccess = result.Result,
+                    IsSuccess = result.BandId > 0,
                     Message = result.Message
                 });
             }
@@ -202,6 +204,29 @@ namespace NewLevel.Api.Controllers
                 { 
                     IsSuccess = false, 
                     Message = "Erro interno do servidor: " + ex.Message 
+                });
+            }
+        }
+
+        [HttpGet("confirm-email")]
+        public async Task<ActionResult<NewLevelResponse<bool>>> ConfirmEmail(string userId, string token)
+        {
+            try
+            {
+                var result = await _authAppService.ConfirmEmail(userId, token);
+
+                return Ok(new NewLevelResponse<bool>
+                {
+                    IsSuccess = result,
+                    Message = result ? "Email confirmado com sucesso." : "Falha ao confirmar o email.",
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<bool>
+                {
+                    IsSuccess = false,
+                    Message = "Erro interno do servidor: " + ex.Message
                 });
             }
         }

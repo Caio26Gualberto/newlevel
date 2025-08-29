@@ -19,7 +19,6 @@ import type {
   BooleanNewLevelResponse,
   MediaByUserIdDtoGenericListNewLevelResponse,
   MediaDtoGenericListNewLevelResponse,
-  Pagination,
   RequestMediaDto,
   UpdateMediaByIdInput,
 } from '../models/index';
@@ -32,8 +31,6 @@ import {
     MediaByUserIdDtoGenericListNewLevelResponseToJSON,
     MediaDtoGenericListNewLevelResponseFromJSON,
     MediaDtoGenericListNewLevelResponseToJSON,
-    PaginationFromJSON,
-    PaginationToJSON,
     RequestMediaDtoFromJSON,
     RequestMediaDtoToJSON,
     UpdateMediaByIdInputFromJSON,
@@ -65,7 +62,11 @@ export interface ApiMediaGetMediaToApproveGetRequest {
 }
 
 export interface ApiMediaGetMediasByUserIdGetRequest {
-    pagination?: Pagination;
+    page?: number;
+    pageSize?: number;
+    totalItems?: number;
+    pageCount?: number;
+    search?: string;
 }
 
 export interface ApiMediaRequestMediaPostRequest {
@@ -145,7 +146,11 @@ export interface MediaApiInterface {
 
     /**
      * 
-     * @param {Pagination} [pagination] 
+     * @param {number} [page] 
+     * @param {number} [pageSize] 
+     * @param {number} [totalItems] 
+     * @param {number} [pageCount] 
+     * @param {string} [search] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MediaApiInterface
@@ -381,9 +386,27 @@ export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
     async apiMediaGetMediasByUserIdGetRaw(requestParameters: ApiMediaGetMediasByUserIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MediaByUserIdDtoGenericListNewLevelResponse>> {
         const queryParameters: any = {};
 
-        const headerParameters: runtime.HTTPHeaders = {};
+        if (requestParameters['page'] != null) {
+            queryParameters['Page'] = requestParameters['page'];
+        }
 
-        headerParameters['Content-Type'] = 'application/json';
+        if (requestParameters['pageSize'] != null) {
+            queryParameters['PageSize'] = requestParameters['pageSize'];
+        }
+
+        if (requestParameters['totalItems'] != null) {
+            queryParameters['TotalItems'] = requestParameters['totalItems'];
+        }
+
+        if (requestParameters['pageCount'] != null) {
+            queryParameters['PageCount'] = requestParameters['pageCount'];
+        }
+
+        if (requestParameters['search'] != null) {
+            queryParameters['Search'] = requestParameters['search'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -401,7 +424,6 @@ export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-            body: PaginationToJSON(requestParameters['pagination']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => MediaByUserIdDtoGenericListNewLevelResponseFromJSON(jsonValue));

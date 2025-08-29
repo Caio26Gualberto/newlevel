@@ -17,7 +17,7 @@ namespace NewLevel.Infra.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "9.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -227,6 +227,49 @@ namespace NewLevel.Infra.Data.Migrations
                     b.ToTable("Bands");
                 });
 
+            modelBuilder.Entity("NewLevel.Domain.Entities.BandVerificationRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BandId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResponsibleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BandId")
+                        .IsUnique();
+
+                    b.ToTable("BandVerificationRequests");
+                });
+
             modelBuilder.Entity("NewLevel.Domain.Entities.BandsUsers", b =>
                 {
                     b.Property<int>("BandId")
@@ -256,7 +299,7 @@ namespace NewLevel.Infra.Data.Migrations
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("EventId")
+                    b.Property<int?>("EventId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
@@ -730,6 +773,17 @@ namespace NewLevel.Infra.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NewLevel.Domain.Entities.BandVerificationRequest", b =>
+                {
+                    b.HasOne("NewLevel.Domain.Entities.Band", "Band")
+                        .WithOne("VerificationRequest")
+                        .HasForeignKey("NewLevel.Domain.Entities.BandVerificationRequest", "BandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Band");
+                });
+
             modelBuilder.Entity("NewLevel.Domain.Entities.BandsUsers", b =>
                 {
                     b.HasOne("NewLevel.Domain.Entities.Band", "Band")
@@ -754,8 +808,7 @@ namespace NewLevel.Infra.Data.Migrations
                     b.HasOne("NewLevel.Domain.Entities.Event", "Event")
                         .WithMany("Comments")
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("NewLevel.Domain.Entities.Media", "Media")
                         .WithMany("Comments")
@@ -770,7 +823,7 @@ namespace NewLevel.Infra.Data.Migrations
                     b.HasOne("NewLevel.Domain.Entities.User", "User")
                         .WithMany("Comments")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Event");
@@ -813,7 +866,8 @@ namespace NewLevel.Infra.Data.Migrations
 
                     b.HasOne("NewLevel.Domain.Entities.User", "User")
                         .WithMany("Photos")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Event");
 
@@ -845,6 +899,8 @@ namespace NewLevel.Infra.Data.Migrations
             modelBuilder.Entity("NewLevel.Domain.Entities.Band", b =>
                 {
                     b.Navigation("BandsUsers");
+
+                    b.Navigation("VerificationRequest");
                 });
 
             modelBuilder.Entity("NewLevel.Domain.Entities.Event", b =>

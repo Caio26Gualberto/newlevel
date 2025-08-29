@@ -50,6 +50,11 @@ export interface ApiAuthBandRegisterPostRequest {
     registerInputDto?: RegisterInputDto;
 }
 
+export interface ApiAuthConfirmEmailGetRequest {
+    userId?: string;
+    token?: string;
+}
+
 export interface ApiAuthForgotPasswordPostRequest {
     forgotPasswordRequestDto?: ForgotPasswordRequestDto;
 }
@@ -89,6 +94,20 @@ export interface AuthApiInterface {
     /**
      */
     apiAuthBandRegisterPost(requestParameters: ApiAuthBandRegisterPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterResponseDtoNewLevelResponse>;
+
+    /**
+     * 
+     * @param {string} [userId] 
+     * @param {string} [token] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    apiAuthConfirmEmailGetRaw(requestParameters: ApiAuthConfirmEmailGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
+
+    /**
+     */
+    apiAuthConfirmEmailGet(requestParameters: ApiAuthConfirmEmailGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
 
     /**
      * 
@@ -209,6 +228,49 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
      */
     async apiAuthBandRegisterPost(requestParameters: ApiAuthBandRegisterPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<RegisterResponseDtoNewLevelResponse> {
         const response = await this.apiAuthBandRegisterPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiAuthConfirmEmailGetRaw(requestParameters: ApiAuthConfirmEmailGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['userId'] != null) {
+            queryParameters['userId'] = requestParameters['userId'];
+        }
+
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/Auth/confirm-email`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiAuthConfirmEmailGet(requestParameters: ApiAuthConfirmEmailGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiAuthConfirmEmailGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

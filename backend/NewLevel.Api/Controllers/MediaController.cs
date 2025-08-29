@@ -71,7 +71,7 @@ namespace NewLevel.Api.Controllers
         }
 
         [HttpGet("GetMediasByUserId")]
-        public async Task<ActionResult<NewLevelResponse<GenericList<MediaByUserIdDto>>>> GetMediasByUserId(Pagination input)
+        public async Task<ActionResult<NewLevelResponse<GenericList<MediaByUserIdDto>>>> GetMediasByUserId([FromQuery] Pagination input)
         {
             try
             {

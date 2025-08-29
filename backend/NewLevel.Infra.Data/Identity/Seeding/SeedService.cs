@@ -49,9 +49,9 @@ namespace NewLevel.Infra.Data.Identity.Seeding
                 var adminUser = await userManager.FindByEmailAsync(userDto.Email);
                 if (adminUser == null)
                 {
-                    var result = await _authService.RegisterUser(userDto.Email, userDto.Password, userDto.Nickname, userDto.Location);
+                    var (result, _, _) = await _authService.RegisterUser(userDto.Email, userDto.Password, userDto.Nickname, userDto.Location);
 
-                    if (!result)
+                    if (string.IsNullOrEmpty(result))
                         throw new Exception("Failed to create admin user during seeding.");
 
                     adminUser = await userManager.FindByEmailAsync(userDto.Email);

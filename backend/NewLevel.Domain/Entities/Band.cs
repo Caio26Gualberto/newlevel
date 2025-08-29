@@ -19,7 +19,7 @@ namespace NewLevel.Domain.Entities
         public Dictionary<string, string> Integrants { get; set; }
         public virtual List<BandsUsers> BandsUsers { get; set; }
         public List<Event> Events { get; set; }
-
+        public BandVerificationRequest? VerificationRequest { get; set; }
         public string IntegrantsSerialized
         {
             get => JsonConvert.SerializeObject(Integrants);

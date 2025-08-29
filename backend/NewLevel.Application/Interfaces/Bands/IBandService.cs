@@ -7,5 +7,6 @@ namespace NewLevel.Application.Interfaces.Bands
         public Task<List<MemberInfoDto>> GetAllBandMembers();
         public Task<BandInfoByUser> GetBandByUser();
         public Task<bool> RemoveMemberByUserId(int userId);
+        public Task<bool> UpdateBand(UpdateBandInput input);
     }
 }

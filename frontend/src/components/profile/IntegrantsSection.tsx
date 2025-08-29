@@ -63,7 +63,7 @@ const IntegrantsSection: React.FC<IntegrantsSectionProps> = ({
 
       <Stack spacing={2}>
         {/* Integrantes sem URL (não confirmados) */}
-        {integrants && Object.entries(integrants).map(([member, instrument], index) => (
+        {integrantsWithUrl?.length === 0 && integrants && Object.entries(integrants).map(([member, instrument], index) => (
           <Box
             key={`simple-${index}`}
             sx={{
@@ -109,16 +109,6 @@ const IntegrantsSection: React.FC<IntegrantsSectionProps> = ({
                 </Typography>
               </Box>
             </Box>
-
-            <Chip
-              label="Pendente"
-              size="small"
-              sx={{
-                bgcolor: 'warning.light',
-                color: 'warning.contrastText',
-                fontSize: '0.75rem'
-              }}
-            />
           </Box>
         ))}
 
@@ -187,16 +177,6 @@ const IntegrantsSection: React.FC<IntegrantsSectionProps> = ({
                 </Typography>
               </Box>
             </Box>
-
-            <Chip
-              label="Confirmado"
-              size="small"
-              sx={{
-                bgcolor: 'success.main',
-                color: 'white',
-                fontSize: '0.75rem'
-              }}
-            />
           </Box>
         ))}
       </Stack>

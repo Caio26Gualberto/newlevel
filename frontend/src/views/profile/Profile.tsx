@@ -297,7 +297,7 @@ const Profile = () => {
                       </Typography>
                       
                       {data.band?.isVerified && (
-                        <VerifiedIcon color="primary" sx={{ fontSize: '2rem' }} />
+                        <VerifiedIcon sx={{ fontSize: '2rem', color: '#48adf5' }} />
                       )}
                       
                       {data.isEnabledToEdit && (
@@ -408,7 +408,8 @@ const Profile = () => {
                     </Accordion>
                   )}
                                     {/* Band Members Accordion */}
-                                    {data.band?.integrantsWithUrl && data.band.integrantsWithUrl.length > 0 && (
+                                    {data.band?.integrantsWithUrl && (data.band.integrantsWithUrl.length > 0 || 
+                                    data.band.integrants && Object.keys(data.band.integrants).length > 0) && (
                     <Accordion 
                       sx={{ 
                         mb: 2,
@@ -435,7 +436,7 @@ const Profile = () => {
                             color: 'primary.main'
                           }}
                         >
-                          👥 Integrantes da Banda ({data.band.integrantsWithUrl.length})
+                          👥 Integrantes da Banda ({data.band.integrantsWithUrl.length > 0 ? data.band.integrantsWithUrl.length : Object.keys(data.band.integrants || {}).length})
                         </Typography>
                       </AccordionSummary>
                       <AccordionDetails sx={{ p: 3 }}>

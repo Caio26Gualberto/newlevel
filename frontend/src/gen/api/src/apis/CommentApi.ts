@@ -17,7 +17,6 @@ import * as runtime from '../runtime';
 import type {
   BooleanNewLevelResponse,
   CommentsPhotoResponseDtoNewLevelResponse,
-  Pagination,
   ReceiveCommentDto,
 } from '../models/index';
 import {
@@ -25,20 +24,35 @@ import {
     BooleanNewLevelResponseToJSON,
     CommentsPhotoResponseDtoNewLevelResponseFromJSON,
     CommentsPhotoResponseDtoNewLevelResponseToJSON,
-    PaginationFromJSON,
-    PaginationToJSON,
     ReceiveCommentDtoFromJSON,
     ReceiveCommentDtoToJSON,
 } from '../models/index';
 
+export interface ApiCommentGetCommentsByEventIdGetRequest {
+    page?: number;
+    pageSize?: number;
+    totalItems?: number;
+    pageCount?: number;
+    search?: string;
+    eventId?: number;
+}
+
 export interface ApiCommentGetCommentsByMediaIdGetRequest {
+    page?: number;
+    pageSize?: number;
+    totalItems?: number;
+    pageCount?: number;
+    search?: string;
     mediaId?: number;
-    pagination?: Pagination;
 }
 
 export interface ApiCommentGetCommentsByPhotoIdGetRequest {
+    page?: number;
+    pageSize?: number;
+    totalItems?: number;
+    pageCount?: number;
+    search?: string;
     photoId?: number;
-    pagination?: Pagination;
 }
 
 export interface ApiCommentSaveCommentPostRequest {
@@ -54,8 +68,30 @@ export interface ApiCommentSaveCommentPostRequest {
 export interface CommentApiInterface {
     /**
      * 
+     * @param {number} [page] 
+     * @param {number} [pageSize] 
+     * @param {number} [totalItems] 
+     * @param {number} [pageCount] 
+     * @param {string} [search] 
+     * @param {number} [eventId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CommentApiInterface
+     */
+    apiCommentGetCommentsByEventIdGetRaw(requestParameters: ApiCommentGetCommentsByEventIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentsPhotoResponseDtoNewLevelResponse>>;
+
+    /**
+     */
+    apiCommentGetCommentsByEventIdGet(requestParameters: ApiCommentGetCommentsByEventIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentsPhotoResponseDtoNewLevelResponse>;
+
+    /**
+     * 
+     * @param {number} [page] 
+     * @param {number} [pageSize] 
+     * @param {number} [totalItems] 
+     * @param {number} [pageCount] 
+     * @param {string} [search] 
      * @param {number} [mediaId] 
-     * @param {Pagination} [pagination] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CommentApiInterface
@@ -68,8 +104,12 @@ export interface CommentApiInterface {
 
     /**
      * 
+     * @param {number} [page] 
+     * @param {number} [pageSize] 
+     * @param {number} [totalItems] 
+     * @param {number} [pageCount] 
+     * @param {string} [search] 
      * @param {number} [photoId] 
-     * @param {Pagination} [pagination] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CommentApiInterface
@@ -102,16 +142,93 @@ export class CommentApi extends runtime.BaseAPI implements CommentApiInterface {
 
     /**
      */
+    async apiCommentGetCommentsByEventIdGetRaw(requestParameters: ApiCommentGetCommentsByEventIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentsPhotoResponseDtoNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['page'] != null) {
+            queryParameters['Page'] = requestParameters['page'];
+        }
+
+        if (requestParameters['pageSize'] != null) {
+            queryParameters['PageSize'] = requestParameters['pageSize'];
+        }
+
+        if (requestParameters['totalItems'] != null) {
+            queryParameters['TotalItems'] = requestParameters['totalItems'];
+        }
+
+        if (requestParameters['pageCount'] != null) {
+            queryParameters['PageCount'] = requestParameters['pageCount'];
+        }
+
+        if (requestParameters['search'] != null) {
+            queryParameters['Search'] = requestParameters['search'];
+        }
+
+        if (requestParameters['eventId'] != null) {
+            queryParameters['eventId'] = requestParameters['eventId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/Comment/GetCommentsByEventId`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CommentsPhotoResponseDtoNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiCommentGetCommentsByEventIdGet(requestParameters: ApiCommentGetCommentsByEventIdGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentsPhotoResponseDtoNewLevelResponse> {
+        const response = await this.apiCommentGetCommentsByEventIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
     async apiCommentGetCommentsByMediaIdGetRaw(requestParameters: ApiCommentGetCommentsByMediaIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentsPhotoResponseDtoNewLevelResponse>> {
         const queryParameters: any = {};
+
+        if (requestParameters['page'] != null) {
+            queryParameters['Page'] = requestParameters['page'];
+        }
+
+        if (requestParameters['pageSize'] != null) {
+            queryParameters['PageSize'] = requestParameters['pageSize'];
+        }
+
+        if (requestParameters['totalItems'] != null) {
+            queryParameters['TotalItems'] = requestParameters['totalItems'];
+        }
+
+        if (requestParameters['pageCount'] != null) {
+            queryParameters['PageCount'] = requestParameters['pageCount'];
+        }
+
+        if (requestParameters['search'] != null) {
+            queryParameters['Search'] = requestParameters['search'];
+        }
 
         if (requestParameters['mediaId'] != null) {
             queryParameters['mediaId'] = requestParameters['mediaId'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -129,7 +246,6 @@ export class CommentApi extends runtime.BaseAPI implements CommentApiInterface {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-            body: PaginationToJSON(requestParameters['pagination']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CommentsPhotoResponseDtoNewLevelResponseFromJSON(jsonValue));
@@ -147,13 +263,31 @@ export class CommentApi extends runtime.BaseAPI implements CommentApiInterface {
     async apiCommentGetCommentsByPhotoIdGetRaw(requestParameters: ApiCommentGetCommentsByPhotoIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentsPhotoResponseDtoNewLevelResponse>> {
         const queryParameters: any = {};
 
+        if (requestParameters['page'] != null) {
+            queryParameters['Page'] = requestParameters['page'];
+        }
+
+        if (requestParameters['pageSize'] != null) {
+            queryParameters['PageSize'] = requestParameters['pageSize'];
+        }
+
+        if (requestParameters['totalItems'] != null) {
+            queryParameters['TotalItems'] = requestParameters['totalItems'];
+        }
+
+        if (requestParameters['pageCount'] != null) {
+            queryParameters['PageCount'] = requestParameters['pageCount'];
+        }
+
+        if (requestParameters['search'] != null) {
+            queryParameters['Search'] = requestParameters['search'];
+        }
+
         if (requestParameters['photoId'] != null) {
             queryParameters['photoId'] = requestParameters['photoId'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -171,7 +305,6 @@ export class CommentApi extends runtime.BaseAPI implements CommentApiInterface {
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-            body: PaginationToJSON(requestParameters['pagination']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => CommentsPhotoResponseDtoNewLevelResponseFromJSON(jsonValue));

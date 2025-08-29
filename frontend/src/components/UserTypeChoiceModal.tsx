@@ -216,7 +216,7 @@ const UserTypeChoiceModal: React.FC<UserTypeChoiceModalProps> = ({ open, onClose
                     fontStyle: 'italic'
                   }}
                 >
-                  Não se preocupe, o contato do administrador será passado no final da etapa
+                  Não se preocupe, ao final do registro terá uma etapa de pedido de verificação
                 </Typography>
               </Box>
             </Fade>

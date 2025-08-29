@@ -4,6 +4,7 @@ using NewLevel.Application.Interfaces.User;
 using NewLevel.Application.Services.Amazon;
 using NewLevel.Application.Utils.UserUtils;
 using NewLevel.Domain.Entities;
+using NewLevel.Domain.Enums.SystemNotification;
 using NewLevel.Domain.Interfaces.Repository;
 using NewLevel.Shared.DTOs.SystemNotification;
 using NewLevel.Shared.DTOs.SystemNotifications;
@@ -73,7 +74,7 @@ namespace NewLevel.Application.Services.SystemNotifications
                 {
                     Title = "Convite recusado",
                     Message = $"{user.Nickname} recusou seu convite para tocar na banda",
-                    SystemNotificationType = notification.SystemNotificationType,
+                    SystemNotificationType = ESystemNotificationType.Popup,
                 };
                 newNotification.UserId = bandUser.Id;
 

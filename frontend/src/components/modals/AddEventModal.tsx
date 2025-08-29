@@ -35,7 +35,6 @@ import {
   PhotoCamera as PhotoCameraIcon,
 } from '@mui/icons-material';
 import { EEventStatus, EventDto } from '../../types/Event';
-import { EMusicGenres } from '../../gen/api/src/models/EMusicGenres';
 import * as toastr from 'toastr';
 import { CommonApi, EventApi, SelectOptionDto } from '../../gen/api/src';
 import ApiConfiguration from '../../config/apiConfig';
@@ -78,12 +77,6 @@ const AddEventModal: React.FC<AddEventModalProps> = ({ open, onClose }) => {
         ? value === '' ? undefined : Number(value)
         : value 
     }));
-  };
-
-  const handleSelectChange = (field: keyof EventDto) => (
-    e: any
-  ) => {
-    setForm(prev => ({ ...prev, [field]: e.target.value }));
   };
 
   const handleGenreChange = (event: any) => {
@@ -171,12 +164,6 @@ const AddEventModal: React.FC<AddEventModalProps> = ({ open, onClose }) => {
 
   const getPhotoPreviewUrl = (file: File): string => {
     return URL.createObjectURL(file);
-  };
-
-  const formatDateTime = (dateTimeString: string) => {
-    if (!dateTimeString) return '';
-    const date = new Date(dateTimeString);
-    return date.toISOString().slice(0, 16);
   };
 
   const handleSubmit = async () => {
@@ -313,7 +300,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({ open, onClose }) => {
         <Stack direction="row" alignItems="center" spacing={1}>
           <EventIcon color="primary" />
           <Typography variant="h5" fontWeight="bold">
-            Criar Novo Evento
+            Criar Novo Evento {selectedBanner ? 'com banner' : 'sem banner'}
           </Typography>
         </Stack>
       </DialogTitle>
@@ -550,7 +537,7 @@ const AddEventModal: React.FC<AddEventModalProps> = ({ open, onClose }) => {
                   Recomendado: 1200x600px, máximo 5MB
                 </Typography>
               </Box>
-              
+
               {selectedBanner && (
                 <Box>
                   <Typography variant="h6" gutterBottom color="primary" fontWeight="bold" sx={{ mb: 2 }}>

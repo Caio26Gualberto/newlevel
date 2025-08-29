@@ -37,6 +37,12 @@ export interface ReceiveCommentDto {
      * @memberof ReceiveCommentDto
      */
     photoId?: number | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof ReceiveCommentDto
+     */
+    eventId?: number | null;
 }
 
 /**
@@ -59,6 +65,7 @@ export function ReceiveCommentDtoFromJSONTyped(json: any, ignoreDiscriminator: b
         'text': json['text'] == null ? undefined : json['text'],
         'mediaId': json['mediaId'] == null ? undefined : json['mediaId'],
         'photoId': json['photoId'] == null ? undefined : json['photoId'],
+        'eventId': json['eventId'] == null ? undefined : json['eventId'],
     };
 }
 
@@ -76,6 +83,7 @@ export function ReceiveCommentDtoToJSONTyped(value?: ReceiveCommentDto | null, i
         'text': value['text'],
         'mediaId': value['mediaId'],
         'photoId': value['photoId'],
+        'eventId': value['eventId'],
     };
 }
 
