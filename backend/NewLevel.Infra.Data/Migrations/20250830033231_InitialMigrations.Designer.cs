@@ -12,18 +12,33 @@ using NewLevel.Infra.Data.Context;
 namespace NewLevel.Infra.Data.Migrations
 {
     [DbContext(typeof(NewLevelDbContext))]
-    [Migration("20250825225359_initial")]
-    partial class initial
+    [Migration("20250830033231_InitialMigrations")]
+    partial class InitialMigrations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "9.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("EventBands", b =>
+                {
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BandId")
+                        .HasColumnType("int");
+
+                    b.HasKey("EventId", "BandId");
+
+                    b.HasIndex("BandId");
+
+                    b.ToTable("EventBands", (string)null);
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
                 {
@@ -215,6 +230,49 @@ namespace NewLevel.Infra.Data.Migrations
                     b.ToTable("Bands");
                 });
 
+            modelBuilder.Entity("NewLevel.Domain.Entities.BandVerificationRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BandId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResponsibleName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BandId")
+                        .IsUnique();
+
+                    b.ToTable("BandVerificationRequests");
+                });
+
             modelBuilder.Entity("NewLevel.Domain.Entities.BandsUsers", b =>
                 {
                     b.Property<int>("BandId")
@@ -244,6 +302,9 @@ namespace NewLevel.Infra.Data.Migrations
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -265,6 +326,8 @@ namespace NewLevel.Infra.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EventId");
+
                     b.HasIndex("MediaId");
 
                     b.HasIndex("PhotoId");
@@ -281,6 +344,12 @@ namespace NewLevel.Infra.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BannerKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("BannerPosition")
+                        .HasColumnType("int");
 
                     b.Property<int?>("Capacity")
                         .HasColumnType("int");
@@ -327,10 +396,9 @@ namespace NewLevel.Infra.Data.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("bannerUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("OrganizerId");
 
                     b.ToTable("Events");
                 });
@@ -356,6 +424,9 @@ namespace NewLevel.Infra.Data.Migrations
                     b.Property<bool>("IsPublic")
                         .HasColumnType("bit");
 
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Src")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -370,7 +441,12 @@ namespace NewLevel.Infra.Data.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
+                    b.Property<string>("YoutubeId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("PostId");
 
                     b.HasIndex("UserId");
 
@@ -395,6 +471,9 @@ namespace NewLevel.Infra.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("EventId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -405,11 +484,8 @@ namespace NewLevel.Infra.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PrivateURL")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("PublicTimer")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Subtitle")
                         .IsRequired()
@@ -422,6 +498,41 @@ namespace NewLevel.Infra.Data.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Photos");
+                });
+
+            modelBuilder.Entity("NewLevel.Domain.Entities.Post", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -429,7 +540,7 @@ namespace NewLevel.Infra.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Photos");
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("NewLevel.Domain.Entities.SystemNotification", b =>
@@ -499,20 +610,18 @@ namespace NewLevel.Infra.Data.Migrations
                     b.Property<string>("AvatarKey")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AvatarUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("BannerKey")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("BannerPosition")
                         .HasColumnType("int");
 
-                    b.Property<string>("BannerUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Instrument")
                         .HasColumnType("nvarchar(max)");
@@ -532,12 +641,6 @@ namespace NewLevel.Infra.Data.Migrations
                     b.Property<string>("Nickname")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("PublicTimerAvatar")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("PublicTimerBanner")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -651,6 +754,21 @@ namespace NewLevel.Infra.Data.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
+            modelBuilder.Entity("EventBands", b =>
+                {
+                    b.HasOne("NewLevel.Domain.Entities.Band", null)
+                        .WithMany()
+                        .HasForeignKey("BandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NewLevel.Domain.Entities.Event", null)
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
@@ -702,6 +820,17 @@ namespace NewLevel.Infra.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("NewLevel.Domain.Entities.BandVerificationRequest", b =>
+                {
+                    b.HasOne("NewLevel.Domain.Entities.Band", "Band")
+                        .WithOne("VerificationRequest")
+                        .HasForeignKey("NewLevel.Domain.Entities.BandVerificationRequest", "BandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Band");
+                });
+
             modelBuilder.Entity("NewLevel.Domain.Entities.BandsUsers", b =>
                 {
                     b.HasOne("NewLevel.Domain.Entities.Band", "Band")
@@ -723,6 +852,11 @@ namespace NewLevel.Infra.Data.Migrations
 
             modelBuilder.Entity("NewLevel.Domain.Entities.Comment", b =>
                 {
+                    b.HasOne("NewLevel.Domain.Entities.Event", "Event")
+                        .WithMany("Comments")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("NewLevel.Domain.Entities.Media", "Media")
                         .WithMany("Comments")
                         .HasForeignKey("MediaId")
@@ -736,8 +870,10 @@ namespace NewLevel.Infra.Data.Migrations
                     b.HasOne("NewLevel.Domain.Entities.User", "User")
                         .WithMany("Comments")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Event");
 
                     b.Navigation("Media");
 
@@ -746,23 +882,67 @@ namespace NewLevel.Infra.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("NewLevel.Domain.Entities.Event", b =>
+                {
+                    b.HasOne("NewLevel.Domain.Entities.User", "Organizer")
+                        .WithMany("OrganizedEvents")
+                        .HasForeignKey("OrganizerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Organizer");
+                });
+
             modelBuilder.Entity("NewLevel.Domain.Entities.Media", b =>
                 {
+                    b.HasOne("NewLevel.Domain.Entities.Post", "Post")
+                        .WithMany("Videos")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("NewLevel.Domain.Entities.User", "User")
                         .WithMany("Medias")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Post");
+
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("NewLevel.Domain.Entities.Photo", b =>
                 {
+                    b.HasOne("NewLevel.Domain.Entities.Event", "Event")
+                        .WithMany("Photos")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("NewLevel.Domain.Entities.Post", "Post")
+                        .WithMany("Photos")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("NewLevel.Domain.Entities.User", "User")
                         .WithMany("Photos")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("NewLevel.Domain.Entities.Post", b =>
+                {
+                    b.HasOne("NewLevel.Domain.Entities.User", "User")
+                        .WithMany("Posts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -793,6 +973,15 @@ namespace NewLevel.Infra.Data.Migrations
             modelBuilder.Entity("NewLevel.Domain.Entities.Band", b =>
                 {
                     b.Navigation("BandsUsers");
+
+                    b.Navigation("VerificationRequest");
+                });
+
+            modelBuilder.Entity("NewLevel.Domain.Entities.Event", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Photos");
                 });
 
             modelBuilder.Entity("NewLevel.Domain.Entities.Media", b =>
@@ -805,6 +994,13 @@ namespace NewLevel.Infra.Data.Migrations
                     b.Navigation("Comments");
                 });
 
+            modelBuilder.Entity("NewLevel.Domain.Entities.Post", b =>
+                {
+                    b.Navigation("Photos");
+
+                    b.Navigation("Videos");
+                });
+
             modelBuilder.Entity("NewLevel.Domain.Entities.User", b =>
                 {
                     b.Navigation("BandsUsers");
@@ -813,7 +1009,11 @@ namespace NewLevel.Infra.Data.Migrations
 
                     b.Navigation("Medias");
 
+                    b.Navigation("OrganizedEvents");
+
                     b.Navigation("Photos");
+
+                    b.Navigation("Posts");
 
                     b.Navigation("SystemNotifications");
                 });

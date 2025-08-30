@@ -198,11 +198,9 @@ const MyVideos = () => {
       
       // API call to request media (like in original project)
       const result = await mediaApi.apiMediaRequestMediaPost({
-        requestMediaDto: {
-          src: newVideoForm.url,
-          title: newVideoForm.title,
-          description: newVideoForm.description
-        }
+        description: newVideoForm.description,
+        src: newVideoForm.url,
+        title: newVideoForm.title
       });
 
       if (result.isSuccess) {

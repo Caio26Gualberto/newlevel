@@ -311,6 +311,9 @@ namespace NewLevel.Infra.Data.Migrations
                     b.Property<int?>("PhotoId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PostId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -328,6 +331,8 @@ namespace NewLevel.Infra.Data.Migrations
                     b.HasIndex("MediaId");
 
                     b.HasIndex("PhotoId");
+
+                    b.HasIndex("PostId");
 
                     b.HasIndex("UserId");
 
@@ -398,6 +403,42 @@ namespace NewLevel.Infra.Data.Migrations
                     b.HasIndex("OrganizerId");
 
                     b.ToTable("Events");
+                });
+
+            modelBuilder.Entity("NewLevel.Domain.Entities.Like", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("TargetId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TargetType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TargetId", "TargetType");
+
+                    b.HasIndex("UserId", "TargetId", "TargetType")
+                        .IsUnique();
+
+                    b.ToTable("Likes");
                 });
 
             modelBuilder.Entity("NewLevel.Domain.Entities.Media", b =>
@@ -864,6 +905,11 @@ namespace NewLevel.Infra.Data.Migrations
                         .HasForeignKey("PhotoId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("NewLevel.Domain.Entities.Post", "Post")
+                        .WithMany("Comments")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("NewLevel.Domain.Entities.User", "User")
                         .WithMany("Comments")
                         .HasForeignKey("UserId")
@@ -875,6 +921,8 @@ namespace NewLevel.Infra.Data.Migrations
                     b.Navigation("Media");
 
                     b.Navigation("Photo");
+
+                    b.Navigation("Post");
 
                     b.Navigation("User");
                 });
@@ -888,6 +936,17 @@ namespace NewLevel.Infra.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Organizer");
+                });
+
+            modelBuilder.Entity("NewLevel.Domain.Entities.Like", b =>
+                {
+                    b.HasOne("NewLevel.Domain.Entities.User", "User")
+                        .WithMany("Likes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("NewLevel.Domain.Entities.Media", b =>
@@ -993,6 +1052,8 @@ namespace NewLevel.Infra.Data.Migrations
 
             modelBuilder.Entity("NewLevel.Domain.Entities.Post", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("Photos");
 
                     b.Navigation("Videos");
@@ -1003,6 +1064,8 @@ namespace NewLevel.Infra.Data.Migrations
                     b.Navigation("BandsUsers");
 
                     b.Navigation("Comments");
+
+                    b.Navigation("Likes");
 
                     b.Navigation("Medias");
 

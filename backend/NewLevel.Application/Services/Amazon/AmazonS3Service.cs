@@ -16,8 +16,9 @@ namespace NewLevel.Application.Services.Amazon
         public static string Bucket = "newlevel-images";
         public static string AvatarKey = "avatars/_userId_/_guid_";
         public static string BannerKey = "banners/_userId_/_guid_";
-        public static string EventBannerKey = "banners/event/_userId_/_guid_";
-        public static string PhotoKey = "Imagens/_fileTitle_/_guid_";
+        public static string EventBannerKey = "eventBanners/_userId_/_guid_";
+        public static string PhotoKey = "photos/_fileTitle_/_guid_";
+        public static string PostPhotoKey = "postPhotos/_postId_/_guid_";
         public string AwsKeyId { get; private set; }
         public string AwsKeySecret { get; private set; }
         public BasicAWSCredentials AwsCredentials { get; private set; }
@@ -88,6 +89,8 @@ namespace NewLevel.Application.Services.Amazon
                     return BannerKey.Replace("_userId_", key).Replace("_guid_", Guid.NewGuid().ToString());
                 case EAmazonFolderType.EventBanner:
                     return EventBannerKey.Replace("_userId_", key).Replace("_guid_", Guid.NewGuid().ToString());
+                case EAmazonFolderType.PostPhoto:
+                    return PostPhotoKey.Replace("_postId_", key).Replace("_guid_", Guid.NewGuid().ToString());
                 default:
                     throw new ArgumentOutOfRangeException(nameof(folderType), folderType, null);
             }

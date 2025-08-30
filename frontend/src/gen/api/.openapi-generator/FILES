@@ -11,6 +11,7 @@ src/apis/CommonApi.ts
 src/apis/EventApi.ts
 src/apis/MediaApi.ts
 src/apis/PhotoApi.ts
+src/apis/PostApi.ts
 src/apis/SystemNotificationApi.ts
 src/apis/UserApi.ts
 src/apis/index.ts
@@ -52,11 +53,15 @@ src/models/MediaDtoGenericListNewLevelResponse.ts
 src/models/MemberInfoDto.ts
 src/models/MemberInfoDtoListNewLevelResponse.ts
 src/models/NotificationDto.ts
+src/models/Pagination.ts
 src/models/PendingInvitesDto.ts
 src/models/PendingInvitesDtoListNewLevelResponse.ts
 src/models/PhotoResponseDto.ts
 src/models/PhotoResponseDtoGenericList.ts
 src/models/PhotoResponseDtoGenericListNewLevelResponse.ts
+src/models/PostDto.ts
+src/models/PostDtoGenericList.ts
+src/models/PostDtoGenericListNewLevelResponse.ts
 src/models/ProfileInfoDto.ts
 src/models/ProfileInfoDtoNewLevelResponse.ts
 src/models/ProfileInfoPhotoDto.ts
@@ -66,7 +71,6 @@ src/models/RefreshTokenRequestDto.ts
 src/models/RegisterInputDto.ts
 src/models/RegisterResponseDto.ts
 src/models/RegisterResponseDtoNewLevelResponse.ts
-src/models/RequestMediaDto.ts
 src/models/ResetPasswordRequestDto.ts
 src/models/SearchBarUserDetailDto.ts
 src/models/SearchBarUserDetailDtoListNewLevelResponse.ts

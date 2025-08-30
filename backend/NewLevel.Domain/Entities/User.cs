@@ -39,5 +39,6 @@ namespace NewLevel.Domain.Entities
         public List<SystemNotification> SystemNotifications { get; set; }
         public List<Event> OrganizedEvents { get; set; } = new List<Event>();
         public List<Post> Posts { get; set; } = new List<Post>();
+        public List<Like> Likes { get; set; } = new List<Like>();
     }
 }

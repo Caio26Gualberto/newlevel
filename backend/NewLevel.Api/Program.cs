@@ -1,5 +1,6 @@
 using Microsoft.OpenApi.Models;
 using NewLevel.Api.Middleware;
+using NewLevel.Application.Services.SignalR;
 using NewLevel.Domain.Interfaces.Seeding;
 using NewLevel.Infra.IoC;
 
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddInfraIoC(builder.Configuration);
+builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -86,6 +88,7 @@ app.UseCors("AllowFrontend");
 app.UseMiddleware<JWTMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHub<PostsHub>("/hubs/posts");
 
 app.MapControllers();
 

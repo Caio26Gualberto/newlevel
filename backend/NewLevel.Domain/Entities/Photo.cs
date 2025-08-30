@@ -13,7 +13,6 @@ namespace NewLevel.Domain.Entities
         public bool IsPublic { get; set; } = false;
 
 
-
         public int? UserId { get; set; }
         [ForeignKey("UserId")]
         public User? User { get; set; }

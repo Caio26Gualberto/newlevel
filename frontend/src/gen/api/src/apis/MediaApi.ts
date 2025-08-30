@@ -19,7 +19,6 @@ import type {
   BooleanNewLevelResponse,
   MediaByUserIdDtoGenericListNewLevelResponse,
   MediaDtoGenericListNewLevelResponse,
-  RequestMediaDto,
   UpdateMediaByIdInput,
 } from '../models/index';
 import {
@@ -31,8 +30,6 @@ import {
     MediaByUserIdDtoGenericListNewLevelResponseToJSON,
     MediaDtoGenericListNewLevelResponseFromJSON,
     MediaDtoGenericListNewLevelResponseToJSON,
-    RequestMediaDtoFromJSON,
-    RequestMediaDtoToJSON,
     UpdateMediaByIdInputFromJSON,
     UpdateMediaByIdInputToJSON,
 } from '../models/index';
@@ -70,7 +67,10 @@ export interface ApiMediaGetMediasByUserIdGetRequest {
 }
 
 export interface ApiMediaRequestMediaPostRequest {
-    requestMediaDto?: RequestMediaDto;
+    src?: string;
+    title?: string;
+    description?: string;
+    file?: Blob;
 }
 
 export interface ApiMediaUpdateMediaByIdPostRequest {
@@ -163,7 +163,10 @@ export interface MediaApiInterface {
 
     /**
      * 
-     * @param {RequestMediaDto} [requestMediaDto] 
+     * @param {string} [src] 
+     * @param {string} [title] 
+     * @param {string} [description] 
+     * @param {Blob} [file] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MediaApiInterface
@@ -441,9 +444,19 @@ export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
     async apiMediaRequestMediaPostRaw(requestParameters: ApiMediaRequestMediaPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
         const queryParameters: any = {};
 
-        const headerParameters: runtime.HTTPHeaders = {};
+        if (requestParameters['src'] != null) {
+            queryParameters['Src'] = requestParameters['src'];
+        }
 
-        headerParameters['Content-Type'] = 'application/json';
+        if (requestParameters['title'] != null) {
+            queryParameters['Title'] = requestParameters['title'];
+        }
+
+        if (requestParameters['description'] != null) {
+            queryParameters['Description'] = requestParameters['description'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -453,6 +466,26 @@ export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
                 headerParameters["Authorization"] = `Bearer ${tokenString}`;
             }
         }
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters['file'] != null) {
+            formParams.append('File', requestParameters['file'] as any);
+        }
+
 
         let urlPath = `/api/Media/RequestMedia`;
 
@@ -461,7 +494,7 @@ export class MediaApi extends runtime.BaseAPI implements MediaApiInterface {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: RequestMediaDtoToJSON(requestParameters['requestMediaDto']),
+            body: formParams,
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => BooleanNewLevelResponseFromJSON(jsonValue));

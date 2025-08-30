@@ -115,7 +115,7 @@ const useLogin = () => {
         if (!result.data.tokens.skipIntroduction) {
           navigate(isMobile ? '/welcome' : '/newAvatar');
         } else {
-          navigate('/videos');
+          navigate('/feed');
         }
       } else {
         const errorMessage = result.message || 'Erro ao fazer login';

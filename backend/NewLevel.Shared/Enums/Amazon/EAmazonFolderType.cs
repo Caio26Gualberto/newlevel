@@ -5,6 +5,7 @@
         Avatars = 0,
         Photo = 1,
         Banner = 2,
-        EventBanner = 3
+        EventBanner = 3,
+        PostPhoto = 4,
     }
 }

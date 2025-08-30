@@ -37,6 +37,7 @@ import {
   Group,
   ExpandMore,
   Folder,
+  Feed,
 } from '@mui/icons-material';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -217,6 +218,7 @@ const Navbar = () => {
   }, [location]);
 
   const menuItems = [
+    { text: 'Feed', path: '/feed', icon: <Feed /> },
     { text: 'Vídeos', path: '/videos', icon: <VideoLibrary /> },
     { text: 'Fotos', path: '/photos', icon: <Photo /> },
     { text: 'Eventos', path: '/events', icon: <EventIcon /> },
@@ -249,7 +251,7 @@ const Navbar = () => {
               component="img"
               src={Logo}
               alt="New Level Logo"
-              onClick={() => navigate('/events')}
+              onClick={() => navigate('/feed')}
               sx={{
                 height: { xs: 32, sm: 40 },
                 cursor: 'pointer',

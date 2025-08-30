@@ -23,6 +23,7 @@ namespace NewLevel.Infra.Data.Context
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<BandVerificationRequest> BandVerificationRequests { get; set; }
         public DbSet<Post> Posts { get; set; }
+        public DbSet<Like> Likes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -156,8 +157,8 @@ namespace NewLevel.Infra.Data.Context
             // Post -> Photo (1:N)
             builder.Entity<Post>()
                 .HasMany(p => p.Photos)
-                .WithOne(photo => photo.Post) 
-                .HasForeignKey(photo => photo.PostId) 
+                .WithOne(photo => photo.Post)
+                .HasForeignKey(photo => photo.PostId)
                 .OnDelete(DeleteBehavior.Cascade); // se deletar o post, deleta as fotos
 
             // Post -> Media (1:N)
@@ -167,12 +168,26 @@ namespace NewLevel.Infra.Data.Context
                 .HasForeignKey(media => media.PostId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Post -> Comments (1:N)
+            builder.Entity<Post>()
+                .HasMany(p => p.Comments)
+                .WithOne(comment => comment.Post)
+                .HasForeignKey(comment => comment.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             // Post -> User (N:1)
             builder.Entity<Post>()
                 .HasOne(p => p.User)
                 .WithMany(u => u.Posts)
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Restrict); // não deletar usuário ao deletar post
+
+            builder.Entity<Like>(entity =>
+            {
+                entity.HasKey(l => l.Id);
+                entity.HasIndex(l => new { l.TargetId, l.TargetType });
+                entity.HasIndex(l => new { l.UserId, l.TargetId, l.TargetType }).IsUnique();
+            });
         }
     }
 }

@@ -46,11 +46,9 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({ open, onClose }) => {
     try {
       setLoading(true);
       const result = await mediaService.apiMediaRequestMediaPost({
-        requestMediaDto: {
-          src: form.url,
-          title: form.title,
-          description: form.description,
-        }
+        src: form.url,
+        title: form.title,
+        description: form.description,
       });
 
       if (result.isSuccess) {

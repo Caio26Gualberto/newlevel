@@ -8,5 +8,6 @@ export * from './CommonApi';
 export * from './EventApi';
 export * from './MediaApi';
 export * from './PhotoApi';
+export * from './PostApi';
 export * from './SystemNotificationApi';
 export * from './UserApi';

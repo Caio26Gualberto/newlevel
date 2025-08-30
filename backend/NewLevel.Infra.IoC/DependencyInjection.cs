@@ -15,6 +15,7 @@ using NewLevel.Application.Interfaces.Events;
 using NewLevel.Application.Interfaces.Github;
 using NewLevel.Application.Interfaces.Medias;
 using NewLevel.Application.Interfaces.Photos;
+using NewLevel.Application.Interfaces.Posts;
 using NewLevel.Application.Interfaces.SystemNotification;
 using NewLevel.Application.Interfaces.User;
 using NewLevel.Application.Interfaces.Youtube;
@@ -32,9 +33,11 @@ using NewLevel.Application.Services.Events;
 using NewLevel.Application.Services.Github;
 using NewLevel.Application.Services.Medias;
 using NewLevel.Application.Services.Photos;
+using NewLevel.Application.Services.Posts;
 using NewLevel.Application.Services.Seeding;
 using NewLevel.Application.Services.SystemNotifications;
 using NewLevel.Domain.Interfaces.Authenticate;
+using NewLevel.Domain.Interfaces.Repositories.UnitOfWork;
 using NewLevel.Domain.Interfaces.Repository;
 using NewLevel.Domain.Interfaces.Seeding;
 using NewLevel.Infra.Data.Context;
@@ -42,6 +45,7 @@ using NewLevel.Infra.Data.Identity;
 using NewLevel.Infra.Data.Identity.AuthenticateService;
 using NewLevel.Infra.Data.Identity.Seeding;
 using NewLevel.Infra.Data.Repositories;
+using NewLevel.Infra.Data.Repositories.UnitOfWork;
 using System.Text;
 
 namespace NewLevel.Infra.IoC
@@ -117,12 +121,14 @@ namespace NewLevel.Infra.IoC
             services.AddScoped<IBandService, BandService>();
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<ICommonService, CommonService>();
+            services.AddScoped<IPostService, PostService>();
             services.AddScoped<IMediaService, MediaService>();
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<ISeedService, SeedService>();
             services.AddScoped<IBandVerificationService, BandVerificationService>();
             services.AddScoped<ICacheService, CacheService>();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             // CORS Configuration
             services.AddCors(options =>
