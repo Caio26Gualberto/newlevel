@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using NewLevel.Application.Interfaces.Medias;
+using NewLevel.Application.Interfaces.Youtube;
 using NewLevel.Application.Utils;
 using NewLevel.Application.Utils.IQueryableExtensions;
 using NewLevel.Application.Utils.UserUtils;
@@ -14,10 +16,12 @@ namespace NewLevel.Application.Services.Medias
     {
         private readonly IRepository<Media> _repository;
         private readonly IServiceProvider _serviceProvider;
-        public MediaService(IRepository<Media> repository, IServiceProvider serviceProvider)
+        private readonly IYoutubeService _youtubeService;
+        public MediaService(IRepository<Media> repository, IServiceProvider serviceProvider, IYoutubeService service)
         {
             _repository = repository;
             _serviceProvider = serviceProvider;
+            _youtubeService = service;
         }
 
         public async Task<bool> ApproveMedia(ApproveMediaInput input)
@@ -160,6 +164,12 @@ namespace NewLevel.Application.Services.Medias
                 Items = medias,
                 TotalCount = totalMedias
             };
+        }
+
+        public async Task<bool> UploadVideoToYoutube(RequestMediaDto request)
+        {
+            var videoId = await _youtubeService.UploadVideoToYoutube(request.File, request.Title, request.Description);
+            return true;
         }
     }
 }

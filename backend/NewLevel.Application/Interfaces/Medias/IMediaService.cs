@@ -1,4 +1,5 @@
-﻿using NewLevel.Shared.DTOs.Medias;
+﻿using Microsoft.AspNetCore.Http;
+using NewLevel.Shared.DTOs.Medias;
 using NewLevel.Shared.DTOs.Utils;
 
 namespace NewLevel.Application.Interfaces.Medias

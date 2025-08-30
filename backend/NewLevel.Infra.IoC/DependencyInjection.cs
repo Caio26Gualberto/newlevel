@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +17,8 @@ using NewLevel.Application.Interfaces.Medias;
 using NewLevel.Application.Interfaces.Photos;
 using NewLevel.Application.Interfaces.SystemNotification;
 using NewLevel.Application.Interfaces.User;
+using NewLevel.Application.Interfaces.Youtube;
+using NewLevel.Application.Services;
 using NewLevel.Application.Services.Amazon;
 using NewLevel.Application.Services.Auth;
 using NewLevel.Application.Services.Bands;
@@ -68,6 +71,11 @@ namespace NewLevel.Infra.IoC
             var jwtSettings = configuration.GetSection("JWT");
             var secretKey = jwtSettings["SecretKey"] ?? "your-secret-key-here-make-it-long-enough";
 
+            services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = 1073741824; // 1 GB
+            });
+
             services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = configuration.GetConnectionString("Redis");
@@ -102,6 +110,7 @@ namespace NewLevel.Infra.IoC
             services.AddScoped<AuthenticateService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IGithubService, GithubService>();
+            services.AddScoped<IYoutubeService, YoutubeService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<ISystemNotificationService, SystemNotificationService>();
