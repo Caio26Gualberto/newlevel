@@ -22,6 +22,7 @@ namespace NewLevel.Infra.Data.Context
         public DbSet<Event> Events { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<BandVerificationRequest> BandVerificationRequests { get; set; }
+        public DbSet<Post> Posts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -151,6 +152,27 @@ namespace NewLevel.Infra.Data.Context
                 .WithOne(v => v.Band)
                 .HasForeignKey<BandVerificationRequest>(v => v.BandId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Post -> Photo (1:N)
+            builder.Entity<Post>()
+                .HasMany(p => p.Photos)
+                .WithOne(photo => photo.Post) 
+                .HasForeignKey(photo => photo.PostId) 
+                .OnDelete(DeleteBehavior.Cascade); // se deletar o post, deleta as fotos
+
+            // Post -> Media (1:N)
+            builder.Entity<Post>()
+                .HasMany(p => p.Videos)
+                .WithOne(media => media.Post)
+                .HasForeignKey(media => media.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Post -> User (N:1)
+            builder.Entity<Post>()
+                .HasOne(p => p.User)
+                .WithMany(u => u.Posts)
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Restrict); // não deletar usuário ao deletar post
         }
     }
 }

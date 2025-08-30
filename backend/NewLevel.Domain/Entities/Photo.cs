@@ -20,5 +20,7 @@ namespace NewLevel.Domain.Entities
         public List<Comment>? Comments { get; set; }
         public int? EventId { get; set; }
         public Event? Event { get; set; }
+        public int PostId { get; set; }
+        public Post? Post { get; set; } = null!;
     }
 }
