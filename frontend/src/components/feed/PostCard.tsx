@@ -28,7 +28,7 @@ import {
 } from '@mui/icons-material';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CommentApi, CommentsListDto , PostApi, PostDto } from '../../gen/api/src';
+import { CommentApi, CommentsListDto , PostDto, LikeApi, ETargetType } from '../../gen/api/src';
 import ApiConfiguration from '../../config/apiConfig';
 import { useAuth } from '../../contexts/AuthContext';
 import toastr from 'toastr';
@@ -46,9 +46,16 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike }) => {
   const [photoModalOpen, setPhotoModalOpen] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const commentService = new CommentApi(ApiConfiguration);
+  const likeService = new LikeApi(ApiConfiguration);
   const {currentUser} = useAuth();
 
-  const handleLike = () => {
+  const handleLike = async () => {
+    const like = await likeService.apiLikeTogglePost({
+      likeInput: {
+        targetId: post.postId || 0,
+        targetType: ETargetType.NUMBER_3
+      }
+    })
     onLike(post.postId?.toString() || '');
   };
 

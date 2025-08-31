@@ -43,7 +43,7 @@ interface MediaFile {
 interface PostCreationProps {
     onPostCreated: (post: PostDto) => void;
 }
-//#TODO: ENTENDER PORQUE O SIGNALR NÃO ESTA ATUALIZANDO O PROGRESSO MESMO RECEBENDO OS EVENTOS
+//#TODO: ENTENDER PORQUE O SIGNALR NÃO ESTA ATUALIZANDO O PROGRESSO MESMO RECEBENDO OS EVENTOS / PAGINAÇÃO POR ROLAGEM ESTA EM LOOPING
 const PostCreation: React.FC<PostCreationProps> = ({ onPostCreated }) => {
     const [content, setContent] = useState('');
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);

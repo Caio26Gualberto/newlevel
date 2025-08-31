@@ -6,6 +6,7 @@ export * from './BandVerificationApi';
 export * from './CommentApi';
 export * from './CommonApi';
 export * from './EventApi';
+export * from './LikeApi';
 export * from './MediaApi';
 export * from './PhotoApi';
 export * from './PostApi';

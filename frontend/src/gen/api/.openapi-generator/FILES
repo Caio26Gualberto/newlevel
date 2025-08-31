@@ -9,6 +9,7 @@ src/apis/BandVerificationApi.ts
 src/apis/CommentApi.ts
 src/apis/CommonApi.ts
 src/apis/EventApi.ts
+src/apis/LikeApi.ts
 src/apis/MediaApi.ts
 src/apis/PhotoApi.ts
 src/apis/PostApi.ts
@@ -32,6 +33,7 @@ src/models/EEventStatus.ts
 src/models/EGitLabels.ts
 src/models/EMusicGenres.ts
 src/models/ESystemNotificationType.ts
+src/models/ETargetType.ts
 src/models/EventResponseDto.ts
 src/models/EventResponseDtoGenericList.ts
 src/models/EventResponseDtoGenericListNewLevelResponse.ts
@@ -41,6 +43,7 @@ src/models/GeneralNotificationInfoDto.ts
 src/models/GeneralNotificationInfoDtoNewLevelResponse.ts
 src/models/IntegrantInfoDto.ts
 src/models/InviteMemberInput.ts
+src/models/LikeInput.ts
 src/models/LoginInputDto.ts
 src/models/LoginResponseDto.ts
 src/models/LoginResponseDtoNewLevelResponse.ts

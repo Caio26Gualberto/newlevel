@@ -9,5 +9,5 @@ namespace NewLevel.Domain.Entities
 
         public int TargetId { get; set; }
         public ETargetType TargetType { get; set; }
-        }
+    }
 }
