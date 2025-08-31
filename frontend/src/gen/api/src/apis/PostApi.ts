@@ -16,26 +16,35 @@
 import * as runtime from '../runtime';
 import type {
   BooleanNewLevelResponse,
-  Pagination,
   PostDtoGenericListNewLevelResponse,
+  PostDtoNewLevelResponse,
 } from '../models/index';
 import {
     BooleanNewLevelResponseFromJSON,
     BooleanNewLevelResponseToJSON,
-    PaginationFromJSON,
-    PaginationToJSON,
     PostDtoGenericListNewLevelResponseFromJSON,
     PostDtoGenericListNewLevelResponseToJSON,
+    PostDtoNewLevelResponseFromJSON,
+    PostDtoNewLevelResponseToJSON,
 } from '../models/index';
 
-export interface ApiPostGetRequest {
-    pagination?: Pagination;
-}
-
-export interface ApiPostPostRequest {
+export interface ApiPostCreatePostPostRequest {
+    guidSignalR?: string;
     text?: string;
     photos?: Array<Blob>;
     videos?: Array<Blob>;
+}
+
+export interface ApiPostGetAllGetRequest {
+    page?: number;
+    pageSize?: number;
+    totalItems?: number;
+    pageCount?: number;
+    search?: string;
+}
+
+export interface ApiPostGetIdGetRequest {
+    id: number;
 }
 
 /**
@@ -47,19 +56,7 @@ export interface ApiPostPostRequest {
 export interface PostApiInterface {
     /**
      * 
-     * @param {Pagination} [pagination] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof PostApiInterface
-     */
-    apiPostGetRaw(requestParameters: ApiPostGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDtoGenericListNewLevelResponse>>;
-
-    /**
-     */
-    apiPostGet(requestParameters: ApiPostGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDtoGenericListNewLevelResponse>;
-
-    /**
-     * 
+     * @param {string} [guidSignalR] 
      * @param {string} [text] 
      * @param {Array<Blob>} [photos] 
      * @param {Array<Blob>} [videos] 
@@ -67,11 +64,41 @@ export interface PostApiInterface {
      * @throws {RequiredError}
      * @memberof PostApiInterface
      */
-    apiPostPostRaw(requestParameters: ApiPostPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
+    apiPostCreatePostPostRaw(requestParameters: ApiPostCreatePostPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>>;
 
     /**
      */
-    apiPostPost(requestParameters: ApiPostPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
+    apiPostCreatePostPost(requestParameters: ApiPostCreatePostPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse>;
+
+    /**
+     * 
+     * @param {number} [page] 
+     * @param {number} [pageSize] 
+     * @param {number} [totalItems] 
+     * @param {number} [pageCount] 
+     * @param {string} [search] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PostApiInterface
+     */
+    apiPostGetAllGetRaw(requestParameters: ApiPostGetAllGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDtoGenericListNewLevelResponse>>;
+
+    /**
+     */
+    apiPostGetAllGet(requestParameters: ApiPostGetAllGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDtoGenericListNewLevelResponse>;
+
+    /**
+     * 
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PostApiInterface
+     */
+    apiPostGetIdGetRaw(requestParameters: ApiPostGetIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDtoNewLevelResponse>>;
+
+    /**
+     */
+    apiPostGetIdGet(requestParameters: ApiPostGetIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDtoNewLevelResponse>;
 
 }
 
@@ -82,46 +109,12 @@ export class PostApi extends runtime.BaseAPI implements PostApiInterface {
 
     /**
      */
-    async apiPostGetRaw(requestParameters: ApiPostGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDtoGenericListNewLevelResponse>> {
+    async apiPostCreatePostPostRaw(requestParameters: ApiPostCreatePostPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
         const queryParameters: any = {};
 
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("Bearer", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
+        if (requestParameters['guidSignalR'] != null) {
+            queryParameters['GuidSignalR'] = requestParameters['guidSignalR'];
         }
-
-        let urlPath = `/api/Post`;
-
-        const response = await this.request({
-            path: urlPath,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-            body: PaginationToJSON(requestParameters['pagination']),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => PostDtoGenericListNewLevelResponseFromJSON(jsonValue));
-    }
-
-    /**
-     */
-    async apiPostGet(requestParameters: ApiPostGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDtoGenericListNewLevelResponse> {
-        const response = await this.apiPostGetRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     */
-    async apiPostPostRaw(requestParameters: ApiPostPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BooleanNewLevelResponse>> {
-        const queryParameters: any = {};
 
         if (requestParameters['text'] != null) {
             queryParameters['Text'] = requestParameters['text'];
@@ -168,7 +161,7 @@ export class PostApi extends runtime.BaseAPI implements PostApiInterface {
         }
 
 
-        let urlPath = `/api/Post`;
+        let urlPath = `/api/Post/CreatePost`;
 
         const response = await this.request({
             path: urlPath,
@@ -183,8 +176,106 @@ export class PostApi extends runtime.BaseAPI implements PostApiInterface {
 
     /**
      */
-    async apiPostPost(requestParameters: ApiPostPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
-        const response = await this.apiPostPostRaw(requestParameters, initOverrides);
+    async apiPostCreatePostPost(requestParameters: ApiPostCreatePostPostRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BooleanNewLevelResponse> {
+        const response = await this.apiPostCreatePostPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiPostGetAllGetRaw(requestParameters: ApiPostGetAllGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDtoGenericListNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['page'] != null) {
+            queryParameters['Page'] = requestParameters['page'];
+        }
+
+        if (requestParameters['pageSize'] != null) {
+            queryParameters['PageSize'] = requestParameters['pageSize'];
+        }
+
+        if (requestParameters['totalItems'] != null) {
+            queryParameters['TotalItems'] = requestParameters['totalItems'];
+        }
+
+        if (requestParameters['pageCount'] != null) {
+            queryParameters['PageCount'] = requestParameters['pageCount'];
+        }
+
+        if (requestParameters['search'] != null) {
+            queryParameters['Search'] = requestParameters['search'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/Post/GetAll`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PostDtoGenericListNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiPostGetAllGet(requestParameters: ApiPostGetAllGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDtoGenericListNewLevelResponse> {
+        const response = await this.apiPostGetAllGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiPostGetIdGetRaw(requestParameters: ApiPostGetIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PostDtoNewLevelResponse>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling apiPostGetIdGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/Post/Get/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PostDtoNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiPostGetIdGet(requestParameters: ApiPostGetIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PostDtoNewLevelResponse> {
+        const response = await this.apiPostGetIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

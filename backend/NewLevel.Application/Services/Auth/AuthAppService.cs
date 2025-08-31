@@ -14,10 +14,10 @@ namespace NewLevel.Application.Services.Auth
         private readonly IEmailService _emailService;
         private readonly IRepository<User> _userRepository;
         private readonly IRepository<BandsUsers> _bandsUsersRepository;
-        private readonly AmazonS3Service _s3Service;
+        private readonly StorageService _s3Service;
 
         public AuthAppService(IAuthenticateService authenticateService, IEmailService emailService, IRepository<User> userRepository, 
-            IRepository<BandsUsers> bandsUsersRepository, AmazonS3Service amazonS3Service)
+            IRepository<BandsUsers> bandsUsersRepository, StorageService amazonS3Service)
         {
             _authService = authenticateService;
             _emailService = emailService;
@@ -168,11 +168,12 @@ namespace NewLevel.Application.Services.Auth
                 return new TokensDto { Token = string.Empty, RefreshToken = string.Empty };
             }
 
+            var user = await _userRepository.FirstOrDefaultAsync(x => x.Email == email);
             // Revogar refresh token atual (token rotation)
             await _authService.RemoveRefreshToken(refreshToken);
 
             // Gerar novos tokens
-            var newAccessToken = await _authService.GenerateJwtToken(email);
+            var newAccessToken = await _authService.GenerateJwtToken(email, await _s3Service.GetOrGenerateAvatarPrivateUrl(user));
             var newRefreshToken = await _authService.GenerateRefreshToken();
             
             // Salvar novo refresh token

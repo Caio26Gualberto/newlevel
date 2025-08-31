@@ -33,7 +33,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Criar o Provider do contexto de autenticação
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [token, setTokenState] = useState<string | null>(localStorage.getItem('accessToken'));
+  const [token, setTokenState] = useState<string | null>(localStorage.getItem('accessToken'));
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
     useEffect(() => {

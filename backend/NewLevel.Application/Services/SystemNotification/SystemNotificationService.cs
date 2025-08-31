@@ -18,9 +18,9 @@ namespace NewLevel.Application.Services.SystemNotifications
         private readonly IRepository<SystemNotification> _repository;
         private readonly IRepository<BandsUsers> _bandUsers;
         private readonly IUserService _userService;
-        private readonly AmazonS3Service _s3Service;
+        private readonly StorageService _s3Service;
         public SystemNotificationService(IServiceProvider serviceProvider, IRepository<SystemNotification> repository, IUserService userService, 
-            IRepository<BandsUsers> bandUsers, AmazonS3Service s3Service)
+            IRepository<BandsUsers> bandUsers, StorageService s3Service)
         {
             _serviceProvider = serviceProvider;
             _repository = repository;

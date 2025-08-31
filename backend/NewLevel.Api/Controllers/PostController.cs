@@ -16,7 +16,7 @@ namespace NewLevel.Api.Controllers
             _postService = postService;
         }
 
-        [HttpPost]
+        [HttpPost("CreatePost")]
         [RequestSizeLimit(1073741824)]
         public async Task<ActionResult<NewLevelResponse<bool>>> CreatePost(CreatePostInput input)
         {
@@ -41,8 +41,8 @@ namespace NewLevel.Api.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<ActionResult<NewLevelResponse<GenericList<PostDto>>>> GetAll(Pagination input)
+        [HttpGet("GetAll")]
+        public async Task<ActionResult<NewLevelResponse<GenericList<PostDto>>>> GetAll([FromQuery] Pagination input)
         {
             try
             {
@@ -62,5 +62,29 @@ namespace NewLevel.Api.Controllers
                 });
             }
         }
+
+        [HttpGet("Get/{id}")]
+        public async Task<ActionResult<NewLevelResponse<PostDto>>> Get([FromRoute] int id)
+        {
+            try
+            {
+                var result = await _postService.GetPost(id);
+
+                return Ok(new NewLevelResponse<PostDto>
+                {
+                    IsSuccess = true,
+                    Data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<PostDto>
+                {
+                    IsSuccess = false,
+                    Message = ex.Message
+                });
+            }
+        }
+
     }
 }

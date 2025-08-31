@@ -15,10 +15,11 @@ namespace NewLevel.Application.Services.Comments
         private readonly IRepository<Photo> _photoRepository;
         private readonly IRepository<Media> _mediaRepository;
         private readonly IRepository<Event> _eventRepository;
+        private readonly IRepository<Post> _postRepository;
         private readonly IServiceProvider _serviceProvider;
-        private readonly AmazonS3Service _s3Service;
-        public CommentService(IRepository<Comment> repository, IRepository<Photo> photoRepository, IRepository<Media> mediaRepository, IRepository<Event> eventRepository,
-            IServiceProvider serviceProvider, AmazonS3Service s3Service)
+        private readonly StorageService _s3Service;
+        public CommentService(IRepository<Comment> repository, IRepository<Photo> photoRepository, IRepository<Media> mediaRepository, IRepository<Post> postRepository,
+            IRepository<Event> eventRepository, IServiceProvider serviceProvider, StorageService s3Service)
         {
             _repository = repository;
             _photoRepository = photoRepository;
@@ -26,6 +27,7 @@ namespace NewLevel.Application.Services.Comments
             _serviceProvider = serviceProvider;
             _s3Service = s3Service;
             _eventRepository = eventRepository;
+            _postRepository = postRepository;
         }
 
         public async Task<bool> SaveComment(ReceiveCommentDto input)
@@ -38,7 +40,8 @@ namespace NewLevel.Application.Services.Comments
                 UserId = user.Id,
                 MediaId = input.MediaId,
                 PhotoId = input.PhotoId,
-                EventId = input.EventId
+                EventId = input.EventId,
+                PostId = input.PostId
             });
 
             return true;
@@ -124,6 +127,35 @@ namespace NewLevel.Application.Services.Comments
             return new CommentsPhotoResponseDto
             {
                 Title = @event.Title,
+                Comments = commentsDto.ToList()
+            };
+        }
+
+        public async Task<CommentsPhotoResponseDto> GetCommentsByPostId(Pagination pagination, int postId)
+        {
+            var skip = (pagination.Page - 1) * pagination.PageSize;
+
+            var post = await _postRepository.FirstOrDefaultAsync(x => x.Id == postId);
+
+            var comments = await _repository.GetAll()
+                .Include(x => x.User)
+                .Where(x => x.PostId == post.Id)
+                .OrderByDescending(post => post.CreationTime)
+                .Skip(skip)
+                .Take(pagination.PageSize)
+                .ToListAsync();
+
+            var commentsDto = await Task.WhenAll(comments.Select(async x => new CommentsListDto
+            {
+                Comment = x.Text,
+                DateOfComment = x.CreationTime,
+                UserAvatarSrc = await _s3Service.GetOrGenerateAvatarPrivateUrl(x.User),
+                UserName = x.User.Nickname
+            }));
+
+            return new CommentsPhotoResponseDto
+            {
+                Title = "N/A",
                 Comments = commentsDto.ToList()
             };
         }

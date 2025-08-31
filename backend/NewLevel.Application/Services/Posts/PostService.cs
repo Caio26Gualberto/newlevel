@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using NewLevel.Application.Interfaces.Posts;
-using NewLevel.Application.Interfaces.Youtube;
 using NewLevel.Application.Services.Amazon;
 using NewLevel.Application.Services.SignalR;
 using NewLevel.Application.Utils.UserUtils;
 using NewLevel.Domain.Entities;
+using NewLevel.Domain.Enums.Like;
 using NewLevel.Domain.Interfaces.Repositories.UnitOfWork;
 using NewLevel.Domain.Interfaces.Repository;
 using NewLevel.Shared.DTOs.Comments;
@@ -20,20 +20,20 @@ namespace NewLevel.Application.Services.Posts
     public class PostService : IPostService
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly AmazonS3Service _S3Service;
-        private readonly IYoutubeService _youtubeService;
+        private readonly StorageService _S3Service;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHubContext<PostsHub> _hubContext;
         private readonly IRepository<Post> _repository;
-        public PostService(IServiceProvider serviceProvider, AmazonS3Service s3Service, IYoutubeService youtubeService, IUnitOfWork unitOfWork, 
-            IHubContext<PostsHub> hubContext, IRepository<Post> repository)
+        private readonly IRepository<Like> _likesRepsitory;
+        public PostService(IServiceProvider serviceProvider, StorageService s3Service, IUnitOfWork unitOfWork,
+            IHubContext<PostsHub> hubContext, IRepository<Post> repository, IRepository<Like> likesRepository)
         {
             _serviceProvider = serviceProvider;
             _S3Service = s3Service;
-            _youtubeService = youtubeService;
             _unitOfWork = unitOfWork;
             _hubContext = hubContext;
             _repository = repository;
+            _likesRepsitory = likesRepository;
         }
 
         public async Task<bool> CreatePostAsync(CreatePostInput input)
@@ -61,18 +61,8 @@ namespace NewLevel.Application.Services.Posts
                 {
                     foreach (var photo in input.Photos)
                     {
-                        current++;
-                        await _hubContext.Clients.User(user.Id.ToString())
-                            .SendAsync("UploadProgress", new
-                            {
-                                PostId = post.Id,
-                                Type = "photo",
-                                Index = current,
-                                Total = totalItems
-                            });
-
                         var key = _S3Service.CreateKey(EAmazonFolderType.PostPhoto, post.Id.ToString());
-                        var url = await _S3Service.UploadFilesAsync(key, photo, EAmazonFolderType.PostPhoto);
+                        var result = await _S3Service.UploadFilesAsync(key, photo, EAmazonFolderType.PostPhoto);
                         photos.Add(new Photo
                         {
                             KeyS3 = key,
@@ -83,6 +73,16 @@ namespace NewLevel.Application.Services.Posts
                             Subtitle = string.Empty,
                             IsPublic = true
                         });
+                        current++;
+                        await _hubContext.Clients.User(user.Id.ToString())
+                            .SendAsync("UploadProgress", new
+                            {
+                                PostId = input.GuidSignalR,
+                                Type = "photo",
+                                Index = current,
+                                Total = totalItems,
+                                FileName = photo.FileName
+                            });
                     }
                 }
 
@@ -90,36 +90,38 @@ namespace NewLevel.Application.Services.Posts
                 {
                     foreach (var video in input.Videos)
                     {
+                        var key = _S3Service.CreateKey(EAmazonFolderType.PostMedia, post.Id.ToString());
+                        var result = await _S3Service.UploadFilesAsync(key, video, EAmazonFolderType.PostMedia);
+
+                        if (result)
+                        {
+                            medias.Add(new Media
+                            {
+                                KeyS3 = key,
+                                PostId = post.Id,
+                                Title = video.FileName,
+                                Description = input.Text,
+                                IsPublic = true,
+                                UserId = user.Id
+                            });
+                        }
                         current++;
                         await _hubContext.Clients.User(user.Id.ToString())
                             .SendAsync("UploadProgress", new
                             {
-                                PostId = post.Id,
+                                PostId = input.GuidSignalR,
                                 Type = "video",
                                 Index = current,
-                                Total = totalItems
+                                Total = totalItems,
+                                FileName = video.FileName
                             });
-
-                        var youtubeVideoId = await _youtubeService.UploadVideoToYoutube(video, video.FileName, input.Text);
-                        if (youtubeVideoId != null)
-                        {
-                            medias.Add(new Media
-                            {
-                                PostId = post.Id,
-                                Title = video.FileName,
-                                Description = input.Text,
-                                YoutubeId = youtubeVideoId,
-                                IsPublic = true,
-                                Src = $"https://www.youtube.com/embed/{youtubeVideoId}"
-                            });
-                        }
                     }
                 }
 
-                if (photos.Any())               
+                if (photos.Any())
                     post.Photos = photos;
-                
-                if (medias.Any())             
+
+                if (medias.Any())
                     post.Videos = medias;
 
                 await _unitOfWork.CommitAsync();
@@ -127,7 +129,7 @@ namespace NewLevel.Application.Services.Posts
                 await _hubContext.Clients.User(user.Id.ToString())
                     .SendAsync("UploadCompleted", new
                     {
-                        PostId = post.Id,
+                        PostId = input.GuidSignalR,
                         Success = true
                     });
 
@@ -152,11 +154,19 @@ namespace NewLevel.Application.Services.Posts
                 .Include(x => x.Photos)
                 .Include(x => x.Videos)
                 .Include(x => x.User)
-                .Where(x => x.Videos != null && x.Videos.Any(x => !string.IsNullOrEmpty(x.YoutubeId)))
+                .Where(x => x.Videos != null && x.Videos.Any(x => !string.IsNullOrEmpty(x.KeyS3)))
                 .OrderByDescending(x => x.CreationTime)
                 .Skip(skip)
                 .Take(input.PageSize)
                 .ToListAsync();
+
+            var postsIds = allPosts.Select(x => x.Id).ToList();
+            var likes = await _likesRepsitory.GetAll()
+                .Where(x => x.TargetType == ETargetType.Post)
+                .Where(x => postsIds.Contains(x.TargetId))
+                .ToListAsync();
+
+            int totalLikes = likes.Count;
 
             int totalPosts = allPosts.Count;
 
@@ -186,21 +196,28 @@ namespace NewLevel.Application.Services.Posts
                     }))).ToList()
                     : new List<CommentsListDto>();
 
+                var medias = post.Videos != null && post.Videos.Any()
+                    ? (await Task.WhenAll(post.Videos.Select(async v => new MediaDto
+                    {
+                        Id = v.Id,
+                        Title = v.Title,
+                        Description = v.Description,
+                        Src = await _S3Service.GetOrGenerateMediaPrivateUrl(v),
+                    }))).ToList() : new List<MediaDto>();
+
                 response.Add(new PostDto
                 {
                     PostId = post.Id,
                     Content = post.Content,
                     CreatedAt = post.CreationTime,
                     Photos = photos,
-                    Medias = post.Videos?.Select(v => new MediaDto
-                    {
-                        Id = v.Id,
-                        Title = v.Title,
-                        Description = v.Description,
-                        Src = v.Src
-                    }).ToList() ?? new List<MediaDto>(),
+                    Medias = medias,
                     Comments = comments,
-                    CommentsCount = post.Comments?.Count ?? 0
+                    CommentsCount = post.Comments?.Count ?? 0,
+                    LikesCount = totalLikes,
+                    IsLiked = likes.Any(x => x.UserId == post.UserId && x.TargetId == post.Id && x.TargetType == ETargetType.Post),
+                    UserAvatar = await _S3Service.GetOrGenerateAvatarPrivateUrl(post.User),
+                    UserName = post.User.Nickname
                 });
             }
 
@@ -208,6 +225,61 @@ namespace NewLevel.Application.Services.Posts
             {
                 TotalCount = totalPosts,
                 Items = response
+            };
+        }
+
+        public async Task<PostDto> GetPost(int id)
+        {
+            var post = await _repository.GetAll()
+                .Include(x => x.Comments)
+                .Include(x => x.Photos)
+                .Include(x => x.Videos)
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (post == null)
+                throw new Exception("Post não encontrado");
+
+            return new PostDto
+            {
+                PostId = post.Id,
+                Content = post.Content,
+                CreatedAt = post.CreationTime,
+                Photos = post.Photos != null && post.Photos.Any()
+                    ? (await Task.WhenAll(post.Photos.Select(async p => new PhotoResponseDto
+                    {
+                        Id = p.Id,
+                        Src = await _S3Service.GetOrGeneratePhotoPrivateUrl(p),
+                        Title = p.Title,
+                        Description = p.Description,
+                        CaptureDate = p.CaptureDate,
+                        Subtitle = p.Subtitle
+                    }))).ToList()
+                    : new List<PhotoResponseDto>(),
+                Medias = post.Videos != null && post.Videos.Any()
+                    ? (await Task.WhenAll(post.Videos.Select(async v => new MediaDto
+                    {
+                        Id = v.Id,
+                        Title = v.Title,
+                        Description = v.Description,
+                        Src = await _S3Service.GetOrGenerateMediaPrivateUrl(v),
+                    }))).ToList() : new List<MediaDto>(),
+                Comments = post.Comments != null && post.Comments.Any()
+                    ? (await Task.WhenAll(post.Comments.Select(async c => new CommentsListDto
+                    {
+                        Comment = c.Text,
+                        UserName = c.User.Nickname,
+                        DateOfComment = c.CreationTime,
+                        UserAvatarSrc = await _S3Service.GetOrGenerateAvatarPrivateUrl(c.User)
+                    }))).ToList() : new List<CommentsListDto>(),
+                CommentsCount = post.Comments?.Count ?? 0,
+                LikesCount = await _likesRepsitory.GetAll()
+                    .Where(x => x.TargetType == ETargetType.Post)
+                    .Where(x => x.TargetId == post.Id)
+                    .CountAsync(),
+                IsLiked = await _likesRepsitory.GetAll().AnyAsync(x => x.UserId == post.UserId && x.TargetId == post.Id && x.TargetType == ETargetType.Post),
+                UserAvatar = await _S3Service.GetOrGenerateAvatarPrivateUrl(post.User),
+                UserName = post.User.Nickname
             };
         }
     }

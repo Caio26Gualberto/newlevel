@@ -18,8 +18,6 @@ using NewLevel.Application.Interfaces.Photos;
 using NewLevel.Application.Interfaces.Posts;
 using NewLevel.Application.Interfaces.SystemNotification;
 using NewLevel.Application.Interfaces.User;
-using NewLevel.Application.Interfaces.Youtube;
-using NewLevel.Application.Services;
 using NewLevel.Application.Services.Amazon;
 using NewLevel.Application.Services.Auth;
 using NewLevel.Application.Services.Bands;
@@ -93,6 +91,17 @@ namespace NewLevel.Infra.IoC
             })
             .AddJwtBearer(options =>
             {
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/posts"))
+                            context.Token = accessToken;
+                        return Task.CompletedTask;
+                    }
+                };
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
@@ -109,12 +118,11 @@ namespace NewLevel.Infra.IoC
             // Dependency Injection
             services.AddScoped<IAuthenticateService, AuthenticateService>();
             services.AddScoped<AuthAppService>();
-            services.AddScoped<AmazonS3Service>();
+            services.AddScoped<StorageService>();
             services.AddScoped<SeedWorker>();
             services.AddScoped<AuthenticateService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IGithubService, GithubService>();
-            services.AddScoped<IYoutubeService, YoutubeService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<ISystemNotificationService, SystemNotificationService>();

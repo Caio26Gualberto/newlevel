@@ -76,6 +76,26 @@ namespace NewLevel.Api.Controllers
             }
         }
 
+        [HttpGet("GetCommentsByPostId")]
+        public async Task<ActionResult<NewLevelResponse<CommentsPhotoResponseDto>>> GetCommentsByPostId([FromQuery] Pagination pagination, int postId)
+        {
+            try
+            {
+                var result = await _commentService.GetCommentsByPostId(pagination, postId);
+
+                if (result.Comments.Count >= 0)
+                {
+                    return Ok(new NewLevelResponse<CommentsPhotoResponseDto> { IsSuccess = true, Data = result });
+                }
+
+                return StatusCode(500, new NewLevelResponse<CommentsPhotoResponseDto> { IsSuccess = false });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new NewLevelResponse<CommentsPhotoResponseDto> { Message = ex.Message, IsSuccess = false });
+            }
+        }
+
         [HttpPost("SaveComment")]
         public async Task<ActionResult<NewLevelResponse<bool>>> SaveComment(ReceiveCommentDto input)
         {

@@ -7,8 +7,8 @@ namespace NewLevel.Domain.Entities
         public string Src { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public string? YoutubeId { get; set; } = null;
         public bool IsPublic { get; set; } = false;
+        public string? KeyS3 { get; set; } = string.Empty;
 
         public int UserId { get; set; }
         [ForeignKey("UserId")]

@@ -18,8 +18,8 @@ namespace NewLevel.Application.Services.Photos
         private readonly IServiceProvider _serviceProvider;
         private readonly IConfiguration _configuration;
         private readonly IRepository<Photo> _repository;
-        private readonly AmazonS3Service _s3Service;
-        public PhotoService(IServiceProvider serviceProvider, IConfiguration configuration, IRepository<Photo> repository, AmazonS3Service s3Service)
+        private readonly StorageService _s3Service;
+        public PhotoService(IServiceProvider serviceProvider, IConfiguration configuration, IRepository<Photo> repository, StorageService s3Service)
         {
             _serviceProvider = serviceProvider;
             _configuration = configuration;

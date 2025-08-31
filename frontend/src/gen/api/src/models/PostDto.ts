@@ -49,6 +49,24 @@ export interface PostDto {
     postId?: number;
     /**
      * 
+     * @type {string}
+     * @memberof PostDto
+     */
+    userAvatar?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof PostDto
+     */
+    userName?: string | null;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PostDto
+     */
+    isLiked?: boolean;
+    /**
+     * 
      * @type {number}
      * @memberof PostDto
      */
@@ -83,6 +101,12 @@ export interface PostDto {
      * @memberof PostDto
      */
     medias?: Array<MediaDto> | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof PostDto
+     */
+    likesCount?: number;
 }
 
 /**
@@ -103,12 +127,16 @@ export function PostDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): P
     return {
         
         'postId': json['postId'] == null ? undefined : json['postId'],
+        'userAvatar': json['userAvatar'] == null ? undefined : json['userAvatar'],
+        'userName': json['userName'] == null ? undefined : json['userName'],
+        'isLiked': json['isLiked'] == null ? undefined : json['isLiked'],
         'commentsCount': json['commentsCount'] == null ? undefined : json['commentsCount'],
         'content': json['content'] == null ? undefined : json['content'],
         'createdAt': json['createdAt'] == null ? undefined : (new Date(json['createdAt'])),
         'comments': json['comments'] == null ? undefined : ((json['comments'] as Array<any>).map(CommentsListDtoFromJSON)),
         'photos': json['photos'] == null ? undefined : ((json['photos'] as Array<any>).map(PhotoResponseDtoFromJSON)),
         'medias': json['medias'] == null ? undefined : ((json['medias'] as Array<any>).map(MediaDtoFromJSON)),
+        'likesCount': json['likesCount'] == null ? undefined : json['likesCount'],
     };
 }
 
@@ -124,12 +152,16 @@ export function PostDtoToJSONTyped(value?: PostDto | null, ignoreDiscriminator: 
     return {
         
         'postId': value['postId'],
+        'userAvatar': value['userAvatar'],
+        'userName': value['userName'],
+        'isLiked': value['isLiked'],
         'commentsCount': value['commentsCount'],
         'content': value['content'],
         'createdAt': value['createdAt'] == null ? undefined : ((value['createdAt']).toISOString()),
         'comments': value['comments'] == null ? undefined : ((value['comments'] as Array<any>).map(CommentsListDtoToJSON)),
         'photos': value['photos'] == null ? undefined : ((value['photos'] as Array<any>).map(PhotoResponseDtoToJSON)),
         'medias': value['medias'] == null ? undefined : ((value['medias'] as Array<any>).map(MediaDtoToJSON)),
+        'likesCount': value['likesCount'],
     };
 }
 

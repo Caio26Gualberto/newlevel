@@ -55,6 +55,15 @@ export interface ApiCommentGetCommentsByPhotoIdGetRequest {
     photoId?: number;
 }
 
+export interface ApiCommentGetCommentsByPostIdGetRequest {
+    page?: number;
+    pageSize?: number;
+    totalItems?: number;
+    pageCount?: number;
+    search?: string;
+    postId?: number;
+}
+
 export interface ApiCommentSaveCommentPostRequest {
     receiveCommentDto?: ReceiveCommentDto;
 }
@@ -119,6 +128,24 @@ export interface CommentApiInterface {
     /**
      */
     apiCommentGetCommentsByPhotoIdGet(requestParameters: ApiCommentGetCommentsByPhotoIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentsPhotoResponseDtoNewLevelResponse>;
+
+    /**
+     * 
+     * @param {number} [page] 
+     * @param {number} [pageSize] 
+     * @param {number} [totalItems] 
+     * @param {number} [pageCount] 
+     * @param {string} [search] 
+     * @param {number} [postId] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CommentApiInterface
+     */
+    apiCommentGetCommentsByPostIdGetRaw(requestParameters: ApiCommentGetCommentsByPostIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentsPhotoResponseDtoNewLevelResponse>>;
+
+    /**
+     */
+    apiCommentGetCommentsByPostIdGet(requestParameters: ApiCommentGetCommentsByPostIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentsPhotoResponseDtoNewLevelResponse>;
 
     /**
      * 
@@ -314,6 +341,65 @@ export class CommentApi extends runtime.BaseAPI implements CommentApiInterface {
      */
     async apiCommentGetCommentsByPhotoIdGet(requestParameters: ApiCommentGetCommentsByPhotoIdGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentsPhotoResponseDtoNewLevelResponse> {
         const response = await this.apiCommentGetCommentsByPhotoIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async apiCommentGetCommentsByPostIdGetRaw(requestParameters: ApiCommentGetCommentsByPostIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentsPhotoResponseDtoNewLevelResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters['page'] != null) {
+            queryParameters['Page'] = requestParameters['page'];
+        }
+
+        if (requestParameters['pageSize'] != null) {
+            queryParameters['PageSize'] = requestParameters['pageSize'];
+        }
+
+        if (requestParameters['totalItems'] != null) {
+            queryParameters['TotalItems'] = requestParameters['totalItems'];
+        }
+
+        if (requestParameters['pageCount'] != null) {
+            queryParameters['PageCount'] = requestParameters['pageCount'];
+        }
+
+        if (requestParameters['search'] != null) {
+            queryParameters['Search'] = requestParameters['search'];
+        }
+
+        if (requestParameters['postId'] != null) {
+            queryParameters['postId'] = requestParameters['postId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("Bearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+
+        let urlPath = `/api/Comment/GetCommentsByPostId`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CommentsPhotoResponseDtoNewLevelResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async apiCommentGetCommentsByPostIdGet(requestParameters: ApiCommentGetCommentsByPostIdGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentsPhotoResponseDtoNewLevelResponse> {
+        const response = await this.apiCommentGetCommentsByPostIdGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

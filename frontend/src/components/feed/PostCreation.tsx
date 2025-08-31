@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import {
     Box,
     Paper,
@@ -27,7 +27,10 @@ import {
     AttachFile,
     CheckCircle,
 } from '@mui/icons-material';
-import { signalRService, UploadProgress } from '../../services/signalRService';
+import { signalRService, UploadProgress, UploadCompleted } from '../../services/signalRService';
+import { PostApi, PostDto } from '../../gen/api/src';
+import ApiConfiguration from '../../config/apiConfig';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface MediaFile {
     file: File;
@@ -38,16 +41,9 @@ interface MediaFile {
 }
 
 interface PostCreationProps {
-    onPostCreated: (post: {
-        userId: string;
-        userName: string;
-        userAvatar?: string;
-        content: string;
-        photos: string[];
-        videos: string[];
-    }) => void;
+    onPostCreated: (post: PostDto) => void;
 }
-
+//#TODO: ENTENDER PORQUE O SIGNALR NÃO ESTA ATUALIZANDO O PROGRESSO MESMO RECEBENDO OS EVENTOS
 const PostCreation: React.FC<PostCreationProps> = ({ onPostCreated }) => {
     const [content, setContent] = useState('');
     const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
@@ -57,6 +53,8 @@ const PostCreation: React.FC<PostCreationProps> = ({ onPostCreated }) => {
     const [previewMedia, setPreviewMedia] = useState<MediaFile | null>(null);
     const [currentPostId, setCurrentPostId] = useState<string | null>(null);
     const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
+    const postService = new PostApi(ApiConfiguration);
+    const { currentUser } = useAuth();
 
     const photoInputRef = useRef<HTMLInputElement>(null);
     const videoInputRef = useRef<HTMLInputElement>(null);
@@ -65,18 +63,11 @@ const PostCreation: React.FC<PostCreationProps> = ({ onPostCreated }) => {
     const MAX_VIDEOS = 3;
     const MAX_TOTAL_SIZE = 1 * 1024 * 1024 * 1024; // 1GB in bytes
 
-    const getCurrentUser = () => ({
-        id: 'current-user',
-        name: 'Usuário Atual',
-        avatar: 'https://i.pravatar.cc/150?u=current'
-    });
-
-    // Initialize SignalR connection
     useEffect(() => {
         const initSignalR = async () => {
             try {
-                const user = getCurrentUser();
-                await signalRService.connect(user.id);
+                const user = currentUser;
+                await signalRService.connect(user?.id);
             } catch (error) {
                 console.error('Failed to connect to SignalR:', error);
             }
@@ -91,27 +82,95 @@ const PostCreation: React.FC<PostCreationProps> = ({ onPostCreated }) => {
         };
     }, []);
 
-    // Handle upload progress updates
-    const handleUploadProgress = (progress: UploadProgress) => {
-        const progressPercentage = (progress.Index / progress.Total) * 100;
+const handleUploadProgress = (progress: UploadProgress) => {
+        console.log('📊 Upload Progress received:', progress);
+
+        // Ensure postId matches current operation
+        if (currentPostId && progress.postId !== currentPostId) {
+            console.warn('⚠️ Received progress for different postId:', progress.postId, 'Expected:', currentPostId);
+            return;
+        }
+
+        const progressPercentage = (progress.index / progress.total) * 100;
+        console.log(`📈 Progress: ${progress.type} ${progress.index}/${progress.total} (${progressPercentage}%) - File: ${progress.fileName}`);
 
         setUploadProgress(prev => ({
             ...prev,
-            [`${progress.Type}-${progress.Index}`]: progressPercentage
+            [`${progress.type}-${progress.index}`]: progressPercentage
         }));
 
-        // Update individual file progress
-        setMediaFiles(prev => prev.map((file, index) => {
-            const fileKey = `${file.type === 'image' ? 'photo' : 'video'}-${index}`;
-            if (fileKey === `${progress.Type}-${progress.Index}`) {
-                return {
-                    ...file,
-                    uploadProgress: progressPercentage,
-                    isUploaded: progressPercentage === 100
-                };
+        setMediaFiles(prev => {
+            console.log('🔍 Updating mediaFiles. Progress event:', progress);
+            console.log('📁 Current mediaFiles:', prev.map((f, i) => ({ index: i, type: f.type, name: f.file.name })));
+            
+            // Find file by name instead of relying on index
+            const targetFileIndex = prev.findIndex(file => file.file.name === progress.fileName);
+            
+            if (targetFileIndex === -1) {
+                console.warn(`⚠️ File not found: ${progress.fileName}`);
+                return prev;
             }
-            return file;
-        }));
+            
+            console.log(`🎯 Found file "${progress.fileName}" at index: ${targetFileIndex}`);
+            
+            return prev.map((file, index) => {
+                if (index === targetFileIndex) {
+                    console.log(`✅ Updating file ${index} (${file.file.name}) to ${progressPercentage}%`);
+                        return {
+                            ...file,
+                            uploadProgress: progressPercentage,
+                            isUploaded: progressPercentage === 100
+                        };
+                    }
+                return file;
+            });
+        });
+    };
+
+    const handleUploadCompleted = (completed: UploadCompleted) => {
+        console.log('✅ Upload completed for post:', completed.postId   , 'Success:', completed.success);
+        
+        if (completed.success) {
+            // Mark all files as uploaded
+            setMediaFiles(prev => prev.map(file => ({
+                ...file,
+                uploadProgress: 100,
+                isUploaded: true
+            })));
+            
+            const user = currentUser;
+            
+            onPostCreated({
+                postId: parseInt(completed.postId) || Date.now(),
+                content: content.trim(),
+                photos: mediaFiles
+                    .filter(f => f.type === 'image')
+                    .map(f => ({ src: f.url })),
+                medias: mediaFiles
+                    .filter(f => f.type === 'video')
+                    .map(f => ({ src: f.url })),
+                createdAt: new Date(),
+                likesCount: 0,
+                commentsCount: 0,
+                comments: null
+            });
+            
+            setTimeout(() => {
+                setContent('');
+                setMediaFiles([]);
+                setUploadProgress({});
+                if (photoInputRef.current) photoInputRef.current.value = '';
+                if (videoInputRef.current) videoInputRef.current.value = '';
+                setIsSubmitting(false);
+                
+                // Cleanup all subscriptions
+                signalRService.clearAllSubscriptions();
+                setCurrentPostId(null);
+            }, 2000);
+        } else {
+            setError('Erro durante o upload. Alguns arquivos podem não ter sido enviados.');
+            setIsSubmitting(false);
+        }
     };
 
     const validateFiles = (newFiles: File[], type: 'image' | 'video'): string | null => {
@@ -151,7 +210,9 @@ const PostCreation: React.FC<PostCreationProps> = ({ onPostCreated }) => {
         const newMediaFiles: MediaFile[] = fileArray.map(file => ({
             file,
             url: URL.createObjectURL(file),
-            type
+            type,
+            uploadProgress: 0,
+            isUploaded: false
         }));
 
         setMediaFiles(prev => [...prev, ...newMediaFiles]);
@@ -198,14 +259,6 @@ const PostCreation: React.FC<PostCreationProps> = ({ onPostCreated }) => {
         setError(null);
 
         try {
-            const user = getCurrentUser();
-            const postId = `post-${Date.now()}`;
-            setCurrentPostId(postId);
-
-            // Subscribe to upload progress for this post
-            signalRService.subscribeToUploadProgress(postId, handleUploadProgress);
-
-            // Reset progress for all files
             setUploadProgress({});
             setMediaFiles(prev => prev.map(file => ({
                 ...file,
@@ -213,60 +266,51 @@ const PostCreation: React.FC<PostCreationProps> = ({ onPostCreated }) => {
                 isUploaded: false
             })));
 
-            // Simulate API call with FormData
-            const formData = new FormData();
-            formData.append('content', content.trim());
-            formData.append('userId', user.id);
-            formData.append('postId', postId);
-
-            mediaFiles.forEach((media, index) => {
-                if (media.type === 'image') {
-                    formData.append('photos', media.file);
-                } else {
-                    formData.append('videos', media.file);
-                }
+            // Generate postId and set it immediately
+            const postId = generateGuid();
+            setCurrentPostId(postId);
+            
+            // Subscribe to SignalR events BEFORE API call
+            console.log('🔗 Subscribing to SignalR events for postId:', postId);
+            await signalRService.ensureConnected(currentUser?.id);
+            await signalRService.subscribeToUploadProgress(postId, handleUploadProgress);
+            await signalRService.subscribeToUploadCompleted(postId, handleUploadCompleted);
+            
+            console.log('✅ SignalR subscriptions ready');
+            
+            console.log('📤 Calling API to create post...');
+            const result = await postService.apiPostCreatePostPost({
+                guidSignalR: postId,
+                text: content,
+                photos: mediaFiles.filter(f => f.type === 'image').map(f => f.file) || [],
+                videos: mediaFiles.filter(f => f.type === 'video').map(f => f.file) || []
             });
 
-            // Simulate upload with progress (replace with actual API call)
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            console.log('📥 API Response:', result);
 
-            const photos = mediaFiles.filter(f => f.type === 'image').map(f => f.url);
-            const videos = mediaFiles.filter(f => f.type === 'video').map(f => f.url);
-
-            onPostCreated({
-                userId: user.id,
-                userName: user.name,
-                userAvatar: user.avatar,
-                content: content.trim(),
-                photos,
-                videos,
-            });
-
-            // Reset form
-            setContent('');
-            setMediaFiles([]);
-            setUploadProgress({});
-
-            // Clear file inputs
-            if (photoInputRef.current) photoInputRef.current.value = '';
-            if (videoInputRef.current) videoInputRef.current.value = '';
-
-            // Unsubscribe from progress updates
-            signalRService.unsubscribeFromUploadProgress(postId);
-            setCurrentPostId(null);
-
-        } catch (err) {
-            setError('Erro ao publicar post. Tente novamente.');
-            if (currentPostId) {
-                signalRService.unsubscribeFromUploadProgress(currentPostId);
+            if (!result.isSuccess) {
+                console.error('❌ API call failed:', result.message);
+                setError(result.message || 'Erro ao criar post');
+                setIsSubmitting(false);
                 setCurrentPostId(null);
+                // Cleanup subscriptions on error
+                signalRService.unsubscribeFromUploadProgress(postId);
+                signalRService.unsubscribeFromUploadCompleted(postId);
+            } else {
+                console.log('✅ API call successful, waiting for SignalR events...');
             }
-        } finally {
+            // If success, the SignalR events will handle the rest
+
+        } catch (err: any) {
+            console.error('Error creating post:', err);
+            setError(err.message || 'Erro ao publicar post. Tente novamente.');
             setIsSubmitting(false);
+            setCurrentPostId(null);
+            // Cleanup subscriptions on error
+            signalRService.clearAllSubscriptions();
         }
     };
 
-    const user = getCurrentUser();
     const totalSize = getTotalSize();
     const sizePercentage = (totalSize / MAX_TOTAL_SIZE) * 100;
 
@@ -284,12 +328,12 @@ const PostCreation: React.FC<PostCreationProps> = ({ onPostCreated }) => {
                     {/* Header */}
                     <Box display="flex" alignItems="center" gap={2}>
                         <Avatar
-                            src={user.avatar}
+                            src={currentUser?.avatarUrl}
                             sx={{ width: 48, height: 48 }}
                         />
                         <Box>
                             <Typography variant="h6" fontWeight="bold">
-                                {user.name}
+                                {currentUser?.name}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
                                 Criar novo post
@@ -569,33 +613,54 @@ const PostCreation: React.FC<PostCreationProps> = ({ onPostCreated }) => {
                     <Collapse in={isSubmitting}>
                         <Box sx={{ mt: 2 }}>
                             <Typography variant="body2" color="text.secondary" gutterBottom>
-                                Enviando arquivos...
+                                {currentPostId ? 'Enviando arquivos...' : 'Criando post...'}
                             </Typography>
 
-                            {/* Overall Progress */}
-                            <Box sx={{ mb: 2 }}>
-                                <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                                    <Typography variant="body2">
-                                        Progresso geral
+                            {/* Show indeterminate progress if no SignalR events yet */}
+                            {!currentPostId ? (
+                                <Box sx={{ mb: 2 }}>
+                                    <Typography variant="body2" sx={{ mb: 1 }}>
+                                        Preparando upload
                                     </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {mediaFiles.filter(f => f.isUploaded).length} / {mediaFiles.length} arquivos
-                                    </Typography>
+                                    <LinearProgress
+                                        variant="indeterminate"
+                                        sx={{
+                                            height: 8,
+                                            borderRadius: 4,
+                                            bgcolor: 'rgba(0,0,0,0.1)',
+                                            '& .MuiLinearProgress-bar': {
+                                                bgcolor: '#2196f3',
+                                                borderRadius: 4
+                                            }
+                                        }}
+                                    />
                                 </Box>
-                                <LinearProgress
-                                    variant="determinate"
-                                    value={mediaFiles.length > 0 ? (mediaFiles.filter(f => f.isUploaded).length / mediaFiles.length) * 100 : 0}
-                                    sx={{
-                                        height: 8,
-                                        borderRadius: 4,
-                                        bgcolor: 'rgba(0,0,0,0.1)',
-                                        '& .MuiLinearProgress-bar': {
-                                            bgcolor: '#4caf50',
-                                            borderRadius: 4
-                                        }
-                                    }}
-                                />
-                            </Box>
+                            ) : (
+                                /* Overall Progress */
+                                <Box sx={{ mb: 2 }}>
+                                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                                        <Typography variant="body2">
+                                            Progresso geral
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {mediaFiles.filter(f => f.isUploaded).length} / {mediaFiles.length} arquivos
+                                        </Typography>
+                                    </Box>
+                                    <LinearProgress
+                                        variant="determinate"
+                                        value={mediaFiles.length > 0 ? (mediaFiles.filter(f => f.isUploaded).length / mediaFiles.length) * 100 : 0}
+                                        sx={{
+                                            height: 8,
+                                            borderRadius: 4,
+                                            bgcolor: 'rgba(0,0,0,0.1)',
+                                            '& .MuiLinearProgress-bar': {
+                                                bgcolor: '#4caf50',
+                                                borderRadius: 4
+                                            }
+                                        }}
+                                    />
+                                </Box>
+                            )}
 
                             {/* Individual File Progress */}
                             <Stack spacing={1}>
@@ -735,3 +800,12 @@ const PostCreation: React.FC<PostCreationProps> = ({ onPostCreated }) => {
 };
 
 export default PostCreation;
+
+function generateGuid(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+  

@@ -24,6 +24,7 @@ import NotFound from '../views/error/NotFound';
 import Profile from '../views/profile/Profile';
 import EventDetail from '../views/events/EventDetail';
 import Feed from '../views/feed/Feed';
+import PostDetail from '../views/feed/PostDetail';
 
 const Routes = () => {
   return (
@@ -39,6 +40,7 @@ const Routes = () => {
           <Route path="/videos" element={<Videos />} />
           <Route path="/photos" element={<Photos />} />
           <Route path="/feed" element={<Feed />} />
+          <Route path="/feed/:postId" element={<PostDetail />} />
           <Route path="/events" element={<Events />} />
           <Route path="/event/:eventId" element={<EventDetail />} />
           <Route path="/podcasts" element={<Podcast />} />

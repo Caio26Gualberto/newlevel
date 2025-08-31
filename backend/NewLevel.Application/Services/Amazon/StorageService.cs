@@ -8,33 +8,42 @@ using Microsoft.Extensions.Configuration;
 using NewLevel.Application.Interfaces.Cache;
 using NewLevel.Domain.Entities;
 using NewLevel.Shared.Enums.Amazon;
+using System.IO;
 
 namespace NewLevel.Application.Services.Amazon
 {
-    public class AmazonS3Service
+    public class StorageService
     {
         public static string Bucket = "newlevel-images";
-        public static string AvatarKey = "avatars/_userId_/_guid_";
-        public static string BannerKey = "banners/_userId_/_guid_";
-        public static string EventBannerKey = "eventBanners/_userId_/_guid_";
-        public static string PhotoKey = "photos/_fileTitle_/_guid_";
-        public static string PostPhotoKey = "postPhotos/_postId_/_guid_";
-        public string AwsKeyId { get; private set; }
-        public string AwsKeySecret { get; private set; }
+        public static string AvatarKey = "avatars/_userId__guid_";
+        public static string BannerKey = "banners/_userId__guid_";
+        public static string EventBannerKey = "eventBanners_userId_/_guid_";
+        public static string PhotoKey = "photos/_fileTitle__guid_";
+        public static string PostPhotoKey = "postPhotos/_postId__guid_";
+        public static string PostMediaKey = "postMedia/_postId__guid_";
+        public static bool IsAWS = false;
+        public string StorageKeyId { get; private set; }
+        public string StorageKeySecret { get; private set; }
         public BasicAWSCredentials AwsCredentials { get; private set; }
 
         private readonly IAmazonS3 _s3Client;
         private readonly ICacheService _redisService;
 
-        public AmazonS3Service(IConfiguration configuration, ICacheService cache)
+        public StorageService(IConfiguration configuration, ICacheService cache)
         {
-            AwsKeyId = configuration["Aws:AccessKeyId"]!;
-            AwsKeySecret = configuration["Aws:SecretAccessKey"]!; ;
-            AwsCredentials = new BasicAWSCredentials(AwsKeyId, AwsKeySecret);
-            var config = new AmazonS3Config
+            StorageKeyId = configuration["Wasabi:AccessKeyId"]!;
+            StorageKeySecret = configuration["Wasabi:SecretAccessKey"]!; ;
+            AwsCredentials = new BasicAWSCredentials(StorageKeyId, StorageKeySecret);
+            var config = new AmazonS3Config();
+
+            if (IsAWS)
+                config.RegionEndpoint = RegionEndpoint.USEast2; // Ohio
+            else
             {
-                RegionEndpoint = RegionEndpoint.USEast2
-            };
+                config.ForcePathStyle = true;
+                config.ServiceURL = "https://s3.us-east-2.wasabisys.com";
+            }
+
             _s3Client = new AmazonS3Client(AwsCredentials, config);
             _redisService = cache;
         }
@@ -52,6 +61,7 @@ namespace NewLevel.Application.Services.Amazon
                 Key = key,
                 BucketName = Bucket,
                 ContentType = file.ContentType,
+                DisableDefaultChecksumValidation = !IsAWS
             });
 
             return true;
@@ -80,7 +90,7 @@ namespace NewLevel.Application.Services.Amazon
         public string CreateKey(EAmazonFolderType folderType, string key)
         {
             switch (folderType)
-            {               
+            {
                 case EAmazonFolderType.Avatars:
                     return AvatarKey.Replace("_userId_", key).Replace("_guid_", Guid.NewGuid().ToString());
                 case EAmazonFolderType.Photo:
@@ -91,6 +101,8 @@ namespace NewLevel.Application.Services.Amazon
                     return EventBannerKey.Replace("_userId_", key).Replace("_guid_", Guid.NewGuid().ToString());
                 case EAmazonFolderType.PostPhoto:
                     return PostPhotoKey.Replace("_postId_", key).Replace("_guid_", Guid.NewGuid().ToString());
+                case EAmazonFolderType.PostMedia:
+                    return PostMediaKey.Replace("_postId_", key).Replace("_guid_", Guid.NewGuid().ToString());
                 default:
                     throw new ArgumentOutOfRangeException(nameof(folderType), folderType, null);
             }
@@ -160,6 +172,24 @@ namespace NewLevel.Application.Services.Amazon
 
             // Não tem no cache -> gera nova
             var url = await CreateTempURLS3(@event.BannerKey!, EAmazonFolderType.EventBanner);
+
+            await _redisService.SetAsync(cacheKey, url, TimeSpan.FromDays(2));
+            return url;
+        }
+
+        public async Task<string> GetOrGenerateMediaPrivateUrl(Media media)
+        {
+            if (string.IsNullOrEmpty(media.KeyS3))
+                return string.Empty;
+
+            var cacheKey = $"user:{media.KeyS3}:postMedia";
+
+            var cachedUrl = await _redisService.GetAsync<string>(cacheKey);
+            if (!string.IsNullOrEmpty(cachedUrl))
+                return cachedUrl;
+
+            // Não tem no cache -> gera nova
+            var url = await CreateTempURLS3(media.KeyS3!, EAmazonFolderType.PostMedia);
 
             await _redisService.SetAsync(cacheKey, url, TimeSpan.FromDays(2));
             return url;

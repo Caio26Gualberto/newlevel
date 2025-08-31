@@ -27,10 +27,10 @@ namespace NewLevel.Application.Services.DomainUser
         private readonly IServiceProvider _serviceProvider;
         private readonly IConfiguration _configuration;
         private readonly AuthAppService _authService;
-        private readonly AmazonS3Service _s3Service;
+        private readonly StorageService _s3Service;
         public UserService(IRepository<User> repository, IServiceProvider serviceProvider, IConfiguration configuration, IRepository<Band> bandRepository,
             IRepository<BandsUsers> bandsUsersRepository, IRepository<SystemNotification> systemNotificationRepository, AuthAppService authenticateService, 
-            AmazonS3Service s3Service)
+            StorageService s3Service)
         {
             _repository = repository;
             _serviceProvider = serviceProvider;

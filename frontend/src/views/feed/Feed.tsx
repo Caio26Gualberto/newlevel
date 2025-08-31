@@ -10,54 +10,22 @@ import {
 import { useInView } from 'react-intersection-observer';
 import PostCreation from '../../components/feed/PostCreation';
 import PostCard from '../../components/feed/PostCard';
-
-interface Post {
-  id: string;
-  userId: string;
-  userName: string;
-  userAvatar?: string;
-  content: string;
-  photos: string[];
-  videos: string[];
-  createdAt: string;
-  likesCount: number;
-  commentsCount: number;
-  isLiked: boolean;
-}
+import { PostApi, PostDto } from '../../gen/api/src';
+import ApiConfiguration from '../../config/apiConfig';
 
 const Feed = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<PostDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const [error, setError] = useState<string | null>(null);
+  const postService = new PostApi(ApiConfiguration);
 
   const { ref, inView } = useInView({
     threshold: 0,
     triggerOnce: false,
   });
 
-  // Mock data for demonstration
-  const generateMockPosts = (pageNum: number): Post[] => {
-    const mockPosts: Post[] = [];
-    for (let i = 0; i < 5; i++) {
-      const postId = `${pageNum}-${i}`;
-      mockPosts.push({
-        id: postId,
-        userId: `user-${i}`,
-        userName: `Usuário ${i + 1}`,
-        userAvatar: `https://i.pravatar.cc/150?u=${i}`,
-        content: `Este é um post de exemplo ${postId}. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`,
-        photos: i % 3 === 0 ? [`https://picsum.photos/600/400?random=${postId}-1`, `https://picsum.photos/600/400?random=${postId}-2`] : [],
-        videos: i % 4 === 0 ? [`https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4`] : [],
-        createdAt: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
-        likesCount: Math.floor(Math.random() * 100),
-        commentsCount: Math.floor(Math.random() * 50),
-        isLiked: Math.random() > 0.5,
-      });
-    }
-    return mockPosts;
-  };
 
   const loadPosts = useCallback(async (pageNum: number) => {
     if (loading) return;
@@ -66,58 +34,56 @@ const Feed = () => {
     setError(null);
 
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const newPosts = generateMockPosts(pageNum);
-      
-      if (pageNum === 1) {
-        setPosts(newPosts);
-      } else {
-        setPosts(prev => [...prev, ...newPosts]);
-      }
+      const response = await postService.apiPostGetAllGet({
+        page: pageNum,
+        pageSize: 10
+      });
 
-      // Simulate end of data after page 5
-      if (pageNum >= 5) {
-        setHasMore(false);
+      if (response.isSuccess && response.data?.items) {
+        const apiPosts = response.data.items;
+
+        if (pageNum === 1) {
+          setPosts(apiPosts);
+        } else {
+          setPosts(prev => [...prev, ...apiPosts]);
+        }
+
+        // Check if there are more posts
+        const totalPages = Math.ceil((response.data.totalCount || 0) / 10);
+        setHasMore(pageNum < totalPages);
+      } else {
+        setError(response.message || 'Erro ao carregar posts');
       }
-    } catch (err) {
+    } catch (err: any) {
+      console.error('Error loading posts:', err);
       setError('Erro ao carregar posts');
     } finally {
       setLoading(false);
     }
-  }, [loading]);
+  }, [loading, postService]);
 
   useEffect(() => {
     loadPosts(1);
   }, []);
 
-  useEffect(() => {
-    if (inView && hasMore && !loading) {
-      setPage(prev => prev + 1);
-      loadPosts(page + 1);
-    }
-  }, [inView, hasMore, loading, page, loadPosts]);
+  // useEffect(() => {
+  //   if (inView && hasMore && !loading) {
+  //     const nextPage = page + 1;
+  //     setPage(nextPage);
+  //     loadPosts(nextPage);
+  //   }
+  // }, [inView, hasMore, loading, page]);
 
-  const handleNewPost = (newPost: Omit<Post, 'id' | 'createdAt' | 'likesCount' | 'commentsCount' | 'isLiked'>) => {
-    const post: Post = {
-      ...newPost,
-      id: `new-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      likesCount: 0,
-      commentsCount: 0,
-      isLiked: false,
-    };
-    setPosts(prev => [post, ...prev]);
+  const handleNewPost = (newPost: PostDto) => {
+    setPosts(prev => [newPost, ...prev]);
   };
 
   const handleLikePost = (postId: string) => {
     setPosts(prev => prev.map(post => 
-      post.id === postId 
+      post.postId?.toString() === postId 
         ? { 
             ...post, 
-            isLiked: !post.isLiked,
-            likesCount: post.isLiked ? post.likesCount - 1 : post.likesCount + 1
+            likesCount: (post.likesCount || 0) + 1
           }
         : post
     ));
@@ -148,7 +114,7 @@ const Feed = () => {
           <Stack spacing={2}>
             {posts.map((post) => (
               <PostCard
-                key={post.id}
+                key={post.postId?.toString() || Math.random()}
                 post={post}
                 onLike={handleLikePost}
               />

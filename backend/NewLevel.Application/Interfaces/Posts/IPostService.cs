@@ -7,5 +7,6 @@ namespace NewLevel.Application.Interfaces.Posts
     {
         public Task<bool> CreatePostAsync(CreatePostInput input);
         public Task<GenericList<PostDto>> GetAll(Pagination input);
+        public Task<PostDto> GetPost(int id);
     }
 }

@@ -7,5 +7,6 @@
         Banner = 2,
         EventBanner = 3,
         PostPhoto = 4,
+        PostMedia = 5
     }
 }

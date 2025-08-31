@@ -18,8 +18,8 @@ namespace NewLevel.Application.Services.Events
     {
         private readonly IRepository<Event> _repository;
         private readonly IServiceProvider _serviceProvider;
-        private readonly AmazonS3Service _s3Service;
-        public EventService(IRepository<Event> repository, IServiceProvider serviceProvider, AmazonS3Service amazonService)
+        private readonly StorageService _s3Service;
+        public EventService(IRepository<Event> repository, IServiceProvider serviceProvider, StorageService amazonService)
         {
             _repository = repository;
             _serviceProvider = serviceProvider;

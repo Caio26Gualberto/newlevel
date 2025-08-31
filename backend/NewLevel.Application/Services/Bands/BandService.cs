@@ -15,9 +15,9 @@ namespace NewLevel.Application.Services.Bands
         private readonly IServiceProvider _serviceProvider;
         private readonly IRepository<Band> _repository;
         private readonly IRepository<BandsUsers> _bandsUsers;
-        private readonly AmazonS3Service _s3Service;
+        private readonly StorageService _s3Service;
         private readonly IConfiguration _configuration;
-        public BandService(IServiceProvider serviceProvider, IRepository<Band> repository, IRepository<BandsUsers> bandsRepository, AmazonS3Service s3Service,
+        public BandService(IServiceProvider serviceProvider, IRepository<Band> repository, IRepository<BandsUsers> bandsRepository, StorageService s3Service,
             IConfiguration configuration)
         {
             _serviceProvider = serviceProvider;

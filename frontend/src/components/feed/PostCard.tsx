@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Paper,
-  Avatar,
   Typography,
+  Avatar,
+  Stack,
   IconButton,
   Button,
-  Stack,
   Grid,
-  Collapse,
   TextField,
+  Collapse,
   Divider,
-  Chip,
+  Dialog,
 } from '@mui/material';
 import {
   Favorite,
@@ -22,27 +22,19 @@ import {
   Send,
   ExpandMore,
   ExpandLess,
-  PlayArrow,
+  Close,
+  ChevronLeft,
+  ChevronRight,
 } from '@mui/icons-material';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-
-interface Post {
-  id: string;
-  userId: string;
-  userName: string;
-  userAvatar?: string;
-  content: string;
-  photos: string[];
-  videos: string[];
-  createdAt: string;
-  likesCount: number;
-  commentsCount: number;
-  isLiked: boolean;
-}
+import { CommentApi, CommentsListDto , PostApi, PostDto } from '../../gen/api/src';
+import ApiConfiguration from '../../config/apiConfig';
+import { useAuth } from '../../contexts/AuthContext';
+import toastr from 'toastr';
 
 interface PostCardProps {
-  post: Post;
+  post: PostDto;
   onLike: (postId: string) => void;
 }
 
@@ -50,31 +42,47 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike }) => {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [showAllPhotos, setShowAllPhotos] = useState(false);
+  const [comments, setComments] = useState<CommentsListDto[] | undefined | null>(null);
+  const [photoModalOpen, setPhotoModalOpen] = useState(false);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const commentService = new CommentApi(ApiConfiguration);
+  const {currentUser} = useAuth();
 
   const handleLike = () => {
-    onLike(post.id);
+    onLike(post.postId?.toString() || '');
   };
 
-  const handleComment = () => {
+  const handleComment = async () => {
+    const comments = await commentService.apiCommentGetCommentsByPostIdGet({postId: post.postId || 0})
+    setComments(comments.data?.comments)
     setShowComments(!showComments);
   };
 
   const handleShare = () => {
-    // Implement share functionality
-    console.log('Share post:', post.id);
+    const postUrl = `${window.location.origin}/feed/${post.postId}`;
+    navigator.clipboard.writeText(postUrl);
+    toastr.success('Link do post copiado para a área de transferência', '', {
+      timeOut: 3000,
+      progressBar: true,
+      positionClass: "toast-bottom-right"
+    });
   };
 
-  const handleSendComment = () => {
+  const handleSendComment = async () => {
     if (newComment.trim()) {
-      // Implement comment submission
-      console.log('New comment:', newComment);
+      const comment = await commentService.apiCommentSaveCommentPost({
+        receiveCommentDto: {
+          postId: post.postId || 0,  
+          text: newComment        
+        }
+      })
       setNewComment('');
     }
   };
 
-  const formatTimeAgo = (dateString: string) => {
+  const formatTimeAgo = (dateString: Date) => {
     try {
-      return formatDistanceToNow(new Date(dateString), {
+      return formatDistanceToNow(dateString, {
         addSuffix: true,
         locale: ptBR
       });
@@ -83,101 +91,100 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike }) => {
     }
   };
 
-  const renderMediaGrid = () => {
-    const totalMedia = post.photos.length + post.videos.length;
-    if (totalMedia === 0) return null;
+  const openPhotoModal = (index: number) => {
+    setCurrentPhotoIndex(index);
+    setPhotoModalOpen(true);
+  };
 
-    const displayPhotos = showAllPhotos ? post.photos : post.photos.slice(0, 4);
-    const remainingCount = post.photos.length - 4;
+  const closePhotoModal = () => {
+    setPhotoModalOpen(false);
+  };
+
+  const nextPhoto = () => {
+    setCurrentPhotoIndex((prev) => 
+      prev === (post.photos?.length || 0) - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevPhoto = () => {
+    setCurrentPhotoIndex((prev) => 
+      prev === 0 ? (post.photos?.length || 0) - 1 : prev - 1
+    );
+  };
+
+  const renderMediaGrid = () => {
+    const totalPhotos = post.photos?.length || 0;
+    if (totalPhotos === 0) return null;
+
+    const displayPhotos = post.photos!.slice(0, 3);
+    const remainingCount = totalPhotos - 3;
 
     return (
       <Box sx={{ mt: 2 }}>
         {/* Photos Grid */}
-        {post.photos.length > 0 && (
-          <Grid container spacing={1} sx={{ mb: post.videos.length > 0 ? 2 : 0 }}>
-            {displayPhotos.map((photo, index) => (
-              <Grid 
-                item 
-                xs={post.photos.length === 1 ? 12 : 6} 
-                sm={post.photos.length === 1 ? 12 : post.photos.length === 2 ? 6 : 4}
-                key={index}
+        <Grid container spacing={1} sx={{ mb: post.medias!.length > 0 ? 2 : 0 }}>
+          {displayPhotos.map((photo, index) => (
+            <Grid 
+              item 
+              xs={totalPhotos === 1 ? 12 : 6} 
+              sm={totalPhotos === 1 ? 12 : totalPhotos === 2 ? 6 : 4}
+              key={index}
+            >
+              <Box
+                onClick={() => openPhotoModal(index)}
+                sx={{
+                  position: 'relative',
+                  borderRadius: 1,
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    transform: 'scale(1.02)',
+                    transition: 'transform 0.2s'
+                  }
+                }}
               >
-                <Box
-                  sx={{
-                    position: 'relative',
-                    borderRadius: 1,
-                    overflow: 'hidden',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      transform: 'scale(1.02)',
-                      transition: 'transform 0.2s'
-                    }
+                <img
+                  src={photo!.src!}
+                  alt={`Post image ${index + 1}`}
+                  style={{
+                    width: '100%',
+                    height: totalPhotos === 1 ? 400 : 200,
+                    objectFit: 'cover'
                   }}
-                >
-                  <img
-                    src={photo}
-                    alt={`Post image ${index + 1}`}
-                    style={{
-                      width: '100%',
-                      height: post.photos.length === 1 ? 400 : 200,
-                      objectFit: 'cover'
+                />
+                
+                {/* Show remaining count overlay on third photo if more exist */}
+                {index === 2 && remainingCount > 0 && (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 7,
+                      bgcolor: 'rgba(0,0,0,0.7)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white'
                     }}
-                  />
-                  
-                  {/* Show remaining count overlay on last visible photo */}
-                  {!showAllPhotos && index === 3 && remainingCount > 0 && (
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        bgcolor: 'rgba(0,0,0,0.6)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'white'
-                      }}
-                      onClick={() => setShowAllPhotos(true)}
-                    >
-                      <Typography variant="h4" fontWeight="bold">
-                        +{remainingCount}
-                      </Typography>
-                    </Box>
-                  )}
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
-        )}
+                  >
+                    <Typography variant="h3" fontWeight="bold">
+                      +{remainingCount}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
 
-        {/* Show More/Less Photos Button */}
-        {post.photos.length > 4 && (
-          <Button
-            size="small"
-            onClick={() => setShowAllPhotos(!showAllPhotos)}
-            sx={{ mb: 2, color: '#d32f2f' }}
-          >
-            {showAllPhotos ? (
-              <>
-                <ExpandLess sx={{ mr: 1 }} />
-                Mostrar menos
-              </>
-            ) : (
-              <>
-                <ExpandMore sx={{ mr: 1 }} />
-                Ver todas as {post.photos.length} fotos
-              </>
-            )}
-          </Button>
-        )}
 
         {/* Videos */}
-        {post.videos.length > 0 && (
+        {post.medias!.length > 0 && (
           <Grid container spacing={1}>
-            {post.videos.map((video, index) => (
-              <Grid item xs={12} sm={post.videos.length === 1 ? 12 : 6} key={index}>
+            {post.medias!.map((video, index) => (
+              <Grid item xs={12} sm={post.medias!.length === 1 ? 12 : 6} key={index}>
                 <Box
                   sx={{
                     position: 'relative',
@@ -187,8 +194,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike }) => {
                   }}
                 >
                   <video
-                    src={video}
-                    controls
+                    src={video!.src!}
+                    controls  
                     style={{
                       width: '100%',
                       height: 300,
@@ -217,10 +224,10 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike }) => {
       <Box sx={{ p: 2, pb: 1 }}>
         <Stack direction="row" spacing={2} alignItems="center">
           <Avatar
-            src={post.userAvatar}
+            src={post.userAvatar!}
             sx={{ width: 48, height: 48 }}
           >
-            {post.userName.charAt(0).toUpperCase()}
+            {post.userName!.charAt(0).toUpperCase()}
           </Avatar>
           
           <Box flex={1}>
@@ -228,7 +235,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike }) => {
               {post.userName}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {formatTimeAgo(post.createdAt)}
+              {formatTimeAgo(post.createdAt!)}
             </Typography>
           </Box>
 
@@ -253,11 +260,11 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike }) => {
       </Box>
 
       {/* Engagement Stats */}
-      {(post.likesCount > 0 || post.commentsCount > 0) && (
+      {(post.likesCount! > 0 || post.commentsCount! > 0) && (
         <Box sx={{ px: 2, py: 1 }}>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Stack direction="row" spacing={2}>
-              {post.likesCount > 0 && (
+              {post.likesCount! > 0 && (
                 <Stack direction="row" alignItems="center" spacing={0.5}>
                   <Favorite sx={{ fontSize: 16, color: '#d32f2f' }} />
                   <Typography variant="body2" color="text.secondary">
@@ -267,7 +274,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike }) => {
               )}
             </Stack>
             
-            {post.commentsCount > 0 && (
+            {post.commentsCount! > 0 && (
               <Typography variant="body2" color="text.secondary">
                 {post.commentsCount} comentário{post.commentsCount !== 1 ? 's' : ''}
               </Typography>
@@ -332,9 +339,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike }) => {
         <Box sx={{ p: 2 }}>
           {/* Comment Input */}
           <Stack direction="row" spacing={2} alignItems="flex-end" sx={{ mb: 2 }}>
-            <Avatar sx={{ width: 32, height: 32 }}>
-              U
-            </Avatar>
+            <Avatar src={currentUser?.avatarUrl} sx={{ width: 32, height: 32 }}></Avatar>
             <TextField
               fullWidth
               multiline
@@ -370,11 +375,9 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike }) => {
 
           {/* Sample Comments */}
           <Stack spacing={2}>
-            {[1, 2].map((commentId) => (
-              <Stack key={commentId} direction="row" spacing={2}>
-                <Avatar sx={{ width: 32, height: 32 }}>
-                  {commentId}
-                </Avatar>
+            { comments && comments?.map((comment, index) => (
+              <Stack key={index} direction="row" spacing={2}>
+                <Avatar src={comment.userAvatarSrc!} sx={{ width: 32, height: 32 }}></Avatar>
                 <Box
                   sx={{
                     bgcolor: '#f5f5f5',
@@ -384,13 +387,13 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike }) => {
                   }}
                 >
                   <Typography variant="subtitle2" fontWeight="bold">
-                    Usuário {commentId}
+                    {comment.userName}
                   </Typography>
                   <Typography variant="body2">
-                    Este é um comentário de exemplo para demonstrar a funcionalidade.
+                    {comment.comment}
                   </Typography>
                   <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    há 2 horas
+                    {formatTimeAgo(comment.dateOfComment!)}
                   </Typography>
                 </Box>
               </Stack>
@@ -398,6 +401,154 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike }) => {
           </Stack>
         </Box>
       </Collapse>
+
+      {/* Photo Modal - Facebook Style */}
+      <Dialog
+        open={photoModalOpen}
+        onClose={closePhotoModal}
+        maxWidth={false}
+        fullWidth
+        sx={{
+          '& .MuiDialog-paper': {
+            bgcolor: 'rgba(0,0,0,0.9)',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            m: 2
+          }
+        }}
+      >
+        <Box
+          sx={{
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '70vh',
+            bgcolor: 'black'
+          }}
+        >
+          {/* Close Button */}
+          <IconButton
+            onClick={closePhotoModal}
+            sx={{
+              position: 'absolute',
+              top: 16,
+              right: 16,
+              color: 'white',
+              bgcolor: 'rgba(255,255,255,0.1)',
+              '&:hover': {
+                bgcolor: 'rgba(255,255,255,0.2)'
+              },
+              zIndex: 1
+            }}
+          >
+            <Close />
+          </IconButton>
+
+          {/* Previous Button */}
+          {(post.photos?.length || 0) > 1 && (
+            <IconButton
+              onClick={prevPhoto}
+              sx={{
+                position: 'absolute',
+                left: 16,
+                color: 'white',
+                bgcolor: 'rgba(255,255,255,0.1)',
+                '&:hover': {
+                  bgcolor: 'rgba(255,255,255,0.2)'
+                },
+                zIndex: 1
+              }}
+            >
+              <ChevronLeft />
+            </IconButton>
+          )}
+
+          {/* Next Button */}
+          {(post.photos?.length || 0) > 1 && (
+            <IconButton
+              onClick={nextPhoto}
+              sx={{
+                position: 'absolute',
+                right: 16,
+                color: 'white',
+                bgcolor: 'rgba(255,255,255,0.1)',
+                '&:hover': {
+                  bgcolor: 'rgba(255,255,255,0.2)'
+                },
+                zIndex: 1
+              }}
+            >
+              <ChevronRight />
+            </IconButton>
+          )}
+
+          {/* Current Photo */}
+          {post.photos && post.photos[currentPhotoIndex] && (
+            <img
+              src={post.photos[currentPhotoIndex].src!}
+              alt={`Foto ${currentPhotoIndex + 1}`}
+              style={{
+                maxWidth: '100%',
+                maxHeight: '70vh',
+                objectFit: 'contain'
+              }}
+            />
+          )}
+
+          {/* Photo Counter */}
+          {(post.photos?.length || 0) > 1 && (
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: 16,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                bgcolor: 'rgba(0,0,0,0.7)',
+                color: 'white',
+                px: 2,
+                py: 1,
+                borderRadius: 2
+              }}
+            >
+              <Typography variant="body2">
+                {currentPhotoIndex + 1} de {post.photos?.length}
+              </Typography>
+            </Box>
+          )}
+
+          {/* Photo Info */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 16,
+              left: 16,
+              bgcolor: 'rgba(0,0,0,0.7)',
+              color: 'white',
+              p: 2,
+              borderRadius: 2,
+              maxWidth: '300px'
+            }}
+          >
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Avatar
+                src={post.userAvatar!}
+                sx={{ width: 32, height: 32 }}
+              >
+                {post.userName!.charAt(0).toUpperCase()}
+              </Avatar>
+              <Box>
+                <Typography variant="subtitle2" fontWeight="bold">
+                  {post.userName}
+                </Typography>
+                <Typography variant="caption" color="rgba(255,255,255,0.7)">
+                  {formatTimeAgo(post.createdAt!)}
+                </Typography>
+              </Box>
+            </Stack>
+          </Box>
+        </Box>
+      </Dialog>
     </Paper>
   );
 };
