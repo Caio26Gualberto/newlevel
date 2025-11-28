@@ -7,7 +7,7 @@ using NewLevel.Infra.IoC;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-//Testando Pipe
+//Testando Pipeeline CI/CD
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddInfraIoC(builder.Configuration);
