@@ -1,0 +1,30 @@
+name: Mirror to Azure DevOps
+
+on:
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Push to Azure DevOps
+      run: |
+        git config user.name "GitHub Mirror Bot"
+        git config user.email "mirror@github.com"
+
+        # Adiciona o remote do Azure DevOps com autenticação via PAT
+        git remote add azure "https://$(printf "%s" "$AZURE_DEVOPS_PAT")@dev.azure.com/test-app-caio/_git/app-test"
+
+        # Envia o commit atual para a branch master do Azure DevOps
+        git push azure HEAD:master --force
+      env:
+        AZURE_DEVOPS_PAT: ${{ secrets.AZURE_DEVOPS_PAT }}
