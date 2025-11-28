@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-      - main
+      - master
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -9,7 +9,7 @@ pool:
 variables:
   buildConfiguration: 'Release'
   # Nome do App Service criado no Azure
-  appServiceName: 'NOME_DO_SEU_APP_SERVICE'
+  appServiceName: 'testappcaio'
 
 stages:
 # ================================
